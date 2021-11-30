@@ -1,0 +1,13 @@
+*/.DS_Store
+sqls/**/*.sql*
+!sqls/postgresql/db/OpenELIS_base.sql
+.DS_Store
+senaite/senaite-data/*
+!senaite/senaite-data/importdata/
+!senaite/senaite-data/oidc/
+__pycache__
+# Ignore the docker-compose.override.yml file
+docker-compose.override.*
+*.env
+!.env
+*.jar

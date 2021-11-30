@@ -1,0 +1,30 @@
+  ProxyPreserveHost On
+  # Conveniently redirect / to /openmrs/spa/
+  RewriteEngine on
+  RewriteCond %{REQUEST_URI} ^/$
+  RewriteRule (.*) /openmrs/spa/ [R=303,L]
+
+  RewriteCond %{REQUEST_URI} ^/openmrs/spa$
+  RewriteRule (.*) /openmrs/spa/ [R=303,L]
+
+  # Frontend
+  ProxyPass /openmrs/spa http://frontend
+  ProxyPassReverse /openmrs/spa http://frontend
+  
+# OpenMRS
+ProxyPass /openmrs http://openmrs:8080/openmrs
+ProxyPassReverse /openmrs http://openmrs:8080/openmrs
+
+ProxyPass        /auth      http://keycloak:8080/auth
+ProxyPassReverse /auth      http://keycloak:8080/auth
+
+ProxyPass        /odoo      http://keycloak:8080
+ProxyPassReverse /odoo      http://keycloak:8080
+
+
+# Appointments
+ProxyPass /appointments http://appointments:8903/appointments
+ProxyPassReverse /appointments http://appointments:8903/appointments
+
+
+
