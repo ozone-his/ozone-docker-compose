@@ -69,3 +69,6 @@ If Docker is run as `sudo` the variables will not be defined. Make sure to eithe
 | SENAITE           | http://172.17.0.1:8081/senaite | admin    | admin    |
 | Odoo              | http://172.17.0.1:8069         | admin    | admin    |
 | Superset          | http://172.17.0.1:8088         | admin    | admin    |
+
+## Find Us
+[Website](http://ozone-his.com) - [Forum](https://talk.openmrs.org/c/software/ozone-his) - [Slack](https://openmrs.slack.com/archives/C02PYQD5D0A)
