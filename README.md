@@ -3,40 +3,47 @@
 This is the official Docker Compose project to start and run an Ozone HIS server.
 
 ## Quick Start
-### Gathering the distro artifacts:
-First, you need to gather all required artifacts out of [ozone-distro](https://github.com/ozone-his/ozone-distro):
-```
-$ git clone  https://github.com/ozone-his/ozone-distro
-$ cd ozone-distro
-$ mvn clean package
-```
-Let us name your sample demo Ozone instance "demo" by exporting the envvar `DISTRO_GROUP`:
-```
-export DISTRO_GROUP="demo"
-```
-Then unzip the demo distro .zip artifact in a temp folder:
-```
-$ unzip target/ozone-distro-1.0.0-SNAPSHOT.zip -d /tmp/ozone-distro-$DISTRO_GROUP/
-```  
 
 ### Clone the project:
-Switch to another terminal window then:
 ```
-git clone https://github.com/ozone-his/ozone-docker
-cd ozone-docker
+$ git clone https://github.com/ozone-his/ozone-docker
+
+$ cd ozone-docker
 ```
 
-Export your sample distro name as envvar here as well:
 ```
-export DISTRO_GROUP="demo"
+$ ./start-demo.sh
+```
+It may take some time to download and setup Ozone so hang tight
+
+## Manual Setup
+
+### Create your working directory:
+
+Move to the location of your choice, eg, your home folder:
+```
+cd ~/
+```
+Then create the working directory and save the path:
+```
+export OZONE_DIR=$PWD/ozone && \
+mkdir -p $OZONE_DIR
+
+```
+### Download and extract the project
+
+```
+export VERSION=1.0.0-SNAPSHOT && \
+./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=net.mekomsolutions:ozone-distro:$VERSION:zip -Dtransitive=false --legacy-local-repository && \
+./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=net.mekomsolutions:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
 ```
 
-### Export all needed envvars:
+### Export all needed env vars:
 
 The Ozone Docker project relies on a number of environment variables to document where the distro sources assets are to be found.
 For the sample demo you can export the following variables:
 ```
-export DISTRO_PATH=/tmp/ozone-distro-$DISTRO_GROUP;  \
+export DISTRO_PATH=$DISTRO_DIR/ozone-distro-$DISTRO_GROUP;  \
 export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config;  \
 export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config;  \
 export OPENMRS_CORE_PATH=$DISTRO_PATH/openmrs_core;  \
@@ -68,7 +75,6 @@ If Docker is run as `sudo` the variables will not be defined. Make sure to eithe
 | OpenMRS Legacy UI | http://172.17.0.1/openmrs      | admin    | Admin123 |
 | SENAITE           | http://172.17.0.1:8081/senaite | admin    | admin    |
 | Odoo              | http://172.17.0.1:8069         | admin    | admin    |
-| Superset          | http://172.17.0.1:8088         | admin    | admin    |
 
 ## Find Us
 [Website](http://ozone-his.com) - [Forum](https://talk.openmrs.org/c/software/ozone-his) - [Slack](https://openmrs.slack.com/archives/C02PYQD5D0A)
