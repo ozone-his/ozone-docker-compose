@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR
 # Download the project
