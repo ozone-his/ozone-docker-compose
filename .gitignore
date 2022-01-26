@@ -1,6 +1,6 @@
 */.DS_Store
 sqls/**/*.sql*
-ozone
+ozone/
 .DS_Store
 senaite/senaite-data/*
 !senaite/senaite-data/importdata/
