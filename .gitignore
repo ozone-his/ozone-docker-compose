@@ -1,6 +1,6 @@
 */.DS_Store
 sqls/**/*.sql*
-!sqls/postgresql/db/OpenELIS_base.sql
+ozone/
 .DS_Store
 senaite/senaite-data/*
 !senaite/senaite-data/importdata/
@@ -10,4 +10,7 @@ __pycache__
 docker-compose.override.*
 *.env
 !.env
-*.jar
+ozone-distro-demo
+*.ozone-distro-demo.zip
+*.zip
+

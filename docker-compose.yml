@@ -218,13 +218,11 @@ services:
         aliases:
           - frontend
   senaite:
-    build:
-      context: senaite/
     environment: 
       - SITE=${SITE}
       - ADMIN_USER=${ADMIN_USER}
       - ADMIN_PASSWORD=${ADMIN_USER}
-    image: senaite
+    image: mekomsolutions/senaite:latest
     volumes:
     - ${SENAITE_CONFIG_PATH}/data:/data/importdata/senaite
     - senaite-filestorage:/data/filestorage
