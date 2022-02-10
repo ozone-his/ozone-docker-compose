@@ -3,8 +3,6 @@
 This is the official Docker Compose project to start and run an Ozone HIS server.
 
 ## Quick Start
-
-### Clone the project:
 ```
 $ git clone https://github.com/ozone-his/ozone-docker
 $ cd ozone-docker
