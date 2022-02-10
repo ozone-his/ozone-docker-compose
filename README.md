@@ -7,14 +7,12 @@ This is the official Docker Compose project to start and run an Ozone HIS server
 ### Clone the project:
 ```
 $ git clone https://github.com/ozone-his/ozone-docker
-
 $ cd ozone-docker
-```
-
-```
 $ ./start-demo.sh
 ```
-It may take some time to download and setup Ozone so hang tight
+It may take some time to download and setup Ozone, so hang tight :-)
+
+Then [start browsing](#start-browsing-ozone-his) Ozone FOSS.
 
 ## Manual Setup
 
