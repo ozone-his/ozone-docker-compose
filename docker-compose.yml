@@ -70,6 +70,9 @@ services:
       - CLIENTS=ozone,eip,senaite,superset,openmrs,odoo
       - MYSQL_ADMIN_USER=root
       - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - EIP_DB_NAME=${EIP_DB_NAME}
+      - EIP_DB_USER=${EIP_DB_USER}
+      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD
     volumes:
        - "${DISTRO_PATH}:/opt/env-substitution/files"
     networks:
@@ -126,6 +129,9 @@ services:
       MYSQL_USER: ${OPENMRS_DB_USER}
       MYSQL_PASSWORD: ${OPENMRS_DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      EIP_DB_NAME: ${EIP_DB_NAME}
+      EIP_DB_USER: ${EIP_DB_USER}
+      EIP_DB_PASSWORD: ${EIP_DB_PASSWORD}
     healthcheck:
       test: "exit 0"
     image: mariadb:10.2
