@@ -21,6 +21,7 @@ services:
     ports:
       - "${PROXY_PUBLIC_PORT}:80"
       - "${PROXY_PUBLIC_PORT_TLS}:443"
+      - "8069:8069"
     volumes:
       - "./proxy/confs:/usr/local/apache2/conf/extra"
       - "${PROXY_TLS_CERTS_PATH:-proxy-tls-certs}:/etc/tls"
@@ -197,13 +198,9 @@ services:
       - "${ODOO_CONFIG_PATH:-odoo-config}:/mnt/odoo_csv"
       - "${ODOO_CONFIG_FILE_PATH:-odoo-config}:/mnt/initializer_config/initializer_config.json"
       - odoo-checksums:/mnt/odoo_csv_checksum
-    ports:
-      - "${ODOO_PUBLIC_PORT:-8069}:8069"
 
   # Microfrontends
   frontend:
-    # ports:
-    #   - 8081:8080
     build: ./ui
     environment:
       SPA_PATH: /openmrs/spa
