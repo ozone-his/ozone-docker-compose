@@ -26,7 +26,13 @@ export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR
 
 ```
-### Download and extract the project
+### Get the docker-compose project
+
+```
+$ git clone https://github.com/ozone-his/ozone-docker
+```
+
+### Download and extract the distro
 
 ```
 export VERSION=1.0.0-SNAPSHOT && \
@@ -39,7 +45,7 @@ export VERSION=1.0.0-SNAPSHOT && \
 The Ozone Docker project relies on a number of environment variables to document where the distro sources assets are to be found.
 For the sample demo you can export the following variables:
 ```
-export DISTRO_PATH=$DISTRO_DIR/ozone-distro-$DISTRO_GROUP;  \
+export DISTRO_PATH=$OZONE_DIR/ozone-distro-$VERSION;  \
 export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config;  \
 export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config;  \
 export OPENMRS_CORE_PATH=$DISTRO_PATH/openmrs_core;  \
@@ -51,13 +57,17 @@ export SUPERSET_CONFIG_PATH=$DISTRO_PATH/superset_config;\
 
 export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons;\
 export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv;\
-export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json;\
+export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json
 ```
 
 ### Start Ozone HIS:
 
 ```
-docker-compose -p $DISTRO_GROUP up
+$ cd ozone-docker
+```
+
+```
+$ docker-compose -p $DISTRO_GROUP up
 ```
 
 **Important:** This assumes that you run the `docker` command as the same user and in the same window in which you exported your variables.

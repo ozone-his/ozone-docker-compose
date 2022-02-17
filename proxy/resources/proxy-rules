@@ -15,11 +15,6 @@
 ProxyPass /openmrs http://openmrs:8080/openmrs
 ProxyPassReverse /openmrs http://openmrs:8080/openmrs
 
-ProxyPass        /auth      http://keycloak:8080/auth
-ProxyPassReverse /auth      http://keycloak:8080/auth
-
-ProxyPass        /odoo      http://keycloak:8080
-ProxyPassReverse /odoo      http://keycloak:8080
 
 
 # Appointments
