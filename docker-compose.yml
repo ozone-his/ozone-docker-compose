@@ -72,7 +72,7 @@ services:
       - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - EIP_DB_NAME=${EIP_DB_NAME}
       - EIP_DB_USER=${EIP_DB_USER}
-      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD
+      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD}
     volumes:
        - "${DISTRO_PATH}:/opt/env-substitution/files"
     networks:
