@@ -14,9 +14,9 @@ Then [start browsing](#start-browsing-ozone-his) Ozone FOSS.
 
 ## Manual Setup
 
-### Create your working directory:
+### Create your working directory
 
-Move to the location of your choice, eg, your home folder:
+Move to the location of your choice, e.g., your home folder:
 ```
 cd ~/
 ```
@@ -24,9 +24,8 @@ Then create the working directory and save the path:
 ```
 export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR
-
 ```
-### Get the docker-compose project
+### Clone the docker-compose project
 
 ```
 $ git clone https://github.com/ozone-his/ozone-docker
@@ -40,7 +39,7 @@ export VERSION=1.0.0-SNAPSHOT && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=net.mekomsolutions:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
 ```
 
-### Export all needed env vars:
+### Export all needed env vars
 
 The Ozone Docker project relies on a number of environment variables to document where the distro sources assets are to be found.
 For the sample demo you can export the following variables:
