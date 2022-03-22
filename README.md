@@ -1,5 +1,7 @@
 # Ozone HIS - The Docker Compose Project
 
+>_The entreprise-grade health information system that augments OpenMRS 3._
+
 This is the official Docker Compose project to start and run an Ozone HIS server.
 
 ## Quick Start
@@ -10,7 +12,7 @@ $ ./start-demo.sh
 ```
 It may take some time to download and setup Ozone, so hang tight :-)
 
-Then [start browsing](#start-browsing-ozone-his) Ozone FOSS.
+Then [start browsing](#browse-ozone-his) Ozone FOSS.
 
 ## Manual Setup
 
@@ -59,12 +61,10 @@ export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv;\
 export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json
 ```
 
-### Start Ozone HIS:
-
+### Start Ozone HIS
 ```
 $ cd ozone-docker
 ```
-
 ```
 $ docker-compose -p $DISTRO_GROUP up
 ```
@@ -72,7 +72,7 @@ $ docker-compose -p $DISTRO_GROUP up
 **Important:** This assumes that you run the `docker` command as the same user and in the same window in which you exported your variables.
 If Docker is run as `sudo` the variables will not be defined. Make sure to either export them as `root`, or run `docker` with `sudo -E` option to preserve the user environment. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/).
 
-### Start Browsing Ozone HIS:
+### Browse Ozone HIS
 
 | HIS Component     | URL                            | Username | Password |
 |-------------------|--------------------------------|----------|----------|
