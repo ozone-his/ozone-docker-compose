@@ -20,12 +20,12 @@ Then [start browsing](#browse-ozone-his) Ozone FOSS.
 
 Move to the location of your choice, e.g., your home folder:
 ```
-cd ~/
+$ cd ~/
 ```
 Then create the working directory and save the path:
 ```
-export OZONE_DIR=$PWD/ozone && \
-mkdir -p $OZONE_DIR
+$ export OZONE_DIR=$PWD/ozone && \
+mkdir -p $OZONE_DIR && cd $OZONE_DIR
 ```
 ### Clone the docker-compose project
 
@@ -33,10 +33,14 @@ mkdir -p $OZONE_DIR
 $ git clone https://github.com/ozone-his/ozone-docker
 ```
 
+```
+$ cd ozone-docker
+```
+
 ### Download and extract the distro
 
 ```
-export VERSION=1.0.0-SNAPSHOT && \
+$ export VERSION=1.0.0-SNAPSHOT && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=net.mekomsolutions:ozone-distro:$VERSION:zip -Dtransitive=false --legacy-local-repository && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=net.mekomsolutions:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
 ```
@@ -46,6 +50,7 @@ export VERSION=1.0.0-SNAPSHOT && \
 The Ozone Docker project relies on a number of environment variables to document where the distro sources assets are to be found.
 For the sample demo you can export the following variables:
 ```
+DISTRO_GROUP=ozone-demo; \
 export DISTRO_PATH=$OZONE_DIR/ozone-distro-$VERSION;  \
 export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config;  \
 export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config;  \
@@ -62,9 +67,7 @@ export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.
 ```
 
 ### Start Ozone HIS
-```
-$ cd ozone-docker
-```
+
 ```
 $ docker-compose -p $DISTRO_GROUP up
 ```
