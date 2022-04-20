@@ -1,6 +1,6 @@
 services:
 
-  # Apache HTTPD: Entry point for the application.
+  # Apache HTTPD - Entry point for the application.
   proxy:
     build:
       context: proxy/
@@ -30,7 +30,7 @@ services:
       - openmrs
 
 
-  # Appointments
+  # Bahmni Appointments
   appointments:
     image: mekomsolutions/appointments:latest
     healthcheck:
@@ -44,7 +44,6 @@ services:
       ozone:
         aliases:
           - appointments-1
-    # Appointments
   env-substitution:
     image:  mekomsolutions/env-substitution
     environment:
@@ -81,7 +80,7 @@ services:
           - env-substitution
         
 
-  # OpenMRS:
+  # OpenMRS
   openmrs:
     image: mekomsolutions/openmrs:latest
     depends_on:
@@ -145,7 +144,7 @@ services:
     ports:
       - "3306:3306"
     
-  # Postgreql: Database shared by multiple services
+  # Postgreql - Database shared by multiple services.
   postgresql:
     image: postgres:13
     command: postgres -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10
@@ -181,7 +180,7 @@ services:
       - "5432:5432"
     
 
-  # Odoo: The ERP component of Ozone
+  # Odoo - The ERP component of Ozone.
   odoo:
     depends_on:
       postgresql:
@@ -205,7 +204,7 @@ services:
       - "${ODOO_CONFIG_FILE_PATH:-odoo-config}:/mnt/initializer_config/initializer_config.json"
       - odoo-checksums:/mnt/odoo_csv_checksum
 
-  # Microfrontends
+  # OpenMRS 3 Microfrontends
   frontend:
     build: ./ui
     environment:
