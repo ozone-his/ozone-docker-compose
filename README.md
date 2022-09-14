@@ -91,3 +91,8 @@ In its FOSS version Ozone requires you to log into each component separately:
 ## 5. Report an issue
 1. Either start a conversation on Slack about it,
 1. Or start a thread on our forum about it.
+
+
+### Infrastructure model
+
+![Infrastructure model](.infragenie/infrastructure_model.png)
