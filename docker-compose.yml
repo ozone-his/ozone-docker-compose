@@ -95,10 +95,10 @@ services:
       DB_AUTO_UPDATE: "true"
       DB_CREATE_TABLES: "true"
       DB_HOST: ${OPENMRS_DB_HOST}
-      OPENMRS_USER: ${OPENMRS_USER}
       DB_DATABASE: openmrs
       DB_USERNAME: ${OPENMRS_DB_USER}
       DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
+      KEYCLOAK_URL: ${HOST_URL}
     healthcheck:
       test:
         - CMD
@@ -206,15 +206,16 @@ services:
 
   # OpenMRS 3 Microfrontends
   frontend:
-    build: ./ui
+    image: openmrs/openmrs-reference-application-3-frontend:${TAG:-nightly}
     environment:
       SPA_PATH: /openmrs/spa
       API_URL: /openmrs
+      SPA_CONFIG_URLS:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
       timeout: 5s
-    volumes:
-      - "${SPA_PATH:-microfrontends}:/usr/share/nginx/html/"
+    # volumes:
+    #   - "${SPA_PATH:-microfrontends}:/usr/share/nginx/html/"
     networks:
       ozone:
         aliases:
