@@ -95,7 +95,6 @@ services:
       DB_AUTO_UPDATE: "true"
       DB_CREATE_TABLES: "true"
       DB_HOST: ${OPENMRS_DB_HOST}
-      OPENMRS_USER: ${OPENMRS_USER}
       DB_DATABASE: openmrs
       DB_USERNAME: ${OPENMRS_DB_USER}
       DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
@@ -190,7 +189,7 @@ services:
       - HOST=${POSTGRES_DB_HOST}
       - USER=${ODOO_DB_USER}
       - PASSWORD=${ODOO_DB_PASSWORD}
-      - ADDONS=sale_management,stock,account_account,odoo_initializer,ozone_settings
+      - ADDONS=sale_management,stock,account_account,purchase,mrp,odoo_initializer,ozone_settings
       - INITIALIZER_DATA_FILES_PATH=/mnt/odoo_csv
       - INITIALIZER_CONFIG_FILE_PATH=/mnt/initializer_config/initializer_config.json
     networks:
@@ -206,15 +205,16 @@ services:
 
   # OpenMRS 3 Microfrontends
   frontend:
-    build: ./ui
+    image: openmrs/openmrs-reference-application-3-frontend:${TAG:-nightly}
     environment:
       SPA_PATH: /openmrs/spa
       API_URL: /openmrs
+      SPA_CONFIG_URLS:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
       timeout: 5s
-    volumes:
-      - "${SPA_PATH:-microfrontends}:/usr/share/nginx/html/"
+    # volumes:
+    #   - "${SPA_PATH:-microfrontends}:/usr/share/nginx/html/"
     networks:
       ozone:
         aliases:
