@@ -8,14 +8,19 @@
   RewriteRule (.*) /openmrs/spa/ [R=303,L]
 
   # Frontend
-  ProxyPass /openmrs/spa http://frontend
-  ProxyPassReverse /openmrs/spa http://frontend
-  
+<Location  /openmrs/spa>
+  ProxyPass http://frontend
+  ProxyPassReverse /
+  ProxyPreserveHost Off
+</Location>  
 # OpenMRS
 ProxyPass /openmrs http://openmrs:8080/openmrs
 ProxyPassReverse /openmrs http://openmrs:8080/openmrs
 
+ProxyPass        /auth      http://keycloak:8080/auth
+ProxyPassReverse /auth      http://keycloak:8080/auth
 
+# Bahmni Apps
 
 # Appointments
 ProxyPass /appointments http://appointments:8903/appointments

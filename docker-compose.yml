@@ -47,31 +47,10 @@ services:
   env-substitution:
     image:  mekomsolutions/env-substitution
     environment:
-      - SENAITE_URL=http://senaite:8080
-      - OPENMRS_URL=http://openmrs:8080
-      - ODOO_URL=http://odoo:8069
-      - ODOO_DATABASE=${ODOO_DATABASE}
-      - ODOO_USER=${ODOO_USER}
-      - ODOO_PASSWORD=${ODOO_PASSWORD}
-      - OPENMRS_DB_HOST=${OPENMRS_DB_HOST}
-      - OPENMRS_DB_PORT=${OPENMRS_DB_PORT}
-      - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
-      - OPENMRS_DB_USER=${OPENMRS_DB_USER}
-      - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
-      - OPENMRS_USER=${OPENMRS_USER}
-      - SENAITE_USERNAME=admin
-      - SENAITE_PASSWORD=admin
-      - OPENMRS_PASSWORD=${OPENMRS_PASSWORD}
-      - ANALYTICS_DB_NAME=${ANALYTICS_DB_NAME}
-      - ANALYTICS_DB_USER=${ANALYTICS_DB_USER}
-      - ANALYTICS_DB_PASSWORD=${ANALYTICS_DB_PASSWORD}
-      - ANALYTICS_DB_HOST=${POSTGRES_DB_HOST}
-      - CLIENTS=ozone,eip,senaite,superset,openmrs,odoo
-      - MYSQL_ADMIN_USER=root
-      - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - EIP_DB_NAME=${EIP_DB_NAME}
-      - EIP_DB_USER=${EIP_DB_USER}
-      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD}
+      - ODOO_PUBLIC_URL=${HOST_URL}:8069
+      - SENAITE_PUBLIC_URL=${HOST_URL}:8081
+      - SUPERSET_PUBLIC_URL=${HOST_URL}:8088
+      - OPENMRS_PUBLIC_URL=${HOST_URL}
     volumes:
        - "${DISTRO_PATH}:/opt/env-substitution/files"
     networks:
@@ -191,7 +170,7 @@ services:
       - PASSWORD=${ODOO_DB_PASSWORD}
       - ADDONS=sale_management,stock,account_account,purchase,mrp,odoo_initializer,ozone_settings
       - INITIALIZER_DATA_FILES_PATH=/mnt/odoo_csv
-      - INITIALIZER_CONFIG_FILE_PATH=/mnt/initializer_config/initializer_config.json
+      - INITIALIZER_CONFIG_FILE_PATH=/mnt/odoo_config/initializer_config.json
     networks:
       ozone:
         aliases:
@@ -200,7 +179,8 @@ services:
       - "${ODOO_FILESTORE:-odoo-filestore}:/var/lib/odoo/filestore"
       - "${ODOO_EXTRA_ADDONS:-odoo-extra-addons}:/mnt/extra-addons"
       - "${ODOO_CONFIG_PATH:-odoo-config}:/mnt/odoo_csv"
-      - "${ODOO_CONFIG_FILE_PATH:-odoo-config}:/mnt/initializer_config/initializer_config.json"
+      - "${ODOO_INITIALIZER_CONFIG_FILE_PATH:-odoo-config}:/mnt/odoo_config/initializer_config.json"
+      - "${ODOO_CONFIG_FILE_PATH:-odoo-config}:/etc/properties/odoo.conf"
       - odoo-checksums:/mnt/odoo_csv_checksum
 
   # OpenMRS 3 Microfrontends
@@ -244,6 +224,36 @@ services:
       - "${EIP_PATH:-eipapp}/config:/config"
       - "${EIP_PATH:-eipapp}/routes:/routes"
       - eip-home:/eip-home
+    environment:
+      - OAUTH_ENABLED=${OAUTH_ENABLED}
+      - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+      - OAUTH_ACCESS_TOKEN_URI=${OAUTH_ACCESS_TOKEN_URI}
+      - OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
+      - EIP_DB_NAME=${EIP_DB_NAME}
+      - EIP_DB_USER=${EIP_DB_USER}
+      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD}
+      - OPENMRS_DB_HOST=${OPENMRS_DB_HOST}
+      - OPENMRS_DB_PORT=${OPENMRS_DB_PORT}
+      - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
+      - OPENMRS_DB_USER=${OPENMRS_DB_USER}
+      - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
+      - OPENMRS_USER=${OPENMRS_USER}
+      - SENAITE_USERNAME=admin
+      - SENAITE_PASSWORD=admin
+      - OPENMRS_PASSWORD=${OPENMRS_PASSWORD}
+      - MYSQL_ADMIN_USER=root
+      - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - ODOO_DATABASE=${ODOO_DATABASE}
+      - ODOO_USER=${ODOO_USER}
+      - ODOO_PASSWORD=${ODOO_PASSWORD}
+      - RESULTS_ENCOUNTER_TYPE_UUID=${RESULTS_ENCOUNTER_TYPE_UUID}
+      - CONCEPT_COMPLEX_UUID=${CONCEPT_COMPLEX_UUID}
+      - OPENMRS_IDENTIFIER_TYPE_UUD=${OPENMRS_IDENTIFIER_TYPE_UUD}
+      - DB_EVENT_DESTINATIONS=${DB_EVENT_DESTINATIONS}
+      - CREATE_CUSTOMER_IF_NOT_EXIST=${CREATE_CUSTOMER_IF_NOT_EXIST}
+      - SENAITE_URL=http://senaite:8080
+      - OPENMRS_URL=http://openmrs:8080
+      - ODOO_URL=http://odoo:8069
     networks:
       ozone:
         aliases:
