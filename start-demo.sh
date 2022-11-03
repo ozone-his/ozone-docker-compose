@@ -16,5 +16,6 @@ export SPA_PATH=$DISTRO_PATH/spa
 export SENAITE_CONFIG_PATH=$DISTRO_PATH/senaite_config
 export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons
 export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv
-export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/inializer_config.json
-docker-compose up -d
+export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json
+export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
+docker-compose up -d --build
