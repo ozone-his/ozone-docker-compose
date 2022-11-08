@@ -66,6 +66,28 @@ export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv;\
 export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json;\
 export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
 ```
+### When working on an Ozone Distro
+
+This example assumes you are downloading a published Ozone distro but sometime you may be working locally and have the distro built locally in this case change the value of `DISTRO_PATH` if for example your local distro is at `/home/foo/Code/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT` so the above export block will look like
+
+```
+DISTRO_GROUP=ozone-demo; \
+export DISTRO_PATH=/home/foo/Code/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT;  \
+export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config;  \
+export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config;  \
+export OPENMRS_CORE_PATH=$DISTRO_PATH/openmrs_core;  \
+export OPENMRS_MODULES_PATH=$DISTRO_PATH/openmrs_modules;  \
+export EIP_PATH=$DISTRO_PATH/eip_config; \
+export SPA_PATH=$DISTRO_PATH/spa;\
+export SENAITE_CONFIG_PATH=$DISTRO_PATH/senaite_config; \
+export SUPERSET_CONFIG_PATH=$DISTRO_PATH/superset_config;\
+
+export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons;\
+export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv;\
+export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json;\
+export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
+```
+
 
 ### Start Ozone
 ```

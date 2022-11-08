@@ -178,10 +178,10 @@ services:
     volumes:
       - "${ODOO_FILESTORE:-odoo-filestore}:/var/lib/odoo/filestore"
       - "${ODOO_EXTRA_ADDONS:-odoo-extra-addons}:/mnt/extra-addons"
-      - "${ODOO_CONFIG_PATH:-odoo-config}:/mnt/odoo_csv"
+      - "${ODOO_CONFIG_PATH:-odoo-config}:/mnt/odoo_config"
       - "${ODOO_INITIALIZER_CONFIG_FILE_PATH:-odoo-config}:/mnt/odoo_config/initializer_config.json"
       - "${ODOO_CONFIG_FILE_PATH:-odoo-config}:/etc/properties/odoo.conf"
-      - odoo-checksums:/mnt/odoo_csv_checksum
+      - odoo-checksums:/mnt/checksums
 
   # OpenMRS 3 Microfrontends
   frontend:
