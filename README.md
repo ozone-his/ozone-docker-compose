@@ -71,7 +71,7 @@ export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
 This example assumes you are downloading a published Ozone distro but sometime you may be working locally and have the distro built locally in this case change the value of `DISTRO_PATH` if for example your local distro is at `/home/foo/Code/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT` so the above export block will look like
 
 ```
-DISTRO_GROUP=ozone-demo; \
+export DISTRO_GROUP=ozone-demo; \
 export DISTRO_PATH=/home/foo/Code/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT;  \
 export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config;  \
 export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config;  \

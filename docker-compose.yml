@@ -199,6 +199,84 @@ services:
       ozone:
         aliases:
           - frontend
+  redis:
+    image: redis
+    restart: always
+    volumes:
+      - redis:/data
+    networks:
+      ozone:
+        aliases:
+          - redis
+  superset:
+    image: amancevice/superset:1.5.1
+    restart: always
+    depends_on:
+      redis:
+        condition: service_started
+      postgresql:
+        condition: service_started
+      superset-init:
+        condition: service_completed_successfully
+    ports:
+      - "8088:8088"
+    environment:
+      - DATABASE_HOST=${POSTGRES_DB_HOST}
+      - DATABASE_DB=${SUPERSET_DB}
+      - DATABASE_USER=${SUPERSET_DB_USER}
+      - DATABASE_PASSWORD=${SUPERSET_DB_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - ADMIN_PASSWORD=${SUPERSET_ADMIN_PASSWORD}
+    volumes:
+      - ./superset:/etc/superset
+    networks:
+      ozone:
+        aliases:
+          - superset
+  superset-worker:
+    image: amancevice/superset:1.5.1
+    restart: always
+    depends_on:
+      redis:
+        condition: service_started
+      postgresql:
+        condition: service_started
+      superset-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./superset:/etc/superset
+    environment:
+      - DATABASE_HOST=${POSTGRES_DB_HOST}
+      - DATABASE_DB=${SUPERSET_DB}
+      - DATABASE_USER=${SUPERSET_DB_USER}
+      - DATABASE_PASSWORD=${SUPERSET_DB_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - ADMIN_PASSWORD=${SUPERSET_ADMIN_PASSWORD}
+    command: "celery worker --app=superset.tasks.celery_app:app"
+    networks:
+      ozone:
+        aliases:
+          - superset-worker
+  superset-init:
+    image: amancevice/superset:1.5.1
+    restart: on-failure
+    depends_on:
+      - postgresql
+      - redis
+    volumes:
+      - ./superset:/etc/superset
+    environment:
+      - DATABASE_HOST=${POSTGRES_DB_HOST}
+      - DATABASE_DB=${SUPERSET_DB}
+      - DATABASE_USER=${SUPERSET_DB_USER}
+      - DATABASE_PASSWORD=${SUPERSET_DB_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - ADMIN_PASSWORD=${SUPERSET_ADMIN_PASSWORD}
+    command: "/etc/superset/superset-init.sh"
+    networks:
+      ozone:
+        aliases:
+          - superset-init
   senaite:
     environment: 
       - SITE=${SITE}
