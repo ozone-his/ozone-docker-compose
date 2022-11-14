@@ -5,7 +5,7 @@
 This is the official Docker Compose project for the free and open-source software flavour of Ozone, aka **Ozone FOSS**.
 This Docker Compose project makes it easy to start and run an Ozone FOSS server on the infrastructure of your choice.
 
-:bulb: **Pro tip:** There is a *pro* flavour of Ozone, aka "Ozone Pro", that adds a number of entreprise features to Ozone FOSS.
+:bulb: **Pro tip:** There is a *pro* flavour of Ozone, aka **Ozone Pro**, that adds a number of entreprise features to Ozone FOSS.
 
 ## 1. Quick start
 ```
