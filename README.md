@@ -12,91 +12,12 @@ $ ./start-demo.sh
 ```
 It may take some time to download and setup Ozone for the first time, so hang tight :hourglass_flowing_sand:
 
-Then [start browsing](#browse-ozone-his) Ozone.
+Then [start browsing](#2-browse-ozone) Ozone.
 
-## 2. Manual setup
+#### :warning: Troubleshooting Ozone quick start
+Are you experiencing issues with the quick start script? → Try the [manual setup](readme/manual-setup.md) instead.
 
-### Create your working directory
-
-Move to the location of your choice, e.g., your home folder:
-```
-$ cd ~/
-```
-Then create the working directory and save the path:
-```
-$ export OZONE_DIR=$PWD/ozone && \
-mkdir -p $OZONE_DIR && cd $OZONE_DIR
-```
-### Clone the docker-compose project
-
-```
-$ git clone https://github.com/ozone-his/ozone-docker
-```
-
-```
-$ cd ozone-docker
-```
-
-### Download and extract the distro
-
-```
-$ export VERSION=1.0.0-SNAPSHOT && \
-./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=net.mekomsolutions:ozone-distro:$VERSION:zip -Dtransitive=false --legacy-local-repository && \
-./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=net.mekomsolutions:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
-```
-
-### Export all needed env vars
-
-The Ozone Docker project relies on a number of environment variables to document where the distro sources assets are to be found.
-For the sample demo you can export the following variables:
-```
-DISTRO_GROUP=ozone-demo; \
-export DISTRO_PATH=$OZONE_DIR/ozone-distro-$VERSION;  \
-export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config;  \
-export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config;  \
-export OPENMRS_CORE_PATH=$DISTRO_PATH/openmrs_core;  \
-export OPENMRS_MODULES_PATH=$DISTRO_PATH/openmrs_modules;  \
-export EIP_PATH=$DISTRO_PATH/eip_config; \
-export SPA_PATH=$DISTRO_PATH/spa;\
-export SENAITE_CONFIG_PATH=$DISTRO_PATH/senaite_config; \
-export SUPERSET_CONFIG_PATH=$DISTRO_PATH/superset_config;\
-
-export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons;\
-export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv;\
-export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json;\
-export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
-```
-### When working on an Ozone Distro
-
-This example assumes you are downloading a published Ozone distro but sometime you may be working locally and have the distro built locally in this case change the value of `DISTRO_PATH` if for example your local distro is at `/home/foo/Code/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT` so the above export block will look like
-
-```
-export DISTRO_GROUP=ozone-demo; \
-export DISTRO_PATH=/home/foo/Code/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT;  \
-export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config;  \
-export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config;  \
-export OPENMRS_CORE_PATH=$DISTRO_PATH/openmrs_core;  \
-export OPENMRS_MODULES_PATH=$DISTRO_PATH/openmrs_modules;  \
-export EIP_PATH=$DISTRO_PATH/eip_config; \
-export SPA_PATH=$DISTRO_PATH/spa;\
-export SENAITE_CONFIG_PATH=$DISTRO_PATH/senaite_config; \
-export SUPERSET_CONFIG_PATH=$DISTRO_PATH/superset_config;\
-
-export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons;\
-export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv;\
-export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json;\
-export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
-```
-
-
-### Start Ozone
-```
-$ docker-compose -p $DISTRO_GROUP up
-```
-
-**Important:** This assumes that you run the `docker` command as the same user and in the same window in which you exported your variables. The variables will not be defined if Docker is run as `sudo`. Make sure to either export them as `root`, or run `docker` with `sudo -E` option to preserve the user environment. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
-
-## 3. Browse Ozone
+## 2. Browse Ozone
 In its FOSS version Ozone requires you to log into each component separately:
 
 | HIS Component     | URL                            | Username | Password |
@@ -106,6 +27,9 @@ In its FOSS version Ozone requires you to log into each component separately:
 | SENAITE           | http://172.17.0.1:8081/senaite | admin    | admin    |
 | Odoo              | http://172.17.0.1:8069         | admin    | admin    |
 | Superset          | http://172.17.0.1:8088         | admin    | password |
+
+## 3. Analytics in Ozone FOSS
+One of the biggest differences between Ozone FOSS and Ozone Pro lies in that Ozone FOSS does **not** stream data in real-time to its BI tool, Superset. There is a number of manual steps required to refresh analytics data in Ozone FOSS, please follow [this](readme/analytics.md) guide to know more.
 
 ## 4. Find us
 [Slack](https://openmrs.slack.com/archives/C02PYQD5D0A) - [Forum](https://talk.openmrs.org/c/software/ozone-his) - [Website](http://ozone-his.com)
