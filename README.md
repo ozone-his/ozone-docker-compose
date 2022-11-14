@@ -5,7 +5,7 @@
 This is the official Docker Compose project for the free and open-source software flavour of Ozone, aka **Ozone FOSS**.
 This Docker Compose project makes it easy to start and run an Ozone FOSS server on the infrastructure of your choice.
 
-:bulb: **Pro tip:** There is a *pro* flavour of Ozone, aka **Ozone Pro**, that adds a number of entreprise features to Ozone FOSS.
+:bulb: **Did you know?** There is a *pro* flavour of Ozone, aka **Ozone Pro**, that adds a number of entreprise features to Ozone FOSS.
 
 ## 1. Quick start
 ```
@@ -31,12 +31,12 @@ Ozone FOSS requires you to log into each component separately:
 | Odoo              | http://172.17.0.1:8069         | admin    | admin    |
 | Superset          | http://172.17.0.1:8088         | admin    | password |
 
-:bulb: **Pro tip:** Ozone Pro comes with single sign-on (SSO) and all its integration layer is secured with OAuth2.
+:bulb: **Did you know?** Ozone Pro comes with single sign-on (SSO) and all its integration layer is secured with OAuth2.
 
 ## 3. Analytics in Ozone FOSS
 There is a number of manual steps required to refresh analytics data in Ozone FOSS, please follow [this](readme/analytics.md) guide to know more.
 
-:bulb: **Pro tip:** Ozone Pro embeds a service named *Ozone Analytics* that streams data from all its components automatically and in real-time data to any reporting and BI platform.
+:bulb: **Did you know?** Ozone Pro embeds a service named *Ozone Analytics* that streams data from all its components automatically and in real-time data to any reporting and BI platform.
 
 ## 4. Find us
 [Slack](https://openmrs.slack.com/archives/C02PYQD5D0A) - [Forum](https://talk.openmrs.org/c/software/ozone-his) - [Website](http://ozone-his.com)
