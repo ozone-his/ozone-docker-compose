@@ -36,7 +36,7 @@ $ export VERSION=1.0.0-SNAPSHOT && \
 The Ozone Docker project relies on a number of environment variables (env vars) to document where the distro assets are expected to be found.
 For the sample demo you can export the following env vars:
 ```bash
-DISTRO_GROUP=ozone-demo; \
+export DISTRO_GROUP=ozone-demo; \
 
 export DISTRO_PATH=$OZONE_DIR/ozone-distro-$VERSION;  \
 
