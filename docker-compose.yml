@@ -227,6 +227,7 @@ services:
       - DATABASE_PASSWORD=${SUPERSET_DB_PASSWORD}
       - SECRET_KEY=${SECRET_KEY}
       - ADMIN_PASSWORD=${SUPERSET_ADMIN_PASSWORD}
+      - ANALYTICS_DB_PASSWORD=${ANALYTICS_DB_PASSWORD}
     volumes:
       - ./superset:/etc/superset
     networks:
@@ -252,6 +253,7 @@ services:
       - DATABASE_PASSWORD=${SUPERSET_DB_PASSWORD}
       - SECRET_KEY=${SECRET_KEY}
       - ADMIN_PASSWORD=${SUPERSET_ADMIN_PASSWORD}
+      - ANALYTICS_DB_PASSWORD=${ANALYTICS_DB_PASSWORD}
     command: "celery worker --app=superset.tasks.celery_app:app"
     networks:
       ozone:
@@ -272,6 +274,7 @@ services:
       - DATABASE_PASSWORD=${SUPERSET_DB_PASSWORD}
       - SECRET_KEY=${SECRET_KEY}
       - ADMIN_PASSWORD=${SUPERSET_ADMIN_PASSWORD}
+      - ANALYTICS_DB_PASSWORD=${ANALYTICS_DB_PASSWORD}
     command: "/etc/superset/superset-init.sh"
     networks:
       ozone:

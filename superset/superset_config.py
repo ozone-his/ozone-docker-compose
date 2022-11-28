@@ -5,6 +5,7 @@ from cachelib import RedisCache
 
 logger = logging.getLogger()
 
+
 def get_env_variable(var_name, default=None):
     """Get the environment variable or raise exception."""
     try:
@@ -28,7 +29,8 @@ DATABASE_HOST = get_env_variable("DATABASE_HOST", "postgres")
 DATABASE_PORT = get_env_variable("DATABASE_PORT", 5432)
 DATABASE_DB = get_env_variable("DATABASE_DB", "superset")
 
-SQLALCHEMY_TRACK_MODIFICATIONS = get_env_variable("SQLALCHEMY_TRACK_MODIFICATIONS", True)
+SQLALCHEMY_TRACK_MODIFICATIONS = get_env_variable(
+    "SQLALCHEMY_TRACK_MODIFICATIONS", True)
 SECRET_KEY = get_env_variable("SECRET_KEY", 'thisISaSECRET_1234')
 
 # The SQLAlchemy connection string.
@@ -46,8 +48,10 @@ REDIS_PORT = get_env_variable("REDIS_PORT", 6379)
 REDIS_CELERY_DB = get_env_variable("REDIS_CELERY_DB", 0)
 REDIS_RESULTS_DB = get_env_variable("REDIS_CELERY_DB", 1)
 
-RESULTS_BACKEND = RedisCache(host=REDIS_HOST, port=REDIS_PORT, key_prefix='superset_results')
+RESULTS_BACKEND = RedisCache(
+    host=REDIS_HOST, port=REDIS_PORT, key_prefix='superset_results')
 # RESULTS_BACKEND = FileSystemCache("/app/superset_home/sqllab")
+
 
 class CeleryConfig(object):
     BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}"
@@ -55,6 +59,7 @@ class CeleryConfig(object):
     CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_RESULTS_DB}"
     CELERY_ANNOTATIONS = {"tasks.add": {"rate_limit": "10/s"}}
     CELERY_TASK_PROTOCOL = 1
+
 
 CACHE_CONFIG = {
     'CACHE_TYPE': 'redis',
@@ -87,6 +92,14 @@ EXPLORE_FORM_DATA_CACHE_CONFIG = {
 CELERY_CONFIG = CeleryConfig
 SQLLAB_CTAS_NO_LIMIT = True
 PERMANENT_SESSION_LIFETIME = 86400
+
+
+def password_from_env(url):
+    return os.getenv("ANALYTICS_DB_PASSWORD")
+
+
+SQLALCHEMY_CUSTOM_PASSWORD_STORE = password_from_env
+
 
 class ReverseProxied(object):
 
