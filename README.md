@@ -25,18 +25,18 @@ Ozone FOSS requires you to log into each component separately:
 
 | HIS Component     | URL                            | Username | Password |
 |-------------------|--------------------------------|----------|----------|
-| OpenMRS 3         | http://172.17.0.1/openmrs/spa  | admin    | Admin123 |
-| OpenMRS Legacy UI | http://172.17.0.1/openmrs      | admin    | Admin123 |
-| SENAITE           | http://172.17.0.1:8081/senaite | admin    | admin    |
-| Odoo              | http://172.17.0.1:8069         | admin    | admin    |
-| Superset          | http://172.17.0.1:8088         | admin    | password |
+| OpenMRS 3         | http://localhost/openmrs/spa  | admin    | Admin123 |
+| OpenMRS Legacy UI | http://localhost/openmrs      | admin    | Admin123 |
+| SENAITE           | http://localhost:8081/senaite | admin    | admin    |
+| Odoo              | http://localhost:8069         | admin    | admin    |
+| Superset          | http://localhost:8088         | admin    | password |
 
 :bulb: **Did you know?** Ozone Pro comes with single sign-on (SSO) and all its integration layer is secured with OAuth2.
 
 ## 3. Analytics in Ozone FOSS
 There is a number of manual steps required to refresh analytics data in Ozone FOSS, please follow [this](readme/analytics.md) guide to know more.
 
-:bulb: **Did you know?** Ozone Pro embeds a service named *Ozone Analytics* that streams data from all its components automatically and in real-time data to any reporting and BI platform.
+:bulb: **Did you know?** Ozone Pro embeds a service called *Ozone Analytics* that streams data from all its components automatically and in real-time data to any reporting and BI platform.
 
 ## 4. Find us
 [Slack](https://openmrs.slack.com/archives/C02PYQD5D0A) - [Forum](https://talk.openmrs.org/c/software/ozone-his) - [Website](http://ozone-his.com)
