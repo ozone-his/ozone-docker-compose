@@ -68,7 +68,7 @@ services:
       env-substitution:
         condition: service_completed_successfully
     ports:
-      - 8080:8080
+      - "8080:8080"
     environment:
       MODULE_WEB_ADMIN: "true"
       DB_AUTO_UPDATE: "true"
