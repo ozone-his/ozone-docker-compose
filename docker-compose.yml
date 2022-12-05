@@ -168,7 +168,7 @@ services:
       - HOST=${POSTGRES_DB_HOST}
       - USER=${ODOO_DB_USER}
       - PASSWORD=${ODOO_DB_PASSWORD}
-      - ADDONS=sale_management,stock,account_account,purchase,mrp,odoo_initializer,ozone_settings
+      - ADDONS=sale_management,stock,account_account,purchase,mrp,odoo_initializer,ozone_settings,mrp_product_expiry,product_expiry,l10n_generic_coa
       - INITIALIZER_DATA_FILES_PATH=/mnt/odoo_csv
       - INITIALIZER_CONFIG_FILE_PATH=/mnt/odoo_config/initializer_config.json
     networks:
