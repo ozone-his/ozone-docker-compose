@@ -8,6 +8,8 @@ This Docker Compose project makes it easy to start and run an Ozone FOSS server 
 :bulb: **Did you know?** There is a *pro* flavour of Ozone, aka **Ozone Pro**, that adds a number of entreprise features to Ozone FOSS.
 
 ## 1. Quick start
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/ozone-his/ozone-docker)
+
 ```
 $ git clone https://github.com/ozone-his/ozone-docker
 $ cd ozone-docker
