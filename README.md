@@ -8,10 +8,9 @@ This Docker Compose project makes it easy to start and run an Ozone FOSS server 
 :bulb: **Did you know?** There is a *pro* flavour of Ozone, aka **Ozone Pro**, that adds a number of entreprise features to Ozone FOSS.
 
 ## 1. Quick start
-### Use Gipod
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/ozone-his/ozone-docker)
 
-### Start locally
+### Run Ozone FOSS locally
+Install Git, Maven and Docker and type this in a terminal:
 ```
 $ git clone https://github.com/ozone-his/ozone-docker
 $ cd ozone-docker
@@ -21,8 +20,15 @@ It may take some time to download and setup Ozone for the first time, so hang ti
 
 Then [start browsing](#2-browse-ozone) Ozone.
 
-#### :warning: Troubleshooting Ozone quick start
-Are you experiencing issues with the quick start script? → Try the [manual setup](readme/manual-setup.md) instead.
+#### :warning: Troubleshooting Ozone quick start locally?
+If you experience issues with the quick start script? → Try the [manual setup](readme/manual-setup.md) instead.
+
+### Run Ozone FOSS in Gipod
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/ozone-his/ozone-docker)
+
+It may take some time to download and setup Ozone for the first time, so hang tight :hourglass_flowing_sand:
+
+When ready Gitpod will launch the tab for OpenMRS 3.
 
 ## 2. Browse Ozone
 Ozone FOSS requires you to log into each component separately:
@@ -34,10 +40,6 @@ Ozone FOSS requires you to log into each component separately:
 | SENAITE           | http://localhost:8081/senaite | admin    | admin    |
 | Odoo              | http://localhost:8069         | admin    | admin    |
 | Superset          | http://localhost:8088         | admin    | password |
-
-**Note on Gitpod** If you started the app in Gitpod check the ports tab at the bottom of the window for links to access the components
-
-![Gitpod Ports](readme/gitpod.png?raw=true "Gitpod Ports")
 
 :bulb: **Did you know?** Ozone Pro comes with single sign-on (SSO) and all its integration layer is secured with OAuth2.
 
