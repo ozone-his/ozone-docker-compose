@@ -8,12 +8,9 @@ ports:
   - name: Odoo
     description: Odoo
     port: 8069
-    onOpen: open-browser
   - name: Superset
     description: Superset
     port: 8088
-    onOpen: open-browser
   - name: SENAITE
     description: SENAITE
     port: 8081
-    onOpen: open-browser
