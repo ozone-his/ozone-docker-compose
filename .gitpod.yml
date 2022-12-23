@@ -2,7 +2,7 @@ tasks:
   - command: ./start-demo.sh
 ports:
   - name: OpenMRS
-    description: Openmrs 3
+    description: OpenMRS 3
     port: 80
     onOpen: open-browser
   - name: Odoo
