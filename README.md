@@ -8,8 +8,10 @@ This Docker Compose project makes it easy to start and run an Ozone FOSS server 
 :bulb: **Did you know?** There is a *pro* flavour of Ozone, aka **Ozone Pro**, that adds a number of entreprise features to Ozone FOSS.
 
 ## 1. Quick start
+### Use Gipod
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/ozone-his/ozone-docker)
 
+### Start locally
 ```
 $ git clone https://github.com/ozone-his/ozone-docker
 $ cd ozone-docker
@@ -32,6 +34,9 @@ Ozone FOSS requires you to log into each component separately:
 | SENAITE           | http://localhost:8081/senaite | admin    | admin    |
 | Odoo              | http://localhost:8069         | admin    | admin    |
 | Superset          | http://localhost:8088         | admin    | password |
+
+If you started the app in Gitpod check the ports tab at the bottom of the window for links to access the components
+![Gitpod Ports](readme/gitpod.png?raw=true "Gitpod Ports")
 
 :bulb: **Did you know?** Ozone Pro comes with single sign-on (SSO) and all its integration layer is secured with OAuth2.
 
