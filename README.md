@@ -35,7 +35,8 @@ Ozone FOSS requires you to log into each component separately:
 | Odoo              | http://localhost:8069         | admin    | admin    |
 | Superset          | http://localhost:8088         | admin    | password |
 
-If you started the app in Gitpod check the ports tab at the bottom of the window for links to access the components
+**Note on Gitpod** If you started the app in Gitpod check the ports tab at the bottom of the window for links to access the components
+
 ![Gitpod Ports](readme/gitpod.png?raw=true "Gitpod Ports")
 
 :bulb: **Did you know?** Ozone Pro comes with single sign-on (SSO) and all its integration layer is secured with OAuth2.
