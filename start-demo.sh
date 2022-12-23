@@ -29,6 +29,5 @@ if [ "${DOCKER_SERVER_VERSION_MAJOR}" -ge 20 ] && \
     echo "Docker version >= 20.10.13 using docker compose v2"
     docker compose up -d --build
 else
-    echo "Docker version < 20.10.13 using docker compose v1"
-    docker-compose up -d --build
+    echo "Docker version < 20.10.13 is not supported" 
 fi
