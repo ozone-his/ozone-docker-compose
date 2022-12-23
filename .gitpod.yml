@@ -1,0 +1,19 @@
+tasks:
+  - command: ./start-demo.sh
+ports:
+  - name: OpenMRS
+    description: Openmrs 3
+    port: 80
+    onOpen: open-browser
+  - name: Odoo
+    description: Odoo
+    port: 8069
+    onOpen: open-browser
+  - name: Superset
+    description: Superset
+    port: 8088
+    onOpen: open-browser
+  - name: SENAITE
+    description: SENAITE
+    port: 8081
+    onOpen: open-browser
