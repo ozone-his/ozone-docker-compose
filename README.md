@@ -37,7 +37,7 @@ Ozone FOSS requires you to log into each component separately:
 |-------------------|--------------------------------|----------|----------|
 | OpenMRS 3         | http://localhost/openmrs/spa  | admin    | Admin123 |
 | OpenMRS Legacy UI | http://localhost/openmrs      | admin    | Admin123 |
-| SENAITE           | http://localhost:8081/senaite | admin    | admin    |
+| SENAITE           | http://localhost:8081/senaite | admin    | password |
 | Odoo              | http://localhost:8069         | admin    | admin    |
 | Superset          | http://localhost:8088         | admin    | password |
 
