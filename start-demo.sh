@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR
-# Download the project
+# Downloads the project
 export VERSION=1.0.0-SNAPSHOT && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=net.mekomsolutions:ozone-distro:$VERSION:zip -Dtransitive=false --legacy-local-repository && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=net.mekomsolutions:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
-# Export required environment variables
+# Exports required environment variables
 export DISTRO_PATH=$OZONE_DIR/ozone-distro-$VERSION
 export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config
 export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config
@@ -26,8 +26,8 @@ DOCKER_SERVER_VERSION_BUILD=$(echo "$DOCKER_SERVER_VERSION"| cut -d'.' -f 3)
 if [ "${DOCKER_SERVER_VERSION_MAJOR}" -ge 20 ] && \
    [ "${DOCKER_SERVER_VERSION_MINOR}" -ge 10 ]  && \
    [ "${DOCKER_SERVER_VERSION_BUILD}" -ge 13 ]; then
-    echo "Docker version >= 20.10.13 using docker compose v2"
+    echo "Docker version >= 20.10.13, using Docker Compose V2"
     docker compose up -d --build
 else
-    echo "Docker version < 20.10.13 is not supported" 
+    echo "Docker versions < 20.10.13 are not supported" 
 fi
