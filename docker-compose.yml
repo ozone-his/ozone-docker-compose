@@ -189,12 +189,12 @@ services:
     environment:
       SPA_PATH: /openmrs/spa
       API_URL: /openmrs
-      SPA_CONFIG_URLS:
+      SPA_CONFIG_URLS: /openmrs/spa/ozone/ozone-frontend-config.json
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
       timeout: 5s
-    # volumes:
-    #   - "${SPA_PATH:-microfrontends}:/usr/share/nginx/html/"
+    volumes:
+      - "${OZONE_CONFIG_PATH}/frontend:/usr/share/nginx/html/ozone"
     networks:
       ozone:
         aliases:
