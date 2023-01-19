@@ -77,6 +77,7 @@ services:
       DB_DATABASE: openmrs
       DB_USERNAME: ${OPENMRS_DB_USER}
       DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
+      _JAVA_OPTIONS='-Xmx4096m'
     healthcheck:
       test:
         - CMD
