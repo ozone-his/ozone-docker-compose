@@ -27,6 +27,9 @@ if [ "${DOCKER_SERVER_VERSION_MAJOR}" -ge 20 ] && \
    [ "${DOCKER_SERVER_VERSION_MINOR}" -ge 10 ]  && \
    [ "${DOCKER_SERVER_VERSION_BUILD}" -ge 13 ]; then
     echo "Docker version >= 20.10.13, using Docker Compose V2"
+    if command -v gp version &> /dev/null; then
+        export PROXY_TLS="-DgitPodEnvironment"    
+    fi
     docker compose up -d --build
 else
     echo "Docker versions < 20.10.13 are not supported" 
