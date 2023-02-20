@@ -23,7 +23,7 @@ Then [start browsing](#2-browse-ozone) Ozone.
 #### :warning: Troubleshooting Ozone quick start locally?
 If you experience issues with the quick start script? → Try the [manual setup](readme/manual-setup.md) instead.
 
-### Run Ozone FOSS in Gipod
+### Run Ozone FOSS in Gitpod
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/ozone-his/ozone-docker)
 
 It may take some time to download and setup Ozone for the first time, so hang tight :hourglass_flowing_sand:
