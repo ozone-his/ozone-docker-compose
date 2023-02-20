@@ -1,0 +1,81 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.ozonehis</groupId>
+  <artifactId>ozone-docker-compose</artifactId>
+  <name>Ozone Docker Compose</name>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <organization>
+    <name>Ozone HIS</name>
+    <url>https://www.ozone-his.com</url>
+  </organization>
+  <developers>
+    <developer>
+      <name>Mekom Solutions</name>
+      <url>https://www.mekomsolutions.com</url>
+    </developer>
+  </developers>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies/>
+  
+  <build>
+    <plugins>
+      <!-- Package as a Zip file -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>package-distro-artifact</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <appendAssemblyId>false</appendAssemblyId>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+          <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
+          <resources>
+            <resource>
+              <directory>${project.basedir}</directory>
+              <excludes>
+                <!-- Exclude some unneeded files from the package-->
+                <exclude>.gitignore</exclude>
+                <exclude>*override*</exclude>
+                <exclude>pom.xml</exclude>
+                <exclude>assembly.xml</exclude>
+                <exclude>senaite/senaite-data/**</exclude>
+              </excludes>
+            </resource>
+          </resources>
+        </configuration>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
