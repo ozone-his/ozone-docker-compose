@@ -1,6 +1,6 @@
 */.DS_Store
 sqls/**/*.sql*
-ozone/
+!sqls/postgresql/db/OpenELIS_base.sql
 .DS_Store
 senaite/senaite-data/*
 !senaite/senaite-data/importdata/
@@ -10,7 +10,18 @@ __pycache__
 docker-compose.override.*
 *.env
 !.env
+*.jar
+
+# Ignore the docker-compose.override.yml file
+docker-compose.override.*
+
+build
+
+# Maven target directory
+target/
+
+
+# Ignore start-demo.sh folders and downloaded resources
+ozone/
 ozone-distro-demo
 *.ozone-distro-demo.zip
-*.zip
-
