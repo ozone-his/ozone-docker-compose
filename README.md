@@ -9,8 +9,11 @@ This Docker Compose project makes it easy to start and run an Ozone FOSS server 
 
 ## 1. Quick start
 
+### Pre-requisite
+Install Git, Maven, Docker and Docker compose.
+
 ### Run Ozone FOSS locally
-Install Git, Maven and Docker and type this in a terminal:
+Create your working directory and as a root user:
 ```
 $ git clone https://github.com/ozone-his/ozone-docker
 $ cd ozone-docker
