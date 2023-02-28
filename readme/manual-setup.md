@@ -54,7 +54,7 @@ export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv;\
 export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json;\
 export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
 ```
-### I am developper with a local build of Ozone
+### I am developer with a local build of Ozone
 
 If you are developing on Ozone and are building the Ozone distro in your local environment, then you would need to override `DISTRO_PATH` to point to where your distro build folder actually is. For example if your working folder is `/your/path/to/ozone-distro` for the distro then you would want to do something like this:
 ```bash
@@ -63,7 +63,7 @@ export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT
 
 ### Start Ozone
 ```bash
-$ docker-compose -p $DISTRO_GROUP up
+$ docker compose -p $DISTRO_GROUP up
 ```
 
 **Important:** This assumes that you run the `docker` command as the same user and in the same window in which you exported your variables. The variables will not be defined if Docker is run as `sudo`. Make sure to either export them as `root`, or run `docker` with `sudo -E` option to preserve the user environment. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
