@@ -4,9 +4,15 @@ Welcome to the Ozone FOSS manual setup guide. This guide details the setup of Oz
 
 ### Create your working directory
 
-Move to your working directory and as a root user;
+Move to the location of your choice, e.g., your home folder:
 
-Create the Ozone working directory and save the path:
+Note: On Linux OS you'll have to open the terminal as root/admin user by typing `sudo -i` and then entering correct user's password if prompted
+
+```bash
+$ cd ~/
+```
+
+Then create the Ozone working directory and save the path:
 ```bash
 $ export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR && cd $OZONE_DIR
@@ -54,7 +60,7 @@ export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
 ```
 ### I am a developer with a local build of Ozone
 
-If you are developing on Ozone and are building the Ozone distro in your local environment, then you would need to override `DISTRO_PATH` to point to the directory of of your distro build folder. For example if your working folder is `/your/path/to/ozone-distro` for the distro then you would want to do something like this:
+If you are developing on Ozone and are building the Ozone distro in your local environment, then you would need to override `DISTRO_PATH` to point to your distro build folder. For example if your working folder is `/your/path/to/ozone-distro` for the distro then you would want to do something like this:
 ```bash
 export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT
 ```
@@ -64,4 +70,4 @@ export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT
 $ docker compose -p $DISTRO_GROUP up
 ```
 
-**Important:** This assumes that you run the `docker` command as the same user and in the same window in which you exported your environment gitvariables. Checkout the['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) users.
+**Important:** This assumes that you run the `docker` command as the same user and in the same window in which you exported your variables. The variables will not be defined if Docker is run as `sudo`. Make sure to either export them as `root`, or run `docker` with `sudo -E` option to preserve the user environment. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
