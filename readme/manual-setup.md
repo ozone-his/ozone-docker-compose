@@ -6,7 +6,7 @@ Welcome to the Ozone FOSS manual setup guide. This guide details the setup of Oz
 
 Move to the location of your choice, e.g., your home folder:
 
-Note: On Linux OS you'll have to open the terminal as root/admin user by typing `sudo -i` and then entering correct user's password if prompted
+Note: On Linux OS you'll have to open the terminal as root/admin user by typing `sudo -s` and then entering correct user's password if prompted
 
 ```bash
 $ cd ~/
