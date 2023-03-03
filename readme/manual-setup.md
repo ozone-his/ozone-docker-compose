@@ -6,8 +6,6 @@ Welcome to the Ozone FOSS manual setup guide. This guide details the setup of Oz
 
 Move to the location of your choice, e.g., your home folder:
 
-Note: On Linux OS you'll have to open the terminal as root/admin user by typing `sudo -s` and then entering correct user's password if prompted
-
 ```bash
 $ cd ~/
 ```
@@ -67,7 +65,7 @@ $ export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-1.0.0-SNAPSH
 
 ### Start Ozone
 ```bash
-$ docker compose -p $DISTRO_GROUP up
+$ sudo -E docker compose -p $DISTRO_GROUP up
 ```
 
-**Important:** This assumes that you run the `docker` command as the same user and in the same window in which you exported your variables. The variables will not be defined if Docker is run as `sudo`. Make sure to either export them as `root`, or run `docker` with `sudo -E` option to preserve the user environment. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
+**Important:** This assumes that you run the `docker` command as the same user and in the same window in which you exported your variables. Run `docker` with `sudo -E` option to preserve the user environment. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.

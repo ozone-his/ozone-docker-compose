@@ -15,7 +15,7 @@ Install Git, Maven and Docker Compose and type in the following in a terminal:
 ```
 $ git clone https://github.com/ozone-his/ozone-docker
 $ cd ozone-docker
-$ ./start-demo.sh
+$ sudo -E./start-demo.sh
 ```
 It may take some time to download and setup Ozone for the first time, so hang tight :hourglass_flowing_sand:
 
