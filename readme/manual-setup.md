@@ -64,8 +64,26 @@ $ export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-1.0.0-SNAPSH
 ```
 
 ### Start Ozone
+<table>
+<tr>
+<td> macOS </td> <td> Linux </td>
+</tr>
+<tr>
+<td>
+
+```bash
+$ docker compose -p $DISTRO_GROUP up
+```
+
+</td>
+<td>
+
 ```bash
 $ sudo -E docker compose -p $DISTRO_GROUP up
 ```
+
+</td>
+</tr>
+</table>
 
 **Important:** This assumes that you run the `docker` command as the same user and in the same window in which you exported your variables. Run `docker` with `sudo -E` option to preserve the user environment. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
