@@ -86,4 +86,4 @@ $ sudo -E docker compose -p $DISTRO_GROUP up
 </tr>
 </table>
 
-**Important:** This assumes that you run the `docker` command as the same user and in the same window in which you exported your variables. Run `docker` with `sudo -E` option to preserve the user environment. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
+**Note:** On Linux we advise to run `docker` with `sudo -E` option to preserve the user environment as `su`. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
