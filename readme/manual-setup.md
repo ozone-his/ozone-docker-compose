@@ -18,7 +18,7 @@ mkdir -p $OZONE_DIR && cd $OZONE_DIR
 ### Clone the ozone-docker project
 
 ```bash
-$ git clone https://github.com/ozone-his/ozone-docker.git
+$ git clone https://github.com/ozone-his/ozone-docker
 ```
 
 ```bash
