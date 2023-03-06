@@ -87,3 +87,9 @@ $ sudo -E docker compose -p $DISTRO_GROUP up
 </table>
 
 **Note:** On Linux we advise to run `docker` with `sudo -E` option to preserve the user environment as `su`. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
+
+## Advanced
+
+### Setting up SSL
+
+[TBC]
