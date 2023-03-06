@@ -28,7 +28,7 @@ $ cd ozone-docker
 ### Download and extract the distro
 
 ```bash
-$ export VERSION=1.0.0-SNAPSHOT && \
+$ export VERSION=1.0.0-alpha.1 && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -Dtransitive=false --legacy-local-repository && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
 ```

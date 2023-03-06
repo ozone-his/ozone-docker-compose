@@ -2,7 +2,7 @@
 export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR
 # Download the project && \
-export VERSION=1.0.0-SNAPSHOT
+export VERSION=1.0.0-alpha.1
 export DISTRO_PATH=$OZONE_DIR/ozone-distro-$VERSION
 export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config
 export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config
