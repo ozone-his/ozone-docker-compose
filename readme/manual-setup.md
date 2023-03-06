@@ -7,28 +7,28 @@ Welcome to the Ozone FOSS manual setup guide. This guide details the setup of Oz
 Move to the location of your choice, e.g., your home folder:
 
 ```bash
-$ cd ~/
+cd ~/
 ```
 
 Then create the Ozone working directory and save the path:
 ```bash
-$ export OZONE_DIR=$PWD/ozone && \
+export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR && cd $OZONE_DIR
 ```
 ### Clone the ozone-docker project
 
 ```bash
-$ git clone https://github.com/ozone-his/ozone-docker
+git clone https://github.com/ozone-his/ozone-docker
 ```
 
 ```bash
-$ cd ozone-docker
+cd ozone-docker
 ```
 
 ### Download and extract the distro
 
 ```bash
-$ export VERSION=1.0.0-SNAPSHOT && \
+export VERSION=1.0.0-SNAPSHOT && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -Dtransitive=false --legacy-local-repository && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
 ```
@@ -60,7 +60,7 @@ export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
 
 If you are developing on Ozone and are building the Ozone distro in your local environment, then you would need to override `DISTRO_PATH` to point to your distro build folder. For example if your working folder is `/your/path/to/ozone-distro` for the distro then you would want to do something like this:
 ```bash
-$ export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT
+export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT
 ```
 
 ### Start Ozone
@@ -72,14 +72,14 @@ $ export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-1.0.0-SNAPSH
 <td>
 
 ```bash
-$ docker compose -p $DISTRO_GROUP up
+docker compose -p $DISTRO_GROUP up
 ```
 
 </td>
 <td>
 
 ```bash
-$ sudo -E docker compose -p $DISTRO_GROUP up
+sudo -E docker compose -p $DISTRO_GROUP up
 ```
 
 </td>

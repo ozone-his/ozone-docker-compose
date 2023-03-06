@@ -12,29 +12,40 @@ This Docker Compose project makes it easy to start and run an Ozone FOSS server 
 ### Run Ozone FOSS locally
 Install Git, Maven and Docker Compose and type in the following in a terminal:
 <table>
-<tr>
-<td> macOS </td> <td> Linux </td>
-</tr>
-<tr>
-<td>
-
-```bash
-$ git clone https://github.com/ozone-his/ozone-docker
-$ cd ozone-docker
-$ ./start-demo.sh
-```
-
-</td>
-<td>
-
-```bash
-$ git clone https://github.com/ozone-his/ozone-docker
-$ cd ozone-docker
-$ sudo -E ./start-demo.sh
-```
-
-</td>
-</tr>
+  <tr>
+    <th>macOS</th>
+    <th>Linux</th>
+  </tr>
+  <tr>
+    <td>
+      Step 1
+      <pre><code>git clone https://github.com/ozone-his/ozone-docker</code></pre>
+    </td>
+    <td>
+      Step 1
+      <pre><code>git clone https://github.com/ozone-his/ozone-docker</code></pre>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Step 2
+      <pre><code>cd ozone-docker</code></pre>
+    </td>
+    <td>
+      Step 2
+      <pre><code>cd ozone-docker</code></pre>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Step 3
+      <pre><code>./start-demo.sh</code></pre>
+    </td>
+    <td>
+      Step 3
+      <pre><code>sudo -E ./start-demo.sh</code></pre>
+    </td>
+  </tr>
 </table>
 
 It may take some time to download and setup Ozone for the first time, so hang tight :hourglass_flowing_sand:
