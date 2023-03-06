@@ -10,12 +10,33 @@ This Docker Compose project makes it easy to start and run an Ozone FOSS server 
 ## 1. Quick start
 
 ### Run Ozone FOSS locally
-Install Git, Maven and Docker and type this in a terminal:
-```
+Install Git, Maven and Docker Compose and type in the following in a terminal:
+<table>
+<tr>
+<td> macOS </td> <td> Linux </td>
+</tr>
+<tr>
+<td>
+
+```bash
 $ git clone https://github.com/ozone-his/ozone-docker
 $ cd ozone-docker
 $ ./start-demo.sh
 ```
+
+</td>
+<td>
+
+```bash
+$ git clone https://github.com/ozone-his/ozone-docker
+$ cd ozone-docker
+$ sudo -E ./start-demo.sh
+```
+
+</td>
+</tr>
+</table>
+
 It may take some time to download and setup Ozone for the first time, so hang tight :hourglass_flowing_sand:
 
 Then [start browsing](#2-browse-ozone) Ozone.
@@ -46,7 +67,7 @@ Ozone FOSS requires you to log into each component separately:
 ## 3. Analytics in Ozone FOSS
 There is a number of manual steps required to refresh analytics data in Ozone FOSS, please follow [this](readme/analytics.md) guide to know more.
 
-:bulb: **Did you know?** Ozone Pro embeds a service called *Ozone Analytics* that streams data from all its components automatically and in real-time data to any reporting and BI platform.
+:bulb: **Did you know?** Ozone Pro embeds a service called *Ozone Analytics* that streams data from all its components automatically and in real-time to any reporting and BI platform.
 
 ## 4. Find us
 [Slack](https://openmrs.slack.com/archives/C02PYQD5D0A) - [Forum](https://talk.openmrs.org/c/software/ozone-his) - [Website](http://ozone-his.com)
