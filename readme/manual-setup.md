@@ -86,4 +86,11 @@ $ sudo -E docker compose -p $DISTRO_GROUP up
 </tr>
 </table>
 
-**Note:** On Linux we advise to run `docker` with `sudo -E` option to preserve the user environment as `su`. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
+**Note:** On Linux we advise to run `docker` with `sudo -E` option to preserve the user environment. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
+
+### Destroy the running instance containers
+Before starting up a fresh instance, ensure to clean up the dev environment by destroying the previously stoped instance containers. 
+
+```bash
+$ sudo -E ./destroy-demo.sh
+```
