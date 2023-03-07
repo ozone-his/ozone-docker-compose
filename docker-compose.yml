@@ -33,7 +33,7 @@ services:
 
   # Bahmni Appointments
   appointments:
-    image: mekomsolutions/appointments:latest
+    image: mekomsolutions/appointments:82b6948
     healthcheck:
       test:
         - CMD
@@ -46,7 +46,7 @@ services:
         aliases:
           - appointments-1
   env-substitution:
-    image:  mekomsolutions/env-substitution
+    image: mekomsolutions/env-substitution:945d61e
     environment:
       - ODOO_PUBLIC_URL=${HOST_URL}:8069
       - SENAITE_PUBLIC_URL=${HOST_URL}:8081
@@ -62,7 +62,7 @@ services:
 
   # OpenMRS
   openmrs:
-    image: mekomsolutions/openmrs:latest
+    image: mekomsolutions/openmrs:69f1dce
     depends_on:
       mysql:
         condition: service_started
@@ -164,7 +164,7 @@ services:
     depends_on:
       postgresql:
         condition: service_healthy
-    image: mekomsolutions/odoo
+    image: mekomsolutions/odoo:2c1706f
     environment:
       - HOST=${POSTGRES_DB_HOST}
       - USER=${ODOO_DB_USER}
@@ -186,7 +186,7 @@ services:
 
   # OpenMRS 3 Microfrontends
   frontend:
-    image: openmrs/openmrs-reference-application-3-frontend:${TAG:-nightly}
+    image: openmrs/openmrs-reference-application-3-frontend:3.0.0-beta.2
     environment:
       SPA_PATH: /openmrs/spa
       API_URL: /openmrs
@@ -201,7 +201,7 @@ services:
         aliases:
           - frontend
   redis:
-    image: redis
+    image: redis:7
     restart: always
     volumes:
       - redis:/data
@@ -298,8 +298,8 @@ services:
     depends_on: 
       env-substitution:
         condition: service_completed_successfully
-  eip_client: 
-    image: mekomsolutions/eip-client
+  eip-client: 
+    image: mekomsolutions/eip-client:sha-ed1c20e
     volumes:
       - "${EIP_PATH:-eipapp}/config:/config"
       - "${EIP_PATH:-eipapp}/routes:/routes"
@@ -337,7 +337,7 @@ services:
     networks:
       ozone:
         aliases:
-          - eip_client
+          - eip-client
     depends_on: 
       env-substitution:
         condition: service_completed_successfully
