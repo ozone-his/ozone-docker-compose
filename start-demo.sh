@@ -18,6 +18,8 @@ export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons
 export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv
 export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json
 export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
+export O3_FRONTEND_TAG=3.0.0-beta.2
+
 DOCKER_SERVER_VERSION=$(docker version -f "{{.Server.Version}}")
 DOCKER_SERVER_VERSION_MAJOR=$(echo "$DOCKER_SERVER_VERSION"| cut -d'.' -f 1)
 DOCKER_SERVER_VERSION_MINOR=$(echo "$DOCKER_SERVER_VERSION"| cut -d'.' -f 2)
