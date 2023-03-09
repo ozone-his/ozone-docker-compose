@@ -2,6 +2,29 @@
 
 Welcome to the Ozone FOSS manual setup guide. This guide details the setup of Ozone FOSS step by step.
 
+### Create your working directory
+
+Move to the location of your choice, e.g., your home folder:
+
+```bash
+$ cd ~/
+```
+
+Then create the Ozone working directory and save the path:
+```bash
+$ export OZONE_DIR=$PWD/ozone && \
+mkdir -p $OZONE_DIR && cd $OZONE_DIR
+```
+### Clone the ozone-docker project
+
+```bash
+$ git clone https://github.com/ozone-his/ozone-docker
+```
+
+```bash
+$ cd ozone-docker
+```
+
 ### Destroy the running instance containers
 If you have already set up Ozone before you may need to clean up your local environment first:
 
@@ -26,29 +49,6 @@ $ sudo -E ./destroy-demo.sh
 </td>
 </tr>
 </table>
-
-### Create your working directory
-
-Move to the location of your choice, e.g., your home folder:
-
-```bash
-$ cd ~/
-```
-
-Then create the Ozone working directory and save the path:
-```bash
-$ export OZONE_DIR=$PWD/ozone && \
-mkdir -p $OZONE_DIR && cd $OZONE_DIR
-```
-### Clone the ozone-docker project
-
-```bash
-$ git clone https://github.com/ozone-his/ozone-docker
-```
-
-```bash
-$ cd ozone-docker
-```
 
 ### Download and extract the distro
 
