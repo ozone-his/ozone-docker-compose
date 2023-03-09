@@ -25,6 +25,31 @@ $ git clone https://github.com/ozone-his/ozone-docker
 $ cd ozone-docker
 ```
 
+### Destroy the running instance containers
+If you have already set up Ozone before you may need to clean up your local environment first:
+
+<table>
+<tr>
+<td> macOS </td> <td> Linux </td>
+</tr>
+<tr>
+<td>
+
+```bash
+$ ./destroy-demo.sh
+```
+
+</td>
+<td>
+
+```bash
+$ sudo -E ./destroy-demo.sh
+```
+
+</td>
+</tr>
+</table>
+
 ### Download and extract the distro
 
 ```bash
@@ -86,4 +111,4 @@ $ sudo -E docker compose -p $DISTRO_GROUP up
 </tr>
 </table>
 
-**Note:** On Linux we advise to run `docker` with `sudo -E` option to preserve the user environment as `su`. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
+**Note:** On Linux we advise to run `docker` with `sudo -E` option to preserve the user environment. See also ['Post-installation steps for Linux'](https://docs.docker.com/engine/install/linux-postinstall/) for more details.
