@@ -80,6 +80,7 @@ export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons;\
 export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv;\
 export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json;\
 export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
+export O3_FRONTEND_TAG=3.0.0-beta.2
 ```
 ### I am a developer with a local build of Ozone
 

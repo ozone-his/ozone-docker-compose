@@ -186,7 +186,7 @@ services:
 
   # OpenMRS 3 Microfrontends
   frontend:
-    image: openmrs/openmrs-reference-application-3-frontend:${TAG:-nightly}
+    image: openmrs/openmrs-reference-application-3-frontend:${O3_FRONTEND_TAG:-nightly}
     environment:
       SPA_PATH: /openmrs/spa
       API_URL: /openmrs
