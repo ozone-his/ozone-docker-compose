@@ -13,9 +13,9 @@ This Docker Compose project makes it easy to start and run an Ozone FOSS server 
 Type in the following in a terminal:
 
 ```bash
-$ git clone https://github.com/ozone-his/ozone-docker
-$ cd ozone-docker
-$ ./start-demo.sh
+git clone https://github.com/ozone-his/ozone-docker
+cd ozone-docker
+./start-demo.sh
 ```
 
 It may take some time to download and setup Ozone for the first time, so hang tight :hourglass_flowing_sand:
