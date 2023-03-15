@@ -7,35 +7,25 @@ This Docker Compose project makes it easy to start and run an Ozone FOSS server 
 
 :bulb: **Did you know?** There is a *pro* flavour of Ozone, aka **Ozone Pro**, that adds a number of entreprise features to Ozone FOSS.
 
+### Run Ozone FOSS locally
+
+#### Prerequisites
+Install Git, Maven and Docker Compose
+
+#### For Linux OS
+Create the docker group and add your user to it. Checkout the guide [here](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user).
+
+
 ## 1. Quick start
 
-### Run Ozone FOSS locally
-Install Git, Maven and Docker Compose and type in the following in a terminal:
-<table>
-<tr>
-<td> macOS </td> <td> Linux </td>
-</tr>
-<tr>
-<td>
+### Setup Ozone FOSS locally
+Type in the following in a terminal:
 
 ```bash
 $ git clone https://github.com/ozone-his/ozone-docker
 $ cd ozone-docker
 $ ./start-demo.sh
 ```
-
-</td>
-<td>
-
-```bash
-$ git clone https://github.com/ozone-his/ozone-docker
-$ cd ozone-docker
-$ sudo -E ./start-demo.sh
-```
-
-</td>
-</tr>
-</table>
 
 It may take some time to download and setup Ozone for the first time, so hang tight :hourglass_flowing_sand:
 
