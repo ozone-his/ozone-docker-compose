@@ -2,6 +2,12 @@
 
 Welcome to the Ozone FOSS manual setup guide. This guide details the setup of Ozone FOSS step by step.
 
+#### Prerequisites
+Install Git, Maven and Docker Compose
+
+#### For Linux OS
+Create the docker group and add your user to it. Checkout the guide [here](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user).
+
 ### Create your working directory
 
 Move to the location of your choice, e.g., your home folder:
