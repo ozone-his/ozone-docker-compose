@@ -87,7 +87,7 @@ export O3_FRONTEND_TAG=3.0.0-beta.2
 
 If you are doing development on Ozone and are building the Ozone distro in your local environment, then you would need to override `DISTRO_PATH` to point to your distro build folder. For example if your working folder is `/your/path/to/ozone-distro` for the distro then you would want to do something like this:
 ```bash
-$ export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-1.0.0-SNAPSHOT
+$ export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-$VERSION
 ```
 
 ### Step 6. Start Ozone
