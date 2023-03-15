@@ -16,8 +16,8 @@ Welcome to the Ozone FOSS manual setup guide. This guide details the setup of Oz
 
 ## Prerequisites
 * Install Git, Maven and Docker Compose
-* ⚠️ On Linux: create the `docker` group and add your user to it. Checkout the guide [here](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user).
-  * In this guide we assume that you run the `docker` command as the same user and in the same window in which you exported your variables. If Docker is run as sudo (which is not recommended), your user's envvars will not have any effect as `su`. Make sure to either export them as `su` as well, or run `docker` with `sudo -E` option to preserve the user environment.
+* ⚠️ On Linux: create the `docker` user group and add your user to it. Checkout the guide [here](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user).
+  * we assume in our setup instructions that you run the `docker` command as the same user and in the same window in which you exported your variables. If Docker is run as `sudo` (which is not recommended), your user's envvars will not have any effect as `su` (or `root`). Make sure to either export them as `su` as well, or use `sudo -E docker` to preserve the user envvars as `su`.
 
 
 ## Manual Setup Steps
