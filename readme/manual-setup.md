@@ -26,35 +26,35 @@ Welcome to the Ozone FOSS manual setup guide. This guide details the setup of Oz
 Move to the location of your choice, e.g., your home folder:
 
 ```bash
-$ cd ~/
+cd ~/
 ```
 
 Then create the Ozone working directory and save the path:
 ```bash
-$ export OZONE_DIR=$PWD/ozone && \
+export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR && cd $OZONE_DIR
 ```
 ### Step 2. Clone the ozone-docker project
 
 ```bash
-$ git clone https://github.com/ozone-his/ozone-docker
+git clone https://github.com/ozone-his/ozone-docker
 ```
 
 ```bash
-$ cd ozone-docker
+cd ozone-docker
 ```
 
 ### Step 3. Destroy the running instance containers
 If you have already set up Ozone before you may need to clean up your local environment first:
 
 ```bash
-$ ./destroy-demo.sh
+./destroy-demo.sh
 ```
 
 ### Step 4. Download and extract the distribution
 
 ```bash
-$ export VERSION=1.0.0-alpha.1 && \
+export VERSION=1.0.0-alpha.1 && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -Dtransitive=false --legacy-local-repository && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
 ```
@@ -87,11 +87,11 @@ export O3_FRONTEND_TAG=3.0.0-beta.2
 
 If you are doing development on Ozone and are building the Ozone distro in your local environment, then you would need to override `DISTRO_PATH` to point to your distro build folder. For example if your working folder is `/your/path/to/ozone-distro` for the distro then you would want to do something like this:
 ```bash
-$ export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-$VERSION
+export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-$VERSION
 ```
 
 ### Step 6. Start Ozone
 
 ```bash
-$ docker compose -p $DISTRO_GROUP up
+docker compose -p $DISTRO_GROUP up
 ```
