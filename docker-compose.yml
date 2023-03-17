@@ -62,7 +62,7 @@ services:
 
   # OpenMRS
   openmrs:
-    image: mekomsolutions/openmrs
+    image: openmrs/openmrs-reference-application-3-backend:${TAG:-nightly}
     depends_on:
       mysql:
         condition: service_started
@@ -71,13 +71,13 @@ services:
     ports:
       - "8080:8080"
     environment:
-      MODULE_WEB_ADMIN: "true"
-      DB_AUTO_UPDATE: "true"
-      DB_CREATE_TABLES: "true"
-      DB_HOST: ${OPENMRS_DB_HOST}
-      DB_DATABASE: openmrs
-      DB_USERNAME: ${OPENMRS_DB_USER}
-      DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
+      OMRS_CONFIG_MODULE_WEB_ADMIN: "true"
+      OMRS_CONFIG_AUTO_UPDATE_DATABASE: "true"
+      OMRS_CONFIG_CREATE_TABLES: "true"
+      OMRS_CONFIG_CONNECTION_SERVER: mysql
+      OMRS_CONFIG_CONNECTION_DATABASE: openmrs
+      OMRS_CONFIG_CONNECTION_USERNAME: ${OPENMRS_DB_USER:-openmrs}
+      OMRS_CONFIG_CONNECTION_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
     healthcheck:
       test:
         - CMD
@@ -91,12 +91,12 @@ services:
           - openmrs
           - openmrs-tomcat
     volumes:
-      - "openmrs-data:/usr/local/tomcat/.OpenMRS/"
-      - "${OPENMRS_OWAS_PATH:-openmrs-owas}:/usr/local/tomcat/.OpenMRS/owa/"
-      - "${OPENMRS_CORE_PATH}:/usr/local/tomcat/webapps"
-      - "${OPENMRS_MODULES_PATH:-openmrs-modules}:/usr/local/tomcat/.OpenMRS/modules/"
-      - "${OPENMRS_CONFIG_PATH:-openmrs-config}:/usr/local/tomcat/.OpenMRS/configuration/"
-      - "${OPENMRS_CONFIG_CHECKSUMS_PATH:-openmrs-config-checksums}:/usr/local/tomcat/.OpenMRS/configuration_checksums/"
+      - "openmrs-data:/openmrs/data"
+      - "${OPENMRS_OWAS_PATH:-openmrs-owas}:/openmrs/distribution/openmrs_owas/"
+      - "${OPENMRS_CORE_PATH}:/openmrs/distribution/openmrs_core/"
+      - "${OPENMRS_MODULES_PATH:-openmrs-modules}:/openmrs/distribution/openmrs_modules/"
+      - "${OPENMRS_CONFIG_PATH:-openmrs-config}:/openmrs/distribution/openmrs_config/"
+      - "${OPENMRS_CONFIG_CHECKSUMS_PATH:-openmrs-config-checksums}:/openmrs/data/configuration_checksums"
       - "${OZONE_CONFIG_PATH:-ozone-config}/openmrs-properties:/etc/properties/"
 
   # MySQL
