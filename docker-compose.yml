@@ -62,7 +62,7 @@ services:
 
   # OpenMRS
   openmrs:
-    image: openmrs/openmrs-reference-application-3-backend:${TAG:-nightly}
+    image: openmrs/openmrs-reference-application-3-backend:${O3_BACKEND_TAG:-nightly}
     depends_on:
       mysql:
         condition: service_started
