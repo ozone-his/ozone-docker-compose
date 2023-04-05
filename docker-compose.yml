@@ -2,6 +2,7 @@ services:
 
   # Apache HTTPD - Entry point for the application.
   proxy:
+    restart: unless-stopped
     build:
       context: proxy/
       args:
@@ -34,6 +35,7 @@ services:
   # Bahmni Appointments
   appointments:
     image: mekomsolutions/appointments
+    restart: unless-stopped
     healthcheck:
       test:
         - CMD
@@ -47,6 +49,7 @@ services:
           - appointments-1
   env-substitution:
     image: mekomsolutions/env-substitution
+    restart: on-failure
     environment:
       - ODOO_PUBLIC_URL=${HOST_URL}:8069
       - SENAITE_PUBLIC_URL=${HOST_URL}:8081
@@ -63,6 +66,7 @@ services:
   # OpenMRS
   openmrs:
     image: openmrs/openmrs-reference-application-3-backend:${O3_BACKEND_TAG:-nightly}
+    restart: unless-stopped
     depends_on:
       mysql:
         condition: service_started
@@ -113,6 +117,7 @@ services:
     healthcheck:
       test: "exit 0"
     image: mariadb:10.2
+    restart: unless-stopped
     networks:
       ozone:
         aliases:
@@ -126,6 +131,7 @@ services:
   # Postgreql - Database shared by multiple services.
   postgresql:
     image: postgres:13
+    restart: unless-stopped
     command: postgres -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -165,6 +171,7 @@ services:
       postgresql:
         condition: service_healthy
     image: mekomsolutions/odoo
+    restart: unless-stopped
     environment:
       - HOST=${POSTGRES_DB_HOST}
       - USER=${ODOO_DB_USER}
@@ -187,6 +194,7 @@ services:
   # OpenMRS 3 Microfrontends
   frontend:
     image: openmrs/openmrs-reference-application-3-frontend:${O3_FRONTEND_TAG:-nightly}
+    restart: unless-stopped
     environment:
       SPA_PATH: /openmrs/spa
       API_URL: /openmrs
@@ -202,7 +210,7 @@ services:
           - frontend
   redis:
     image: redis:7
-    restart: always
+    restart: unless-stopped
     volumes:
       - redis:/data
     networks:
@@ -211,7 +219,7 @@ services:
           - redis
   superset:
     image: amancevice/superset:1.5.1
-    restart: always
+    restart: unless-stopped
     depends_on:
       redis:
         condition: service_started
@@ -237,7 +245,7 @@ services:
           - superset
   superset-worker:
     image: amancevice/superset:1.5.1
-    restart: always
+    restart: unless-stopped
     depends_on:
       redis:
         condition: service_started
@@ -287,6 +295,7 @@ services:
       - ADMIN_USER=${ADMIN_USER}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     image: mekomsolutions/senaite:latest
+    restart: unless-stopped
     volumes:
     - ${SENAITE_CONFIG_PATH}/data:/data/importdata/senaite
     - senaite-filestorage:/data/filestorage
@@ -300,6 +309,7 @@ services:
         condition: service_completed_successfully
   eip-client: 
     image: mekomsolutions/eip-client
+    restart: unless-stopped
     volumes:
       - "${EIP_PATH:-eipapp}/config:/config"
       - "${EIP_PATH:-eipapp}/routes:/routes"
