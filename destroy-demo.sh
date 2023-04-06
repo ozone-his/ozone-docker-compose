@@ -19,12 +19,15 @@ DOCKER_SERVER_VERSION_MAJOR=$(echo "$DOCKER_SERVER_VERSION"| cut -d'.' -f 1)
 DOCKER_SERVER_VERSION_MINOR=$(echo "$DOCKER_SERVER_VERSION"| cut -d'.' -f 2)
 DOCKER_SERVER_VERSION_BUILD=$(echo "$DOCKER_SERVER_VERSION"| cut -d'.' -f 3)
 
-if [ "${DOCKER_SERVER_VERSION_MAJOR}" -ge 20 ] && \
-   [ "${DOCKER_SERVER_VERSION_MINOR}" -ge 10 ]  && \
-   [ "${DOCKER_SERVER_VERSION_BUILD}" -ge 13 ]; then
-    echo "Docker version >= 20.10.13 using docker compose v2"
+INSTALLED_DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
+MINIMUM_REQUIRED_DOCKER_VERSION_REGEX="^((([2-9][1-9]|[3-9][0]|[0-9]{3,}).*)|(20\.([0-9]{3,}|[1-9][1-9]|[2-9][0]).*)|(20\.10\.([0-9]{3,}|[2-9][0-9]|[1][3-9])))"
+if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; then
+    echo "Docker version >= 20.10.13, using Docker Compose V2"
+    if command -v gp version &> /dev/null; then
+        export PROXY_TLS="-DgitPodEnvironment"
+    fi
     docker compose down -v
 else
-    echo "Docker version < 20.10.13 using docker compose v1"
+    echo "Docker versions < 20.10.13 are not supported"
     docker-compose down -v
 fi
