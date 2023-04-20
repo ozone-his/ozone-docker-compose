@@ -90,6 +90,22 @@ export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initial
 export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
 export O3_FRONTEND_TAG=3.0.0-beta.8
 ```
+
+#### Activate demo data generation
+
+```bash
+find $OPENMRS_CONFIG_PATH/globalproperties -type f -name "globalproperties_core-demo.xml" -exec sed -i '' -e "s|<value>.*[0-9]*.*</value>|<value>0</value>|" {} \;
+
+mkdir -p $EIP_PATH/routes/demo
+mkdir -p $EIP_PATH/config/demo
+
+cp ./demo/eip/routes/generate-demo-data-route.xml $EIP_PATH/routes/demo/
+cp ./demo/eip/config/application.properties $EIP_PATH/config/demo/
+
+export NUMBER_OF_DEMO_PATIENTS=50
+```
+Note: The generation of demo data is triggered 10 minutes after the instance has started.
+
 #### For developers: Override of `DISTRO_PATH`
 
 If you are doing development on Ozone and are building the Ozone distro in your local environment, then you would need to override `DISTRO_PATH` to point to your distro build folder. For example if your working folder is `/your/path/to/ozone-distro` for the distro then you would want to do something like this:
