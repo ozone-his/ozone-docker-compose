@@ -89,8 +89,46 @@ If you are doing development on Ozone and are building the Ozone distro in your 
 ```bash
 export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-$VERSION
 ```
+### Using Traefik Proxy (This won't work in GitPod)
+
+Running with Traefik  assumes existence of a well configured Traefik Reverse proxy running in the Docker network `web` for development purposes you can use https://github.com/mekomsolutions/traefik-docker-compose-dev.
+
+In production Traefik has to be configured with a wildcard domain  pointed to it so we can have component subdomains configured.
+
+For development purposes using Traefik we need to use domains and we rely on the special domain `traefik.me`
+
+### Traefik hostnames on macOS
+
+Docker desktop for MacOS does not provide a static IP address which complicates the use of the `traefik.me` domain. For example the domain
+`app-172-17-0-1.traefik.me` will resolve the docker host IP `172.17.0.1` which will work on Linux without any special considerations but on MacOS the only way to use the `traefik.me` with docker is to use the IP assigned  the host.
+
+The default hostnames 
+
+```
+O3_HOSTNAME=emr-172-17-0-1.traefik.me
+ODOO_HOSTNAME=erp-172-17-0-1.traefik.me
+SENAITE_HOSTNAME=lims-172-17-0-1.traefik.me
+SUPERSET_HOSTNAME=analytics-172-17-0-1.traefik.me
+```
+will work only on Linux, on macOS you have to set the IP to you ethernet IP so run before running Ozone.
+
+```
+export IP="${$(ipconfig getifaddr en0)//./-}"; \
+export O3_HOSTNAME=emr-"${IP}.traefik.me"; \
+export ODOO_HOSTNAME=erp-"${IP}.traefik.me";  \
+export SENAITE_HOSTNAME=lims-"${IP}.traefik.me";  \
+export SUPERSET_HOSTNAME=analytics-"${IP}.traefik.me";  
+```
 
 ### Step 6. Start Ozone
+
+#### With Apache 2
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose-proxy.yml -p $DISTRO_GROUP up
+```
+
+#### With Traefik
 
 ```bash
 docker compose -p $DISTRO_GROUP up

@@ -1,0 +1,32 @@
+services:
+
+  # Apache HTTPD - Entry point for the application.
+  proxy:
+    restart: unless-stopped
+    build:
+      context: proxy/
+      args:
+        TIMEZONE: "${TIMEZONE}"
+    command: "httpd-foreground ${PROXY_TLS}"
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - "-f"
+        - "http://localhost/"
+    networks:
+      ozone:
+        aliases:
+          - ozone-proxy
+          - proxy
+    ports:
+      - "${PROXY_PUBLIC_PORT}:80"
+      - "${PROXY_PUBLIC_PORT_TLS}:443"
+      - "8069:8069"
+      - "8081:8081"
+    volumes:
+      - "./proxy/confs:/usr/local/apache2/conf/extra"
+      - "${PROXY_TLS_CERTS_PATH:-proxy-tls-certs}:/etc/tls"
+    depends_on:
+      - frontend
+      - openmrs
