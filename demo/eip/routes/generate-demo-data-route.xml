@@ -3,7 +3,7 @@
         <!-- Triggering generation of demo data on OpenMRS EMR after 10 minutes  -->
         <from uri="scheduler:generateDemoData?initialDelay=600000&amp;repeatCount=1" />
         
-        <log message="Sheduled Demo Data generation." />
+        <log message="Sheduled demo data generation." />
 
         <to uri="direct:authenticate-to-openmrs"/>
 
