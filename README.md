@@ -15,10 +15,10 @@ Type in the following in a terminal:
 ```bash
 git clone https://github.com/ozone-his/ozone-docker
 cd ozone-docker
-# Create the web network if it does not exist.
-# The project is configured to run behind Traefik running in the web network but the demo uses Apache
-# So you have to create this network for docker compose to work.
-# For running behind Traefik see the manual instractions.
+# Create the web Docker network if it does not exist yet.
+# The project is configured to run behind Traefik running in the web Docker network but the demo uses Apache.
+# So you have to create this network for Docker Compose to work.
+# For running behind Traefik see the manual instructions.
 docker network create web
 ./start-demo.sh
 ```
