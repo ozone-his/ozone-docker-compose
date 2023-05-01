@@ -92,7 +92,9 @@ export O3_FRONTEND_TAG=3.0.0-beta.8
 ```
 
 #### Activate demo data generation
+In waiting for all demo data to be managed through its own separate microservice we manually add an EIP route that takes care of generating demo data (and for now only OpenMRS demo data).
 
+This disables OpenMRS' default behaviour and adds the route:
 ```bash
 find $OPENMRS_CONFIG_PATH/globalproperties -type f -name "globalproperties_core-demo.xml" -exec sed -i '' -e "s|<value>.*[0-9]*.*</value>|<value>0</value>|" {} \;
 
@@ -101,7 +103,9 @@ mkdir -p $EIP_PATH/config/demo
 
 cp ./demo/eip/routes/generate-demo-data-route.xml $EIP_PATH/routes/demo/
 cp ./demo/eip/config/application.properties $EIP_PATH/config/demo/
-
+```
+Then use this to set the number of demo patients to be generated:
+```bash
 export NUMBER_OF_DEMO_PATIENTS=50
 ```
 Note: The generation of demo data is triggered 10 minutes after the instance has started.
