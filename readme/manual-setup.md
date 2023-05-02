@@ -90,7 +90,11 @@ If you are doing development on Ozone and are building the Ozone distro in your 
 ```bash
 export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-$VERSION
 ```
-### Step 6. Setting up Traefik
+## Step 6 Create Public Network
+
+```docker network create web```
+
+### Step 7. Setting up Traefik
 
 #### Using Traefik Proxy
 
@@ -124,7 +128,7 @@ export SENAITE_HOSTNAME=lims-"${IP}.traefik.me";  \
 export SUPERSET_HOSTNAME=analytics-"${IP}.traefik.me";  
 ```
 
-### Step 7. Start Ozone
+### Step 8. Start Ozone
 #### With Traefik
 
 ```bash
