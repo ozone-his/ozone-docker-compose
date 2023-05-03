@@ -93,7 +93,6 @@ export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-$VERSION
 ## Step 6 Create Public Network
 
 ```docker network create web```
-
 ### Step 7. Setting up Traefik
 
 #### Using Traefik Proxy
@@ -139,3 +138,25 @@ docker compose -p $DISTRO_GROUP up
 ```bash
 docker compose -f docker-compose.yml -f docker-compose-proxy.yml -p $DISTRO_GROUP up
 ```
+
+## Step 9. Browse Ozone
+Ozone FOSS requires you to log into each component separately:
+
+| HIS Component     | URL                            | Username | Password |
+|-------------------|--------------------------------|----------|----------|
+| OpenMRS 3         | http://localhost/openmrs/spa  | admin    | Admin123 |
+| OpenMRS Legacy UI | http://localhost/openmrs      | admin    | Admin123 |
+| SENAITE           | http://localhost:8081/senaite | admin    | password |
+| Odoo              | http://localhost:8069         | admin    | admin    |
+| Superset          | http://localhost:8088         | admin    | password |
+
+If you followed the manual Steps and started the Project with Traefik the coordinates for the components will be different.
+For macOS replace 172-17-0-1 with your host IP. For example if your host IP is 192.168.200.197 replace with 192-168-200-197
+
+| HIS Component     | URL                            | Username | Password |
+|-------------------|--------------------------------|----------|----------|
+| OpenMRS 3         | https://emr-172-17-0-1.traefik.me  | admin    | Admin123 |
+| OpenMRS Legacy UI | https://emr-172-17-0-1.traefik.me/openmrs   | admin    | Admin123 |
+| SENAITE           | https://lims-172-17-0-1.traefik.me | admin    | password |
+| Odoo              | https://erp-172-17-0-1.traefik.me       | admin    | admin    |
+| Superset          | https://analytics-172-17-0-1.traefik.me       | admin    | password |

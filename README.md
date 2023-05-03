@@ -43,16 +43,6 @@ Ozone FOSS requires you to log into each component separately:
 | Odoo              | http://localhost:8069         | admin    | admin    |
 | Superset          | http://localhost:8088         | admin    | password |
 
-If you followed the manual Steps and started the Project with Traefik the coordinates for the components will be different.
-For macOS replace 172-17-0-1 with your host IP. For example if your host IP is 192.168.200.197 replace with 192-168-200-197
-
-| HIS Component     | URL                            | Username | Password |
-|-------------------|--------------------------------|----------|----------|
-| OpenMRS 3         | htts://emr-172-17-0-1.traefik.me  | admin    | Admin123 |
-| OpenMRS Legacy UI | htts://emr-172-17-0-1.traefik.me/openmrs   | admin    | Admin123 |
-| SENAITE           | htts://lims-172-17-0-1.traefik.me | admin    | password |
-| Odoo              | htts://erp-172-17-0-1.traefik.me       | admin    | admin    |
-| Superset          | htts://analytics-172-17-0-1.traefik.me       | admin    | password |
 
 :bulb: **Did you know?** Ozone Pro comes with single sign-on (SSO) and all its integration layer is secured with OAuth2.
 
