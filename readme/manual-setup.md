@@ -6,19 +6,20 @@ Welcome to the Ozone FOSS manual setup guide. This guide details the setup of Oz
 - [Manual Setup Steps](#manual-setup-steps)
   * [Step 1. Create your working directory](#step-1-create-your-working-directory)
   * [Step 2. Clone the ozone-docker project](#step-2-clone-the-ozone-docker-project)
-  * [Step 3. Destroy the running instance containers](#step-3-destroy-the-running-instance-containers)
-  * [Step 4. Download and extract the distribution](#step-4-download-and-extract-the-distribution)
-  * [Step 5. Export all needed environment variables](#step-5-export-all-needed-environment-variables)
-  * [Step 6. Setting up Traefik](#step-6-setting-up-traefik)
-  * [Step 7. Start Ozone](#step-7-start-ozone)
+  * [Step 3. Create the public Docker network](#step-3-create-the-public-docker-network)
+  * [Step 4. Destroy the running instance containers](#step-4-destroy-the-running-instance-containers)
+  * [Step 5. Download and extract the distribution](#step-5-download-and-extract-the-distribution)
+  * [Step 6. Export all needed environment variables](#step-6-export-all-needed-environment-variables)
+  * [Step 7. Set up Traefik](#step-7-set-up-traefik)
+  * [Step 8. Start Ozone](#step-8-start-ozone)
+  * [Step 9. Browse Ozone](#step-9-browse-ozone)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>(Table of contents generated with markdown-toc)</a></i></small>
-
 
 ## Prerequisites
 * Install Git, Maven and Docker Compose
 * ⚠️ On Linux: create the `docker` user group and add your user to it. Checkout the guide [here](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user).
-  * we assume in our setup instructions that you run the `docker` command as the same user and in the same window in which you exported your variables. If Docker is run as `sudo` (which is not recommended), your user's envvars will not have any effect as `su` (or `root`). Make sure to either export them as `su` as well, or use `sudo -E docker` to preserve the user envvars as `su`.
+  * We assume in our setup instructions that you run the `docker` command as the same user and in the same window in which you exported your variables. If Docker is run as `sudo` (which is not recommended), your user's envvars will not have any effect as `su` (or `root`). Make sure to either export them as `su` as well, or use `sudo -E docker` to preserve the user envvars as `su`.
 
 
 ## Manual Setup Steps
@@ -45,14 +46,19 @@ git clone https://github.com/ozone-his/ozone-docker
 cd ozone-docker
 ```
 
-### Step 3. Destroy the running instance containers
+### Step 3. Create the public Docker network
+```bash
+docker network create web
+```
+
+### Step 4. Destroy the running instance containers
 If you have already set up Ozone before you may need to clean up your local environment first:
 
 ```bash
 ./destroy-demo.sh
 ```
 
-### Step 4. Download and extract the distribution
+### Step 5. Download and extract the distribution
 
 ```bash
 export VERSION=1.0.0-alpha.1 && \
@@ -60,7 +66,7 @@ export VERSION=1.0.0-alpha.1 && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
 ```
 
-### Step 5. Export all needed environment variables
+### Step 6. Export all needed environment variables
 
 The Ozone Docker project relies on a number of environment variables (env vars) to document where the distro assets are expected to be found.
 For the sample demo you can export the following env vars:
@@ -90,20 +96,20 @@ If you are doing development on Ozone and are building the Ozone distro in your 
 ```bash
 export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-$VERSION
 ```
-## Step 6 Create Public Network
 
-```docker network create web```
-### Step 7. Setting up Traefik
+### Step 7. Set up Traefik
 
-#### Using Traefik Proxy
+This step is optional but recommended since Traefik brings many benefits as a reverse proxy for your Ozone project.
+⚠️ Traefik will not work in Gitpod.
 
-⚠️ This will not work in Gitpod.
+#### Using Traefik proxy
 
-When you are running a project with Traefik, it assumes that there is already a properly configured Traefik reverse proxy that is running in the `web` Docker network. To simplify this process for development purposes, you can use the pre-configured Traefik reverse proxy provided by `https://github.com/mekomsolutions/traefik-docker-compose-dev`.
+When you select to use Traefik as the proxy for this project, it requires a properly configured Traefik reverse proxy that is already running in the `web` Docker network that was created earlier.
+To make things easier for development purposes, you can use a pre-configured Traefik reverse proxy that is provided at [mekomsolutions/traefik-docker-compose-dev](https://github.com/mekomsolutions/traefik-docker-compose-dev). This saves you the time and effort required to set up and configure a new Traefik reverse proxy from scratch.
 
-However, in a production environment, Traefik needs to be configured with a wildcard domain that points to it. This allows for the configuration of subdomains for different components. 
+It is better to use domains with Traefik and we will rely on the special domain `traefik.me` for this purpose.
 
-For development purposes using Traefik, you also need to use domains, and the special domain `traefik.me` is relied upon for this purpose.
+⚠️ The special domain `traefik.me` requires access to the Internet.
 
 #### Traefik hostnames on macOS
 
@@ -111,14 +117,14 @@ In Linux, the domain `app-172-17-0-1.traefik.me` will resolve the Docker host IP
 
 The only way to use the `traefik.me` domain with Docker on macOS is to use the IP address assigned to the host. This means that instead of using `app-172-17-0-1.traefik.me`, you would need to use the IP address of the Docker host machine in your configuration.
 
-The default hostnames 
+The default hostnames below will only work on Linux:
 ```bash
 O3_HOSTNAME=emr-172-17-0-1.traefik.me
 ODOO_HOSTNAME=erp-172-17-0-1.traefik.me
 SENAITE_HOSTNAME=lims-172-17-0-1.traefik.me
 SUPERSET_HOSTNAME=analytics-172-17-0-1.traefik.me
 ```
-will work only on Linux. On macOS you have to set the IP to your ethernet IP by setting the following envvars:
+On macOS you need the extra step to set the IP to your ethernet IP like this:
 ```bash
 export IP="${$(ipconfig getifaddr en0)//./-}"; \
 export O3_HOSTNAME=emr-"${IP}.traefik.me"; \
@@ -128,35 +134,27 @@ export SUPERSET_HOSTNAME=analytics-"${IP}.traefik.me";
 ```
 
 ### Step 8. Start Ozone
-#### With Traefik
-
-```bash
-docker compose -p $DISTRO_GROUP up
-```
 #### With Apache 2
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose-proxy.yml -p $DISTRO_GROUP up
 ```
+#### With Traefik
 
-## Step 9. Browse Ozone
+```bash
+docker compose -p $DISTRO_GROUP up
+```
+
+### Step 9. Browse Ozone
 Ozone FOSS requires you to log into each component separately:
 
-| HIS Component     | URL                            | Username | Password |
-|-------------------|--------------------------------|----------|----------|
-| OpenMRS 3         | http://localhost/openmrs/spa  | admin    | Admin123 |
-| OpenMRS Legacy UI | http://localhost/openmrs      | admin    | Admin123 |
-| SENAITE           | http://localhost:8081/senaite | admin    | password |
-| Odoo              | http://localhost:8069         | admin    | admin    |
-| Superset          | http://localhost:8088         | admin    | password |
+| HIS Component     | Apache 2 URL                  | Traefik (Linux) URL                       | Username | Password |
+|-------------------|-------------------------------|-------------------------------------------|----------|----------|
+| OpenMRS 3         | http://localhost/openmrs/spa  | https://emr-172-17-0-1.traefik.me         | admin    | Admin123 |
+| OpenMRS Legacy UI | http://localhost/openmrs      | https://emr-172-17-0-1.traefik.me/openmrs | admin    | Admin123 |
+| SENAITE           | http://localhost:8081/senaite | https://lims-172-17-0-1.traefik.me        | admin    | password |
+| Odoo              | http://localhost:8069         | https://erp-172-17-0-1.traefik.me         | admin    | admin    |
+| Superset          | http://localhost:8088         | https://analytics-172-17-0-1.traefik.me   | admin    | password |
 
-If you followed the manual Steps and started the Project with Traefik the coordinates for the components will be different.
-For macOS replace 172-17-0-1 with your host IP. For example if your host IP is 192.168.200.197 replace with 192-168-200-197
-
-| HIS Component     | URL                            | Username | Password |
-|-------------------|--------------------------------|----------|----------|
-| OpenMRS 3         | https://emr-172-17-0-1.traefik.me  | admin    | Admin123 |
-| OpenMRS Legacy UI | https://emr-172-17-0-1.traefik.me/openmrs   | admin    | Admin123 |
-| SENAITE           | https://lims-172-17-0-1.traefik.me | admin    | password |
-| Odoo              | https://erp-172-17-0-1.traefik.me       | admin    | admin    |
-| Superset          | https://analytics-172-17-0-1.traefik.me       | admin    | password |
+⚠️ If you started the project with Traefik on macOS the coordinates for the components will be different and you will have to replace "`172-17-0-1`" with your host IP.
+E.g. if your host IP is 192.168.200.197, https://emr-172-17-0-1.traefik.me will have to become https://emr-192-168-200-197.traefik.me, etc.
