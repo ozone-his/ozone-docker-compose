@@ -9,7 +9,8 @@ Welcome to the Ozone FOSS manual setup guide. This guide details the setup of Oz
   * [Step 3. Destroy the running instance containers](#step-3-destroy-the-running-instance-containers)
   * [Step 4. Download and extract the distribution](#step-4-download-and-extract-the-distribution)
   * [Step 5. Export all needed environment variables](#step-5-export-all-needed-environment-variables)
-  * [Step 6. Start Ozone](#step-6-start-ozone)
+  * [Step 6. Setting up Traefik](#step-6-setting-up-traefik)
+  * [Step 7. Start Ozone](#step-7-start-ozone)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>(Table of contents generated with markdown-toc)</a></i></small>
 
@@ -89,9 +90,73 @@ If you are doing development on Ozone and are building the Ozone distro in your 
 ```bash
 export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-$VERSION
 ```
+## Step 6 Create Public Network
 
-### Step 6. Start Ozone
+```docker network create web```
+### Step 7. Setting up Traefik
+
+#### Using Traefik Proxy
+
+⚠️ This will not work in Gitpod.
+
+When you are running a project with Traefik, it assumes that there is already a properly configured Traefik reverse proxy that is running in the `web` Docker network. To simplify this process for development purposes, you can use the pre-configured Traefik reverse proxy provided by `https://github.com/mekomsolutions/traefik-docker-compose-dev`.
+
+However, in a production environment, Traefik needs to be configured with a wildcard domain that points to it. This allows for the configuration of subdomains for different components. 
+
+For development purposes using Traefik, you also need to use domains, and the special domain `traefik.me` is relied upon for this purpose.
+
+#### Traefik hostnames on macOS
+
+In Linux, the domain `app-172-17-0-1.traefik.me` will resolve the Docker host IP `172.17.0.1` without any special considerations. However, Docker desktop for macOS does not provide a static IP address, which makes it challenging to use the `traefik.me` domain in the same way.
+
+The only way to use the `traefik.me` domain with Docker on macOS is to use the IP address assigned to the host. This means that instead of using `app-172-17-0-1.traefik.me`, you would need to use the IP address of the Docker host machine in your configuration.
+
+The default hostnames 
+```bash
+O3_HOSTNAME=emr-172-17-0-1.traefik.me
+ODOO_HOSTNAME=erp-172-17-0-1.traefik.me
+SENAITE_HOSTNAME=lims-172-17-0-1.traefik.me
+SUPERSET_HOSTNAME=analytics-172-17-0-1.traefik.me
+```
+will work only on Linux. On macOS you have to set the IP to your ethernet IP by setting the following envvars:
+```bash
+export IP="${$(ipconfig getifaddr en0)//./-}"; \
+export O3_HOSTNAME=emr-"${IP}.traefik.me"; \
+export ODOO_HOSTNAME=erp-"${IP}.traefik.me";  \
+export SENAITE_HOSTNAME=lims-"${IP}.traefik.me";  \
+export SUPERSET_HOSTNAME=analytics-"${IP}.traefik.me";  
+```
+
+### Step 8. Start Ozone
+#### With Traefik
 
 ```bash
 docker compose -p $DISTRO_GROUP up
 ```
+#### With Apache 2
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose-proxy.yml -p $DISTRO_GROUP up
+```
+
+## Step 9. Browse Ozone
+Ozone FOSS requires you to log into each component separately:
+
+| HIS Component     | URL                            | Username | Password |
+|-------------------|--------------------------------|----------|----------|
+| OpenMRS 3         | http://localhost/openmrs/spa  | admin    | Admin123 |
+| OpenMRS Legacy UI | http://localhost/openmrs      | admin    | Admin123 |
+| SENAITE           | http://localhost:8081/senaite | admin    | password |
+| Odoo              | http://localhost:8069         | admin    | admin    |
+| Superset          | http://localhost:8088         | admin    | password |
+
+If you followed the manual Steps and started the Project with Traefik the coordinates for the components will be different.
+For macOS replace 172-17-0-1 with your host IP. For example if your host IP is 192.168.200.197 replace with 192-168-200-197
+
+| HIS Component     | URL                            | Username | Password |
+|-------------------|--------------------------------|----------|----------|
+| OpenMRS 3         | https://emr-172-17-0-1.traefik.me  | admin    | Admin123 |
+| OpenMRS Legacy UI | https://emr-172-17-0-1.traefik.me/openmrs   | admin    | Admin123 |
+| SENAITE           | https://lims-172-17-0-1.traefik.me | admin    | password |
+| Odoo              | https://erp-172-17-0-1.traefik.me       | admin    | admin    |
+| Superset          | https://analytics-172-17-0-1.traefik.me       | admin    | password |
