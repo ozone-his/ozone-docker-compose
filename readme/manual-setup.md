@@ -99,7 +99,10 @@ export DISTRO_PATH=/your/path/to/ozone-distro/target/ozone-distro-$VERSION
 
 ### Step 7. Set up Traefik
 
-This step is optional but recommended since Traefik brings many benefits as a reverse proxy for your Ozone project.
+This step is optional but recommended since Traefik brings many benefits as a reverse proxy for your Ozone project. 
+
+Traefik solves a known URL redirection issue that will show up when using Apache 2. Incorrect `/spahome` redirections occur (instead of of the correct `/spa/home` path), leading to disrupting 404 errors that need to be corrected manually by changing the incorrect URL in the browser's address bar.
+
 ⚠️ Traefik will not work in Gitpod.
 
 #### Using Traefik proxy
