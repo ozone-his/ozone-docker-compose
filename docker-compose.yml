@@ -15,6 +15,8 @@ services:
       ozone:
         aliases:
           - appointments-1
+          
+  # mekomsolutions/env-substitution
   env-substitution:
     image: mekomsolutions/env-substitution
     restart: on-failure
@@ -30,8 +32,7 @@ services:
         aliases:
           - env-substitution
         
-
-  # OpenMRS
+  # OpenMRS 3 Backend
   openmrs:
     image: openmrs/openmrs-reference-application-3-backend:${O3_BACKEND_TAG:-nightly}
     restart: unless-stopped
@@ -102,7 +103,7 @@ services:
     ports:
       - "3306:3306"
     
-  # Postgreql - Database shared by multiple services.
+  # Postgresql
   postgresql:
     image: postgres:13
     restart: unless-stopped
@@ -116,14 +117,15 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      # Analystics
+      # Analytics
       ANALYTICS_DB_NAME: ${ANALYTICS_DB_NAME}
       ANALYTICS_DB_USER: ${ANALYTICS_DB_USER}
       ANALYTICS_DB_PASSWORD: ${ANALYTICS_DB_PASSWORD}
-      # Odoo DB vars
+      # Odoo
       ODOO_DB_NAME: odoo
       ODOO_DB_USER: ${ODOO_DB_USER}
       ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD}
+      # Superset
       SUPERSET_DB: ${SUPERSET_DB}
       SUPERSET_DB_USER: ${SUPERSET_DB_USER}
       SUPERSET_DB_PASSWORD: ${SUPERSET_DB_PASSWORD}
@@ -138,8 +140,7 @@ services:
     ports:
       - "5432:5432"
     
-
-  # Odoo - The ERP component of Ozone.
+  # Odoo
   odoo:
     depends_on:
       postgresql:
@@ -196,7 +197,7 @@ services:
       traefik.http.middlewares.limit.buffering.memRequestBodyBytes: 20971520
       traefik.http.middlewares.limit.buffering.maxRequestBodyBytes: 20971520
 
-  # OpenMRS 3 Microfrontends
+  # OpenMRS 3 Frontend
   frontend:
     image: openmrs/openmrs-reference-application-3-frontend:${O3_FRONTEND_TAG:-nightly}
     restart: unless-stopped
@@ -236,6 +237,7 @@ services:
       traefik.http.middlewares.root-redirectregex.redirectregex.regex: https://${O3_HOSTNAME}
       traefik.http.middlewares.root-redirectregex.redirectregex.replacement: https://${O3_HOSTNAME}/openmrs/spa/home
       traefik.http.middlewares.gzip.compress: true
+      
   redis:
     image: redis:7
     restart: unless-stopped
@@ -245,6 +247,8 @@ services:
       ozone:
         aliases:
           - redis
+
+  # Superset
   superset:
     image: amancevice/superset:1.5.1
     restart: unless-stopped
@@ -323,6 +327,8 @@ services:
       ozone:
         aliases:
           - superset-init
+
+  # SENAITE
   senaite:
     environment: 
       - SITE=${SITE}
@@ -348,6 +354,8 @@ services:
       - "traefik.http.routers.senaite.rule=Host(`${SENAITE_HOSTNAME}`)"
       - "traefik.http.routers.senaite.middlewares=senaite"
       - "traefik.http.middlewares.senaite.addprefix.prefix=/VirtualHostBase/https/${SENAITE_HOSTNAME}/senaite/VirtualHostRoot"
+      
+  # EIP Client
   eip-client: 
     image: mekomsolutions/eip-client
     restart: unless-stopped
@@ -402,7 +410,6 @@ services:
     ports:
     - "8083:8083"
 
-    
 version: "3.7"
 volumes:
   proxy-tls-certs: ~
