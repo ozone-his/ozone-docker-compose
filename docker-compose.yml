@@ -2,7 +2,7 @@ services:
 
   # Bahmni Appointments
   appointments:
-    image: mekomsolutions/appointments:8c3bd0f
+    image: mekomsolutions/appointments
     restart: unless-stopped
     healthcheck:
       test:
@@ -15,10 +15,8 @@ services:
       ozone:
         aliases:
           - appointments-1
-          
-  # mekomsolutions/env-substitution
   env-substitution:
-    image: mekomsolutions/env-substitution:945d61e
+    image: mekomsolutions/env-substitution
     restart: on-failure
     environment:
       - ODOO_PUBLIC_URL=https://${ODOO_HOSTNAME}
@@ -32,9 +30,10 @@ services:
         aliases:
           - env-substitution
         
-  # OpenMRS 3 Backend
+
+  # OpenMRS
   openmrs:
-    image: openmrs/openmrs-reference-application-3-backend:3.0.0-beta.8
+    image: openmrs/openmrs-reference-application-3-backend:${O3_BACKEND_TAG:-nightly}
     restart: unless-stopped
     depends_on:
       mysql:
@@ -103,7 +102,7 @@ services:
     ports:
       - "3306:3306"
     
-  # Postgresql
+  # Postgreql - Database shared by multiple services.
   postgresql:
     image: postgres:13
     restart: unless-stopped
@@ -117,15 +116,14 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      # Analytics
+      # Analystics
       ANALYTICS_DB_NAME: ${ANALYTICS_DB_NAME}
       ANALYTICS_DB_USER: ${ANALYTICS_DB_USER}
       ANALYTICS_DB_PASSWORD: ${ANALYTICS_DB_PASSWORD}
-      # Odoo
+      # Odoo DB vars
       ODOO_DB_NAME: odoo
       ODOO_DB_USER: ${ODOO_DB_USER}
       ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD}
-      # Superset
       SUPERSET_DB: ${SUPERSET_DB}
       SUPERSET_DB_USER: ${SUPERSET_DB_USER}
       SUPERSET_DB_PASSWORD: ${SUPERSET_DB_PASSWORD}
@@ -140,12 +138,13 @@ services:
     ports:
       - "5432:5432"
     
-  # Odoo
+
+  # Odoo - The ERP component of Ozone.
   odoo:
     depends_on:
       postgresql:
         condition: service_healthy
-    image: mekomsolutions/odoo:bahmni_3066047
+    image: mekomsolutions/odoo
     restart: unless-stopped
     environment:
       - HOST=${POSTGRES_DB_HOST}
@@ -197,9 +196,9 @@ services:
       traefik.http.middlewares.limit.buffering.memRequestBodyBytes: 20971520
       traefik.http.middlewares.limit.buffering.maxRequestBodyBytes: 20971520
 
-  # OpenMRS 3 Frontend
+  # OpenMRS 3 Microfrontends
   frontend:
-    image: openmrs/openmrs-reference-application-3-frontend:3.0.0-beta.8
+    image: openmrs/openmrs-reference-application-3-frontend:${O3_FRONTEND_TAG:-nightly}
     restart: unless-stopped
     environment:
       SPA_PATH: /openmrs/spa
@@ -237,7 +236,6 @@ services:
       traefik.http.middlewares.root-redirectregex.redirectregex.regex: https://${O3_HOSTNAME}
       traefik.http.middlewares.root-redirectregex.redirectregex.replacement: https://${O3_HOSTNAME}/openmrs/spa/home
       traefik.http.middlewares.gzip.compress: true
-      
   redis:
     image: redis:7
     restart: unless-stopped
@@ -247,8 +245,6 @@ services:
       ozone:
         aliases:
           - redis
-
-  # Superset
   superset:
     image: amancevice/superset:1.5.1
     restart: unless-stopped
@@ -327,14 +323,12 @@ services:
       ozone:
         aliases:
           - superset-init
-
-  # SENAITE
   senaite:
     environment: 
       - SITE=${SITE}
       - ADMIN_USER=${ADMIN_USER}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-    image: mekomsolutions/senaite:sha-272c0f5
+    image: mekomsolutions/senaite:latest
     restart: unless-stopped
     volumes:
     - ${SENAITE_CONFIG_PATH}/data:/data/importdata/senaite
@@ -354,10 +348,8 @@ services:
       - "traefik.http.routers.senaite.rule=Host(`${SENAITE_HOSTNAME}`)"
       - "traefik.http.routers.senaite.middlewares=senaite"
       - "traefik.http.middlewares.senaite.addprefix.prefix=/VirtualHostBase/https/${SENAITE_HOSTNAME}/senaite/VirtualHostRoot"
-      
-  # EIP Client
   eip-client: 
-    image: mekomsolutions/eip-client:sha-ed1c20e
+    image: mekomsolutions/eip-client
     restart: unless-stopped
     volumes:
       - "${EIP_PATH:-eipapp}/config:/config"
@@ -410,6 +402,7 @@ services:
     ports:
     - "8083:8083"
 
+    
 version: "3.7"
 volumes:
   proxy-tls-certs: ~
