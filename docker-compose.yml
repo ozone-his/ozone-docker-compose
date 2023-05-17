@@ -98,7 +98,7 @@ services:
         aliases:
           - openmrs-mysql
     volumes:
-      - "${MYSQL_DATADIR:-mysql-data}:/var/lib/mysql"
+      - "${MYSQL_DATA_DIR:-mysql-data}:/var/lib/mysql"
       - "${SQL_SCRIPTS_PATH:-./sqls}/mysql:/docker-entrypoint-initdb.d"
     ports:
       - "3306:3306"
@@ -135,7 +135,7 @@ services:
           - odoo-postgresql
           - odoo-14
     volumes:
-      - ${POSTGRES_DATADIR:-postgresql-data}:/var/lib/postgresql/data
+      - ${POSTGRES_DATA_DIR:-postgresql-data}:/var/lib/postgresql/data
       - "${SQL_SCRIPTS_PATH:-./sqls}/postgresql:/docker-entrypoint-initdb.d"
     ports:
       - "5432:5432"
