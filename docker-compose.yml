@@ -70,7 +70,7 @@ services:
       traefik.http.routers.openmrs.entrypoints: "websecure"
       traefik.http.services.openmrs.loadbalancer.server.port: 8080
     volumes:
-      - "${OPENMRS_DATA_PATH:-openmrs-data}:/openmrs/data"
+      - "${OPENMRS_APPDATA_DIR:-openmrs-data}:/openmrs/data"
       - "${OPENMRS_OWAS_PATH:-openmrs-owas}:/openmrs/distribution/openmrs_owas/"
       - "${OPENMRS_CORE_PATH}:/openmrs/distribution/openmrs_core/"
       - "${OPENMRS_MODULES_PATH:-openmrs-modules}:/openmrs/distribution/openmrs_modules/"
