@@ -161,3 +161,13 @@ Ozone FOSS requires you to log into each component separately:
 
 ⚠️ If you started the project with Traefik on macOS the coordinates for the components will be different and you will have to replace "`172-17-0-1`" with your host IP.
 E.g. if your host IP is 192.168.200.197, https://emr-172-17-0-1.traefik.me will have to become https://emr-192-168-200-197.traefik.me, etc.
+
+# Backup databases and filestores
+
+To get the backup of services:
+
+```
+export BACKUP_PATH=<path/to/backup>
+# Run the backup
+export BACKUP_FOLDER=`date +%F-%R` && docker-compose [-p <project-name>] -f backup.docker-compose.yml up
+```
