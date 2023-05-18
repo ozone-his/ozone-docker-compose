@@ -20,9 +20,6 @@ export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initial
 export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
 export O3_FRONTEND_TAG=3.0.0-beta.8
 
-# Demo data generation setup
-find $OPENMRS_CONFIG_PATH/globalproperties -type f -name "globalproperties_core-demo.xml" -exec sed -i '' -e "s|<value>.*[0-9]*.*</value>|<value>0</value>|" {} \;
-
 mkdir -p $EIP_PATH/routes/demo
 mkdir -p $EIP_PATH/config/demo
 
