@@ -90,6 +90,23 @@ export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initial
 export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
 export O3_FRONTEND_TAG=3.0.0-beta.8
 ```
+
+#### How to activate Ozone demo data generation
+In waiting for all demo data to be managed through its own separate microservice, we manually add an ad-hoc EIP route that takes care of generating demo data 10 minutes after Ozone has started. It is for now limited to controlling the generation of _OpenMRS_ demo data.
+
+To add the route:
+```bash
+mkdir -p $EIP_PATH/routes/demo
+mkdir -p $EIP_PATH/config/demo
+
+cp ./demo/eip/routes/generate-demo-data-route.xml $EIP_PATH/routes/demo/
+cp ./demo/eip/config/application.properties $EIP_PATH/config/demo/
+```
+
+To set the number of demo patients to be generated:
+```bash
+export NUMBER_OF_DEMO_PATIENTS=50
+```
 #### For developers: Override of `DISTRO_PATH`
 
 If you are doing development on Ozone and are building the Ozone distro in your local environment, then you would need to override `DISTRO_PATH` to point to your distro build folder. For example if your working folder is `/your/path/to/ozone-distro` for the distro then you would want to do something like this:
