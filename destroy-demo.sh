@@ -8,12 +8,14 @@ export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config
 export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config
 export OPENMRS_CORE_PATH=$DISTRO_PATH/openmrs_core
 export OPENMRS_MODULES_PATH=$DISTRO_PATH/openmrs_modules
-export EIP_PATH=$DISTRO_PATH/eip_confi
+export EIP_PATH=$DISTRO_PATH/eip_config
 export SPA_PATH=$DISTRO_PATH/spa
 export SENAITE_CONFIG_PATH=$DISTRO_PATH/senaite_config
 export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons
 export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv
-export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/inializer_config.json;
+export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json
+export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
+export O3_FRONTEND_TAG=3.0.0-beta.9
 DOCKER_SERVER_VERSION=$(docker version -f "{{.Server.Version}}")
 
 INSTALLED_DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
