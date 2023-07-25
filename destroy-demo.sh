@@ -2,7 +2,7 @@
 export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR
 # Download the project && \
-export VERSION=1.0.0-alpha.3
+export VERSION=1.0.0-alpha.4
 export DISTRO_PATH=$OZONE_DIR/ozone-distro-$VERSION
 export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config
 export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config
@@ -15,7 +15,8 @@ export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons
 export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv
 export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json
 export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
-export O3_FRONTEND_TAG=3.0.0-beta.9
+export O3_FRONTEND_TAG=3.0.0-beta.11
+export O3_BACKEND_TAG=3.0.0-beta.11
 DOCKER_SERVER_VERSION=$(docker version -f "{{.Server.Version}}")
 
 INSTALLED_DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
