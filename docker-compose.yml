@@ -2,7 +2,7 @@ services:
 
   # Bahmni Appointments
   appointments:
-    image: mekomsolutions/appointments:8c3bd0f
+    image: mekomsolutions/appointments
     restart: unless-stopped
     healthcheck:
       test:
@@ -18,7 +18,7 @@ services:
           
   # mekomsolutions/env-substitution
   env-substitution:
-    image: mekomsolutions/env-substitution:945d61e
+    image: mekomsolutions/env-substitution
     restart: on-failure
     environment:
       - ODOO_PUBLIC_URL=https://${ODOO_HOSTNAME}
@@ -34,7 +34,7 @@ services:
         
   # OpenMRS 3 Backend
   openmrs:
-    image: openmrs/openmrs-reference-application-3-backend:3.0.0-beta.11
+    image: openmrs/openmrs-reference-application-3-backend:${O3_BACKEND_TAG:-nightly}
     restart: unless-stopped
     depends_on:
       mysql:
@@ -199,7 +199,7 @@ services:
 
   # OpenMRS 3 Frontend
   frontend:
-    image: openmrs/openmrs-reference-application-3-frontend:3.0.0-beta.11
+    image: openmrs/openmrs-reference-application-3-frontend:${O3_FRONTEND_TAG:-nightly}
     restart: unless-stopped
     environment:
       SPA_PATH: /openmrs/spa
@@ -335,7 +335,7 @@ services:
       - SITE=${SITE}
       - ADMIN_USER=${ADMIN_USER}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-    image: mekomsolutions/senaite:sha-272c0f5
+    image: mekomsolutions/senaite:latest
     restart: unless-stopped
     volumes:
     - ${SENAITE_CONFIG_PATH}/data:/data/importdata/senaite
@@ -358,7 +358,7 @@ services:
       
   # EIP Client
   eip-client: 
-    image: mekomsolutions/eip-client:sha-7bc672e
+    image: mekomsolutions/eip-client
     restart: unless-stopped
     volumes:
       - "${EIP_PATH:-eipapp}/config:/config"
