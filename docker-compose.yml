@@ -416,10 +416,156 @@ services:
     ports:
     - "8083:8083"
 
+  ####
+  # OpenELIS set up
+  ####
+  mongo-db:
+    container_name: mongo-db
+    image: mongo:4.0
+    networks:
+      ozone:
+        aliases:
+          - mongo-db
+    volumes:
+      - "mongo-data:/data/db"
+    restart: unless-stopped
+
+  openhim-core:
+    container_name: openhim-core
+    image: jembi/openhim-core:latest
+    restart: unless-stopped
+    environment:
+      mongo_url: "mongodb://mongo-db/openhim-development"
+      mongo_atnaUrl: "mongodb://mongo-db/openhim-development"
+      NODE_ENV: "development"
+    ports:
+      - "8090:8090"
+      - "5000:5000"
+      - "5001:5001"
+    volumes:
+      - ./openelis/openhim/core-config.json:/app/config/default.json
+    networks:
+      ozone:
+        aliases:
+          - openhim-core
+    healthcheck:
+     test: "curl -sSk https://openhim-core:8090/heartbeat || exit 1"
+     interval: 30s
+     timeout: 30s
+     retries: 3
+
+  openhim-console:
+    container_name: openhim-console
+    image: jembi/openhim-console:latest
+    restart: unless-stopped
+    networks:
+      ozone:
+        aliases:
+          - openhim-console
+    ports:
+      - "9000:80"
+    healthcheck:
+     test: "curl -sS http://openhim-console || exit 1"
+     interval: 30s
+     timeout: 30s
+     retries: 3
+
+  ####
+  # OpenELIS
+  ####
+  certs:
+    container_name: oe-certs
+    image: ghcr.io/i-tech-uw/certgen:main
+    restart: always
+    environment:
+      - KEYSTORE_PW="kspass"
+      - TRUSTSTORE_PW="tspass"
+    volumes:
+      - key_trust-store-volume:/etc/openelis-global
+
+  database:
+    container_name: openelisglobal-database
+    image: postgres:9.5
+    ports:
+       - "15432:5432"
+    restart: always
+    env_file:
+      - ./openelis/database/database.env
+    volumes:
+      # preserves the database between containers
+      - db-data:/var/lib/postgresql/data
+        # files here will run on install
+      - ./openelis/database/dbInit:/docker-entrypoint-initdb.d
+
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "clinlims", "-U", "clinlims"]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+
+  oe.openelis.org:
+    container_name: openelisglobal-webapp
+    image: ghcr.io/i-tech-uw/openelis-global-2:develop
+    depends_on:
+      - database
+    ports:
+       - "8443:8443"
+    restart: always
+    environment:
+        # context.xml doesn't seem to be able to pick up environment variables directly, so we are passing them in as CATALINA_OPTS
+      - CATALINA_OPTS= -Ddatasource.url=jdbc:postgresql://database:5432/clinlims -Ddatasource.username=clinlims -Ddatasource.password=clinlims
+    volumes:
+      - key_trust-store-volume:/etc/openelis-global
+      # -  openelis-plugins-data:/var/lib/openelis-global/plugins
+      - ./openelis/tomcat/oe_server.xml:/usr/local/tomcat/conf/server.xml
+    secrets:
+      - source: datasource.password
+      - source: common.properties
+
+
+  fhir.openelis.org:
+    container_name: external-fhir-api
+    image: hapiproject/hapi:v5.5.1
+    # ports:
+    # - "8081:8080"
+    restart: always
+    environment:
+      TZ: Africa/Nairobi
+      JAVA_OPTS: "-Djavax.net.ssl.trustStore=/etc/openelis-global/truststore 
+            -Djavax.net.ssl.trustStorePassword=tspass
+            -Djavax.net.ssl.trustStoreType=pkcs12 
+            -Djavax.net.ssl.keyStore=/etc/openelis-global/keystore 
+            -Djavax.net.ssl.keyStorePassword=kspass 
+            -Djavax.net.ssl.keyStoreType=pkcs12"
+
+    volumes:
+        -  key_trust-store-volume:/etc/openelis-global
+        - ./openelis/tomcat/hapi_server.xml:/usr/local/tomcat/conf/server.xml
+
+  fhir.openelis.org.remote:
+    container_name: openelis-remote-source
+    image: hapiproject/hapi:v5.5.1
+    # ports:
+    #   - "8081:8080"
+    restart: always
+    environment:
+      - hapi.fhir.auto_create_placeholder_reference_targets=true
+      - hapi.fhir.allow_placeholder_references=true
+      - hapi.fhir.allow_external_references=true
+
+secrets:
+  datasource.password:
+    file: ./openelis/properties/datasource.password
+  common.properties:
+    file: ./openelis/properties/common.properties
+
 version: "3.7"
 volumes:
   proxy-tls-certs: ~
   openmrs-data: ~
+  mongo-data: ~
+  db-data: ~
+  key_trust-store-volume: ~
   mysql-data: ~
   openmrs-config: ~
   openmrs-config-checksums: ~

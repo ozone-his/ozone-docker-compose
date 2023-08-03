@@ -1,0 +1,85 @@
+{
+  "Users": [
+    {
+      "groups": [
+        "admin"
+      ],
+      "firstname": "Super",
+      "surname": "User",
+      "email": "root@openhim.org",
+      "passwordAlgorithm": "sha512",
+      "passwordHash": "e12ea7a5468925ab2b6d839e5b0566c8d8e68d9dd48241282ec1c448c0b11386b499be64011c88060b241ed5a143fea90992dabb0d91a334daecd96e20156c24",
+      "passwordSalt": "5f49ab7df7fac0fd7860d3b1be95cbf4",
+      "expiry": null,
+      "locked": false,
+      "tokenType": null,
+      "token": null
+    }
+  ],
+  "Clients": [],
+  "Channels": [
+    {
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE",
+        "PUT",
+        "OPTIONS",
+        "HEAD",
+        "TRACE",
+        "CONNECT",
+        "PATCH"
+      ],
+      "type": "http",
+      "allow": [],
+      "whitelist": [],
+      "authType": "public",
+      "matchContentTypes": [],
+      "properties": [],
+      "txViewAcl": [],
+      "txViewFullAcl": [],
+      "txRerunAcl": [],
+      "status": "enabled",
+      "rewriteUrls": false,
+      "addAutoRewriteRules": true,
+      "autoRetryEnabled": false,
+      "autoRetryPeriodMinutes": 60,
+      "routes": [
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": false,
+          "name": "Central FHIR server",
+          "secured": false,
+          "host": "fhir.openelis.org.remote",
+          "port": 8080,
+          "path": "",
+          "pathTransform": "",
+          "primary": true,
+          "username": "",
+          "password": ""
+        }
+      ],
+      "requestBody": true,
+      "responseBody": true,
+      "rewriteUrlsConfig": [],
+      "name": "central fhir server",
+      "description": "Access to the central FHIR server",
+      "pollingSchedule": null,
+      "matchContentRegex": null,
+      "matchContentXpath": null,
+      "matchContentValue": null,
+      "matchContentJson": null,
+      "urlPattern": "^/fhir/.*$",
+      "tcpHost": null,
+      "tcpPort": null,
+      "updatedBy": {
+        "id": "6374bbabba26d10013784480",
+        "name": "Super User"
+      },
+      "alerts": []
+    }
+  ],
+  "Mediators": [],
+  "ContactGroups": []
+}

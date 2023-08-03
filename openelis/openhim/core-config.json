@@ -1,0 +1,168 @@
+{
+  "bindAddress": "0.0.0.0",
+  "mongo": {
+    "url": "mongodb://localhost/openhim",
+    "atnaUrl": "mongodb://localhost/openhim",
+    "connectionOptions": {},
+    "openHIMApiReadPreference": "primaryPreferred",
+    "openHIMApiWriteConcern": 1,
+    "openHIMApiReadConcern": "local"
+  },
+  "logger": {
+    "level": "info",
+    "logToDB": true,
+    "capDBLogs": true,
+    "capSize": 10000000
+  },
+  "mongoLogger": {
+    "options": {
+      "w": 0,
+      "useNewUrlParser": true
+    }
+  },
+  "router": {
+    "externalHostname": "localhost",
+    "httpPort": 5001,
+    "httpsPort": 5004,
+    "timeout": 60000,
+    "kafkaBrokers": "localhost:9092"
+  },
+  "bodyCull":{
+    "enabled":true,
+    "pollPeriodMins": 60
+  },
+  "api": {
+    "sessionKey": "r8q,+&1LM3)CD*zAGpx1xm{NeQhc;#",
+    "trustProxy": false,
+    "secureCookie": true,
+    "maxAge": 7200000,
+    "salt": 10,
+    "enabled": true,
+    "protocol": "https",
+    "port": 8090,
+    "authWindowSeconds": 10,
+    "maxBodiesSizeMB": 15,
+    "maxPayloadSizeMB": 50,
+    "truncateSize": 15000,
+    "truncateAppend": "\n[truncated ...]",
+    "authenticationTypes": ["basic", "local", "token", "openid"],
+    "openid": {
+      "url": "http://localhost:9088/realms/platform-realm",
+      "callbackUrl": "http://localhost:9000",
+      "clientId": "openhim-oauth",
+      "clientSecret": "tZKfEbWf0Ka5HBNZwFrdSyQH2xT1sNMR",
+      "scope": "openid email profile offline_access roles"
+    }
+  },
+  "rerun": {
+    "httpPort": 7786,
+    "host": "localhost",
+    "processor": {
+      "enabled": true,
+      "pollPeriodMillis": 2000
+    },
+    "taskTransactionsLength": 50,
+    "activeConcurrentTasks": 3
+  },
+  "tcpAdapter": {
+    "httpReceiver": {
+      "httpPort": 7787,
+      "host": "localhost"
+    }
+  },
+  "polling": {
+    "enabled": true,
+    "pollingPort": 7788,
+    "host": "localhost"
+  },
+  "authentication": {
+    "enableMutualTLSAuthentication": true,
+    "enableBasicAuthentication": true,
+    "enableCustomTokenAuthentication": false,
+    "enableJWTAuthentication": false,
+    "jwt": {
+      "secretOrPublicKey": "",
+      "algorithms": "",
+      "audience": "",
+      "issuer": ""
+    }
+  },
+  "email": {
+    "fromAddress": "address@example.com",
+    "nodemailer": {
+      "service": "Gmail",
+      "auth": {
+        "user": "user@gmail.com",
+        "pass": "password"
+      }
+    }
+  },
+  "smsGateway": {
+    "provider": "clickatell",
+    "config": {
+      "user": "user",
+      "pass": "pass",
+      "apiID": "apiID"
+    }
+  },
+  "alerts": {
+    "enableAlerts": true,
+    "pollPeriodMinutes": 1,
+    "himInstance": "Local OpenHIM",
+    "consoleURL": "http://localhost:9000"
+  },
+  "reports": {
+    "enableReports": true,
+    "dailyReportAt": "0 7 * * *",
+    "weeklyReportAt": "0 7 * * 1",
+    "utcOffset": null
+  },
+  "events": {
+    "enableTSNormalization": true
+  },
+  "newUserExpiry": {
+    "duration": 7,
+    "durationType": "days"
+  },
+  "userPasswordResetExpiry": {
+    "duration": 1,
+    "durationType": "hours"
+  },
+  "auditing": {
+    "servers": {
+      "udp": {
+        "enabled": false,
+        "port": 5050
+      },
+      "tls": {
+        "enabled": false,
+        "port": 5051
+      },
+      "tcp": {
+        "enabled": false,
+        "port": 5052
+      }
+    },
+    "auditEvents": {
+      "interface": "internal",
+      "host": "localhost",
+      "port": 5051,
+      "auditSourceID": "OpenHIM"
+    }
+  },
+  "caching": {
+    "enabled": true,
+    "refreshMillis": 1000
+  },
+  "tlsClientLookup": {
+    "type": "strict"
+  },
+  "agenda": {
+    "startupDelay": 500
+  },
+  "certificateManagement": {
+    "watchFSForCert": false,
+    "certPath": "/etc/letsencrypt/live/openhim.jembi.org/cert.pem",
+    "keyPath": "/etc/letsencrypt/live/openhim.jembi.org/privkey.pem"
+  }
+}
