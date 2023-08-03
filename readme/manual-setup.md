@@ -61,7 +61,7 @@ If you have already set up Ozone before you may need to clean up your local envi
 ### Step 5. Download and extract the distribution
 
 ```bash
-export VERSION=1.0.0-alpha.4&& \
+export VERSION=1.0.0-alpha.5&& \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -Dtransitive=false --legacy-local-repository && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
 ```
