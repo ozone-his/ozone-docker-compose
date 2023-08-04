@@ -23,7 +23,7 @@
   "router": {
     "externalHostname": "localhost",
     "httpPort": 5001,
-    "httpsPort": 5004,
+    "httpsPort": 5000,
     "timeout": 60000,
     "kafkaBrokers": "localhost:9092"
   },
