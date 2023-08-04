@@ -524,7 +524,7 @@ services:
       ozone:
         aliases:
           - oe.openelis.org
-        ipv4_address: 172.20.1.121
+        # ipv4_address: 172.20.1.121
 
     environment:
         - DEFAULT_PW=adminADMIN! 
@@ -570,7 +570,7 @@ secrets:
   common.properties:
     file:  ./volume/properties/common.properties  
 
-
+version: '3.7'
 volumes:
   proxy-tls-certs: ~
   openmrs-data: ~
@@ -600,10 +600,10 @@ volumes:
   odoo-checksums: ~
 networks:
   ozone:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.1.0/24  
+    # driver: bridge
+    # ipam:
+    #   config:
+    #     - subnet: 172.20.1.0/24  
   web:
     external: true
     
