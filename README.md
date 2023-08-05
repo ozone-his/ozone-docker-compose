@@ -6,6 +6,25 @@ While is not the recommended way, developpers can also run Ozone directly from t
 
 ## (option 1) Try Ozone FOSS in Gitpod
 
+## 1. Quick start
+
+### Run Ozone FOSS locally
+Type in the following in a terminal:
+
+```bash
+git clone https://github.com/jnsereko/ozone-desh-docker
+cd ozone-desh-docker
+./start-demo.sh
+```
+
+It may take some time to download and setup Ozone for the first time, so hang tight :hourglass_flowing_sand:
+
+Then [start browsing](#2-browse-ozone) Ozone.
+
+#### :warning: Troubleshooting Ozone quick start locally?
+If you experience issues with the quick start script? → Try the [manual setup](readme/manual-setup.md) instead.
+
+### Run Ozone FOSS in Gitpod
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/ozone-his/ozone-docker)
 
 It may take some time to setup Ozone for the first time, so hang tight :hourglass_flowing_sand:

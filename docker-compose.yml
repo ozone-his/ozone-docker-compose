@@ -517,14 +517,13 @@ services:
     depends_on:
         - database
     ports:
-        - "8080:8080"
+        - "8082:8080"
         - "8443:8443"
     restart: always
     networks:
       ozone:
         aliases:
           - oe.openelis.org
-        # ipv4_address: 172.20.1.121
 
     environment:
         - DEFAULT_PW=adminADMIN! 
@@ -543,7 +542,7 @@ services:
     container_name: external-fhir-api
     image: hapiproject/hapi:v5.5.1
     ports:
-        - "8082:8080"
+        - "8083:8080"
         - "8444:8443"
     networks:
       ozone:
@@ -600,10 +599,10 @@ volumes:
   odoo-checksums: ~
 networks:
   ozone:
-    # driver: bridge
-    # ipam:
-    #   config:
-    #     - subnet: 172.20.1.0/24  
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.1.0/24  
   web:
     external: true
     
