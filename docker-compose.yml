@@ -414,7 +414,7 @@ services:
         condition: service_started
       
     ports:
-    - "8083:8083"
+    - "8084:8084"
 
   ####
   # OpenELIS set up
