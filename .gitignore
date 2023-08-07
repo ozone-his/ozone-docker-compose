@@ -8,6 +8,10 @@ senaite/senaite-data/*
 __pycache__
 # Ignore the docker-compose.override.yml file
 docker-compose.override.*
+*.jar
+
+# Ignore the docker-compose.override.yml file
+docker-compose.override.*
 
 build
 
