@@ -4,7 +4,7 @@
   "protocol": "https",
   "host": "localhost",
   "hostPath": "",
-  "port": "8090",
+  "port": "8080",
   "title": "Admin Console",
   "footerTitle": "Clinic Plus Administration Console",
   "footerPoweredBy": "<a href='http://openhim.org/' target='_blank'>Powered by Clinic Plus</a>",
