@@ -122,19 +122,19 @@
       },
       {
         "title": "OpenHIM",
-        "redirect": "http://localhost:9000"
+        "redirect": "http://openhim.clinicplusurgentcare.com.localhost/"
       },
       {
         "title": "senaite",
-        "redirect": "http://localhost:8081/senaite"
+        "redirect": "http://senaite.clinicplusurgentcare.com.localhost/"
       },
       {
         "title": "odoo",
-        "redirect": "http://localhost:8069"
+        "redirect": "http://odoo.clinicplusurgentcare.com.localhost/"
       },
       {
         "title": "Superset",
-        "redirect": "http://localhost:8088"
+        "redirect": "http://superset.clinicplusurgentcare.com.localhost"
       }
     ]
 

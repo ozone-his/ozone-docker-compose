@@ -211,6 +211,7 @@ services:
       timeout: 5s
     volumes:
       - "${OZONE_CONFIG_PATH}/frontend:/usr/share/nginx/html/ozone"
+      - "./openmrs/frontend:/usr/share/nginx/html/ozone"
     networks:
       ozone:
         aliases:
@@ -495,12 +496,12 @@ services:
         - "15432:5432"
     restart: always
     env_file:
-        - ./volume/database/database.env
+        - ./openelis/database/database.env
     volumes:
           # preserves the database between containers
           - db-data:/var/lib/postgresql/data                
           # files here will run on install
-          - ./volume/database/dbInit:/docker-entrypoint-initdb.d
+          - ./openelis/database/dbInit:/docker-entrypoint-initdb.d
     networks:
       ozone:
         aliases:
@@ -532,8 +533,8 @@ services:
         - CATALINA_OPTS= -Ddatasource.url=jdbc:postgresql://database:5432/clinlims -Ddatasource.username=clinlims
     volumes:
         -  key_trust-store-volume:/etc/openelis-global
-        - ./volume/plugins/:/var/lib/openelis-global/plugins
-        - ./volume/tomcat/oe_server.xml:/usr/local/tomcat/conf/server.xml
+        - ./openelis/plugins/:/var/lib/openelis-global/plugins
+        - ./openelis/tomcat/oe_server.xml:/usr/local/tomcat/conf/server.xml
     secrets:
         - source: datasource.password
         - source: common.properties
@@ -561,13 +562,13 @@ services:
     
     volumes:
         -  key_trust-store-volume:/etc/openelis-global
-        - ./volume/tomcat/hapi_server.xml:/usr/local/tomcat/conf/server.xml
+        - ./openelis/tomcat/hapi_server.xml:/usr/local/tomcat/conf/server.xml
             
 secrets:
   datasource.password:
-    file: ./volume/properties/datasource.password  
+    file: ./openelis/properties/datasource.password  
   common.properties:
-    file:  ./volume/properties/common.properties  
+    file:  ./openelis/properties/common.properties  
 
 version: '3.7'
 volumes:
