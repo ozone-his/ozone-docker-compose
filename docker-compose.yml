@@ -69,6 +69,9 @@ services:
       traefik.http.routers.openmrs.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs`)"
       traefik.http.routers.openmrs.entrypoints: "websecure"
       traefik.http.services.openmrs.loadbalancer.server.port: 8080
+      traefik.http.routers.openmrs.middlewares: openmrs-spa-redirectregex
+      traefik.http.middlewares.openmrs-spa-redirectregex.redirectregex.regex: https://${O3_HOSTNAME}/openmrs/spa
+      traefik.http.middlewares.openmrs-spa-redirectregex.redirectregex.replacement: https://${O3_HOSTNAME}/openmrs/spa/home
     volumes:
       - "openmrs-data:/openmrs/data"
       - "${OPENMRS_OWAS_PATH:-openmrs-owas}:/openmrs/distribution/openmrs_owas/"
@@ -234,7 +237,7 @@ services:
       traefik.http.middlewares.frontend-stripprefix.stripprefix.prefixes: /openmrs/spa
       traefik.http.middlewares.frontend-stripprefix.stripprefix.forceslash: false
       traefik.http.middlewares.home-redirectregex.redirectregex.regex: https://${O3_HOSTNAME}/home
-      traefik.http.middlewares.home-redirectregex.redirectregex.replacement: https://${O3_HOSTNAME}/openmrs/spa
+      traefik.http.middlewares.home-redirectregex.redirectregex.replacement: https://${O3_HOSTNAME}/openmrs/spa/home
       traefik.http.middlewares.root-redirectregex.redirectregex.regex: https://${O3_HOSTNAME}
       traefik.http.middlewares.root-redirectregex.redirectregex.replacement: https://${O3_HOSTNAME}/openmrs/spa/home
       traefik.http.middlewares.gzip.compress: true
