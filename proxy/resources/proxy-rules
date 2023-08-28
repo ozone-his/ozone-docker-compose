@@ -8,8 +8,8 @@
   RewriteRule (.*) /openmrs/spa/ [R=303,L]
 
   # Frontend
-<Location  /openmrs/spa>
-  ProxyPass http://frontend
+<Location  /openmrs/spa/>
+  ProxyPass http://frontend/
   ProxyPassReverse /
   ProxyPreserveHost Off
 </Location>  
