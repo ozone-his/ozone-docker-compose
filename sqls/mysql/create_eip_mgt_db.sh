@@ -13,4 +13,15 @@ mysql --password=$MYSQL_ROOT_PASSWORD --user=root <<MYSQL_SCRIPT
 MYSQL_SCRIPT
 }
 
-create_user_and_database ${EIP_DB_NAME} ${EIP_DB_USER} ${EIP_DB_PASSWORD}
+create_eip_client_user_and_database() {
+	local dbName="${1:-}"
+	local doUser="${2:-}"
+	local dbUserPassword="${3:-}"
+	if [ "${dbName:-}" ] && [ "${doUser:-}" ] && [ "${dbUserPassword:-}" ]; then
+		create_user_and_database "$dbName" "$doUser" "$dbUserPassword";
+	fi
+}
+
+create_eip_client_user_and_database ${EIP_DB_NAME_ODOO:-} ${EIP_DB_USER_ODOO:-} ${EIP_DB_PASSWORD_ODOO:-};
+
+create_eip_client_user_and_database ${EIP_DB_NAME_SENAITE:-} ${EIP_DB_USER_SENAITE:-} ${EIP_DB_PASSWORD_SENAITE:-};

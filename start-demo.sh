@@ -2,7 +2,7 @@
 export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR
 # Downloads the project
-export VERSION=1.0.0-alpha.6 && \
+export VERSION=1.0.0-SNAPSHOT && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -Dtransitive=false --legacy-local-repository && \
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
 # Exports required environment variables
@@ -18,9 +18,8 @@ export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons
 export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv
 export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json
 export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
-export O3_FRONTEND_TAG=3.0.0-beta.13
-export O3_BACKEND_TAG=3.0.0-beta.13
-
+export O3_FRONTEND_TAG=
+export O3_BACKEND_TAG=
 
 mkdir -p $EIP_PATH/routes/demo
 mkdir -p $EIP_PATH/config/demo
@@ -38,7 +37,7 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
         export PROXY_TLS="-DgitPodEnvironment"
     fi
    docker network create web
-   docker compose -f docker-compose.yml -f docker-compose-proxy.yml up -d --build
+   docker compose -f docker-compose.yml -f docker-compose-proxy.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml up -d --build
 else
     echo "Docker versions < 20.10.13 are not supported"
 fi

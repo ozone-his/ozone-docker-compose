@@ -93,16 +93,7 @@ export O3_BACKEND_TAG=3.0.0-beta.13;
 ```
 
 #### How to activate Ozone demo data generation
-In waiting for all demo data to be managed through its own separate microservice, we manually add an ad-hoc EIP route that takes care of generating demo data 10 minutes after Ozone has started. It is for now limited to controlling the generation of _OpenMRS_ demo data.
-
-To add the route:
-```bash
-mkdir -p $EIP_PATH/routes/demo && \
-mkdir -p $EIP_PATH/config/demo && \
-
-cp ./demo/eip/routes/generate-demo-data-route.xml $EIP_PATH/routes/demo/ && \
-cp ./demo/eip/config/application.properties $EIP_PATH/config/demo/
-```
+Demo data as of 1.0.0-alpha.7 is managed through its own separate service. It is configured with an ad-hoc EIP route that takes care of generating demo data 10 minutes after Ozone has started. It is for now limited to controlling the generation of _OpenMRS_ demo data.
 
 To set the number of demo patients to be generated:
 ```bash
@@ -158,14 +149,21 @@ export SUPERSET_HOSTNAME=analytics-"${IP}.traefik.me";
 #### With Apache 2
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose-proxy.yml -p $DISTRO_GROUP up
+docker -f docker-compose.yml -f docker-compose-proxy.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
 ```
 #### With Traefik
 
 ```bash
-docker compose -p $DISTRO_GROUP up
+docker compose -f docker-compose.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
 ```
+The above commands will startup an Ozone instance that will be populated with some demo data depending on whether the environment property `NUMBER_OF_DEMO_PATIENTS` has been set to a given value greater than `0`. Otherwise no demo data is generated.
 
+#### Note
+The different integrations i.e. SENAITE and Odoo are managed through separate services which are defined in separate docker compose files. To disable an integration from running on an instance, simply eliminate the corresponding file from the command spinning up an instance. For example, disabling the SENAITE integration implies listing the other docker-comopose files exept the `docker-compose-senaite.yml` file as seen below:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
+```
 ### Step 9. Browse Ozone
 Ozone FOSS requires you to log into each component separately:
 

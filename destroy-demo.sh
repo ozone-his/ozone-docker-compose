@@ -2,7 +2,7 @@
 export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR
 # Download the project && \
-export VERSION=1.0.0-alpha.6
+export VERSION=1.0.0-SNAPSHOT
 export DISTRO_PATH=$OZONE_DIR/ozone-distro-$VERSION
 export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config
 export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config
@@ -15,14 +15,14 @@ export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons
 export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv
 export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json
 export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
-export O3_FRONTEND_TAG=3.0.0-beta.13
-export O3_BACKEND_TAG=3.0.0-beta.13
+export O3_FRONTEND_TAG=
+export O3_BACKEND_TAG=
 DOCKER_SERVER_VERSION=$(docker version -f "{{.Server.Version}}")
 
 INSTALLED_DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
 MINIMUM_REQUIRED_DOCKER_VERSION_REGEX="^((([2-9][1-9]|[3-9][0]|[0-9]{3,}).*)|(20\.([0-9]{3,}|[1-9][1-9]|[2-9][0]).*)|(20\.10\.([0-9]{3,}|[2-9][0-9]|[1][3-9])))"
 if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; then
-    docker compose -f docker-compose.yml -f docker-compose-proxy.yml down -v
+    docker compose -f docker-compose.yml -f docker-compose-proxy.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml down -v
 else
     echo "Docker versions < 20.10.13 are not supported"
 fi

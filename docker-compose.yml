@@ -89,9 +89,6 @@ services:
       MYSQL_USER: ${OPENMRS_DB_USER}
       MYSQL_PASSWORD: ${OPENMRS_DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      EIP_DB_NAME: ${EIP_DB_NAME}
-      EIP_DB_USER: ${EIP_DB_USER}
-      EIP_DB_PASSWORD: ${EIP_DB_PASSWORD}
     healthcheck:
       test: "exit 0"
     image: mariadb:10.2
@@ -336,8 +333,8 @@ services:
   senaite:
     environment: 
       - SITE=${SITE}
-      - ADMIN_USER=${ADMIN_USER}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ADMIN_USER=${SENAITE_ADMIN_USER}
+      - ADMIN_PASSWORD=${SENAITE_ADMIN_PASSWORD}
     image: mekomsolutions/senaite:latest
     restart: unless-stopped
     volumes:
@@ -358,67 +355,6 @@ services:
       - "traefik.http.routers.senaite.rule=Host(`${SENAITE_HOSTNAME}`)"
       - "traefik.http.routers.senaite.middlewares=senaite"
       - "traefik.http.middlewares.senaite.addprefix.prefix=/VirtualHostBase/https/${SENAITE_HOSTNAME}/senaite/VirtualHostRoot"
-      
-  # EIP Client
-  eip-client: 
-    image: mekomsolutions/eip-client
-    restart: unless-stopped
-    volumes:
-      - "${EIP_PATH:-eipapp}/config:/config"
-      - "${EIP_PATH:-eipapp}/routes:/routes"
-      - eip-home:/eip-home
-    environment:
-      - OAUTH_ENABLED=${OAUTH_ENABLED}
-      - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
-      - OAUTH_ACCESS_TOKEN_URI=${OAUTH_ACCESS_TOKEN_URI}
-      - OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
-      - EIP_DB_NAME=${EIP_DB_NAME}
-      - EIP_DB_USER=${EIP_DB_USER}
-      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD}
-      - OPENMRS_DB_HOST=${OPENMRS_DB_HOST}
-      - OPENMRS_DB_PORT=${OPENMRS_DB_PORT}
-      - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
-      - OPENMRS_DB_USER=${OPENMRS_DB_USER}
-      - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
-      - OPENMRS_USER=${OPENMRS_USER}
-      - SENAITE_USERNAME=${ADMIN_USER}
-      - SENAITE_PASSWORD=${ADMIN_PASSWORD}
-      - OPENMRS_PASSWORD=${OPENMRS_PASSWORD}
-      - MYSQL_ADMIN_USER=root
-      - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - ODOO_DATABASE=${ODOO_DATABASE}
-      - ODOO_USER=${ODOO_USER}
-      - ODOO_PASSWORD=${ODOO_PASSWORD}
-      - RESULTS_ENCOUNTER_TYPE_UUID=${RESULTS_ENCOUNTER_TYPE_UUID}
-      - CONCEPT_COMPLEX_UUID=${CONCEPT_COMPLEX_UUID}
-      - OPENMRS_IDENTIFIER_TYPE_UUID=${OPENMRS_IDENTIFIER_TYPE_UUID}
-      - DB_EVENT_DESTINATIONS=${DB_EVENT_DESTINATIONS}
-      - CREATE_CUSTOMER_IF_NOT_EXIST=${CREATE_CUSTOMER_IF_NOT_EXIST}
-      - ODOO_CUSTOMER_EXTERNAL_ID=${ODOO_CUSTOMER_EXTERNAL_ID}
-      - ODOO_CUSTOMER_DOB_FIELD=${ODOO_CUSTOMER_DOB_FIELD}
-      - ODOO_CUSTOMER_WEIGHT_FIELD=${ODOO_CUSTOMER_WEIGHT_FIELD}
-      - EMR_WEIGHT_CONCEPT=${EMR_WEIGHT_CONCEPT}
-      - ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE=${ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE}
-      - ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE=${ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE}
-      - SENAITE_URL=http://senaite:8080
-      - OPENMRS_URL=http://openmrs:8080
-      - ODOO_URL=http://odoo:8069
-    networks:
-      ozone:
-        aliases:
-          - eip-client
-    depends_on: 
-      env-substitution:
-        condition: service_completed_successfully
-      openmrs:
-        condition: service_started
-      odoo:
-        condition: service_started
-      senaite:
-        condition: service_started
-      
-    ports:
-    - "8083:8083"
 
 version: "3.7"
 volumes:
