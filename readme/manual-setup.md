@@ -91,9 +91,11 @@ export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf;  \
 export O3_FRONTEND_TAG=3.0.0-beta.13;  \
 export O3_BACKEND_TAG=3.0.0-beta.13;
 ```
-
 #### How to activate Ozone demo data generation
-Demo data as of 1.0.0-alpha.7 is managed through its own separate service. It is configured with an ad-hoc EIP route that takes care of generating demo data 10 minutes after Ozone has started. It is for now limited to controlling the generation of _OpenMRS_ demo data.
+
+The generation of demo data is handled by a separate service that can be opted in or out. This service is configured with an EIP route that takes care of generating demo data 10 minutes after Ozone has started.
+
+⚠️ The demo data service currently only handles _OpenMRS_ demo data.
 
 To set the number of demo patients to be generated:
 ```bash
