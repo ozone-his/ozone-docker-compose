@@ -80,15 +80,16 @@ export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config;  \
 export OPENMRS_CORE_PATH=$DISTRO_PATH/openmrs_core;  \
 export OPENMRS_MODULES_PATH=$DISTRO_PATH/openmrs_modules;  \
 export EIP_PATH=$DISTRO_PATH/eip_config; \
-export SPA_PATH=$DISTRO_PATH/spa;\
+export SPA_PATH=$DISTRO_PATH/spa;  \
 export SENAITE_CONFIG_PATH=$DISTRO_PATH/senaite_config; \
 export SUPERSET_CONFIG_PATH=$DISTRO_PATH/superset_config;\
 
 export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons;\
 export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv;\
-export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json;\
-export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf
-export O3_FRONTEND_TAG=3.0.0-beta.9
+export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json;  \
+export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf;  \
+export O3_FRONTEND_TAG=3.0.0-beta.13;  \
+export O3_BACKEND_TAG=3.0.0-beta.13;
 ```
 
 #### How to activate Ozone demo data generation
@@ -96,11 +97,11 @@ In waiting for all demo data to be managed through its own separate microservice
 
 To add the route:
 ```bash
-mkdir -p $EIP_PATH/routes/demo
-mkdir -p $EIP_PATH/config/demo
+export mkdir -p $EIP_PATH/routes/demo;  \
+export mkdir -p $EIP_PATH/config/demo;  \
 
-cp ./demo/eip/routes/generate-demo-data-route.xml $EIP_PATH/routes/demo/
-cp ./demo/eip/config/application.properties $EIP_PATH/config/demo/
+export cp ./demo/eip/routes/generate-demo-data-route.xml $EIP_PATH/routes/demo/;  \
+export cp ./demo/eip/config/application.properties $EIP_PATH/config/demo/;
 ```
 
 To set the number of demo patients to be generated:
@@ -139,10 +140,10 @@ The only way to use the `traefik.me` domain with Docker on macOS is to use the I
 
 The default hostnames below will only work on Linux:
 ```bash
-O3_HOSTNAME=emr-172-17-0-1.traefik.me
-ODOO_HOSTNAME=erp-172-17-0-1.traefik.me
-SENAITE_HOSTNAME=lims-172-17-0-1.traefik.me
-SUPERSET_HOSTNAME=analytics-172-17-0-1.traefik.me
+export O3_HOSTNAME=emr-172-17-0-1.traefik.me; \
+export ODOO_HOSTNAME=erp-172-17-0-1.traefik.me; \
+export SENAITE_HOSTNAME=lims-172-17-0-1.traefik.me; \
+export SUPERSET_HOSTNAME=analytics-172-17-0-1.traefik.me; \
 ```
 On macOS you need the extra step to set the IP to your ethernet IP like this:
 ```bash
