@@ -15,10 +15,10 @@ MYSQL_SCRIPT
 
 create_eip_client_user_and_database() {
 	local dbName="${1:-}"
-	local doUser="${2:-}"
+	local dbUser="${2:-}"
 	local dbUserPassword="${3:-}"
-	if [ "${dbName:-}" ] && [ "${doUser:-}" ] && [ "${dbUserPassword:-}" ]; then
-		create_user_and_database "$dbName" "$doUser" "$dbUserPassword";
+	if [ "${dbName:-}" ] && [ "${dbUser:-}" ] && [ "${dbUserPassword:-}" ]; then
+		create_user_and_database "$dbName" "$dbUser" "$dbUserPassword";
 	fi
 }
 

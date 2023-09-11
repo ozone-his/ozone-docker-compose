@@ -151,21 +151,14 @@ export SUPERSET_HOSTNAME=analytics-"${IP}.traefik.me";
 #### With Apache 2
 
 ```bash
-docker -f docker-compose.yml -f docker-compose-proxy.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
+docker compose -f docker-compose.yml -f docker-compose-proxy.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
 ```
 #### With Traefik
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
 ```
-The above commands will startup an Ozone instance that will be populated with some demo data depending on whether the environment property `NUMBER_OF_DEMO_PATIENTS` has been set to a given value greater than `0`. Otherwise no demo data is generated.
 
-#### Note
-The different integrations i.e. SENAITE and Odoo are managed through separate services which are defined in separate docker compose files. To disable an integration from running on an instance, simply eliminate the corresponding file from the command spinning up an instance. For example, disabling the SENAITE integration implies listing the other docker-comopose files exept the `docker-compose-senaite.yml` file as seen below:
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
-```
 ### Step 9. Browse Ozone
 Ozone FOSS requires you to log into each component separately:
 
