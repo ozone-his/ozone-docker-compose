@@ -1,0 +1,51 @@
+services:
+
+  # MySQL env variables to merge
+  mysql:
+    environment:
+      EIP_DB_NAME_ODOO: ${EIP_DB_NAME_ODOO}
+      EIP_DB_USER_ODOO: ${EIP_DB_USER_ODOO}
+      EIP_DB_PASSWORD_ODOO: ${EIP_DB_PASSWORD_ODOO}
+
+  # Odoo integration service
+  eip-client-odoo:
+    image: mekomsolutions/eip-client
+    restart: unless-stopped
+    env_file: .common_eip_env
+    environment:
+      - DB_EVENT_DESTINATIONS=${DB_EVENT_DESTINATIONS_ODOO}
+      - EIP_DB_NAME=${EIP_DB_NAME_ODOO}
+      - EIP_DB_USER=${EIP_DB_USER_ODOO}
+      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD_ODOO}
+      - ODOO_DATABASE=${ODOO_DATABASE}
+      - ODOO_USER=${ODOO_USER}
+      - ODOO_PASSWORD=${ODOO_PASSWORD}
+      - CREATE_CUSTOMER_IF_NOT_EXIST=${CREATE_CUSTOMER_IF_NOT_EXIST}
+      - ODOO_CUSTOMER_EXTERNAL_ID=${ODOO_CUSTOMER_EXTERNAL_ID}
+      - ODOO_CUSTOMER_DOB_FIELD=${ODOO_CUSTOMER_DOB_FIELD}
+      - ODOO_CUSTOMER_WEIGHT_FIELD=${ODOO_CUSTOMER_WEIGHT_FIELD}
+      - EMR_WEIGHT_CONCEPT=${EMR_WEIGHT_CONCEPT}
+      - ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE=${ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE}
+      - ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE=${ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE}
+      - ODOO_URL=http://odoo:8069
+    volumes:
+      - "${EIP_PATH:-odoo_eipapp}/config/application.properties:/application.properties"
+      - "${EIP_PATH:-odoo_eipapp}/config/odoo-config:/config"
+      - "${EIP_PATH:-odoo_eipapp}/routes/odoo:/routes"
+      - eip-home-odoo:/eip-home
+    networks:
+      ozone:
+        aliases:
+          - eip-client-odoo
+    depends_on:
+      env-substitution:
+        condition: service_completed_successfully
+      openmrs:
+        condition: service_started
+      mysql:
+        condition: service_started
+      odoo:
+        condition: service_started
+
+volumes:
+  eip-home-odoo: ~

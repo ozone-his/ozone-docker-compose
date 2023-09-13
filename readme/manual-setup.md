@@ -91,18 +91,11 @@ export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf;  \
 export O3_FRONTEND_TAG=3.0.0-beta.13;  \
 export O3_BACKEND_TAG=3.0.0-beta.13;
 ```
-
 #### How to activate Ozone demo data generation
-In waiting for all demo data to be managed through its own separate microservice, we manually add an ad-hoc EIP route that takes care of generating demo data 10 minutes after Ozone has started. It is for now limited to controlling the generation of _OpenMRS_ demo data.
 
-To add the route:
-```bash
-mkdir -p $EIP_PATH/routes/demo && \
-mkdir -p $EIP_PATH/config/demo && \
+The generation of demo data is handled by a separate service that can be opted in or out. This service is configured with an EIP route that takes care of generating demo data 10 minutes after Ozone has started.
 
-cp ./demo/eip/routes/generate-demo-data-route.xml $EIP_PATH/routes/demo/ && \
-cp ./demo/eip/config/application.properties $EIP_PATH/config/demo/
-```
+⚠️ The demo data service currently only handles _OpenMRS_ demo data.
 
 To set the number of demo patients to be generated:
 ```bash
@@ -158,12 +151,12 @@ export SUPERSET_HOSTNAME=analytics-"${IP}.traefik.me";
 #### With Apache 2
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose-proxy.yml -p $DISTRO_GROUP up
+docker compose -f docker-compose.yml -f docker-compose-proxy.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
 ```
 #### With Traefik
 
 ```bash
-docker compose -p $DISTRO_GROUP up
+docker compose -f docker-compose.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
 ```
 
 ### Step 9. Browse Ozone

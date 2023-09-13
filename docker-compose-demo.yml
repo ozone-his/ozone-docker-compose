@@ -1,0 +1,25 @@
+services:
+
+  eip-client-demo:
+    image: mekomsolutions/eip-client
+    restart: "no"
+    env_file: .common_eip_env
+    environment:
+      - NUMBER_OF_DEMO_PATIENTS=${NUMBER_OF_DEMO_PATIENTS}
+      - EIP_DB_NAME=${EIP_DB_NAME_DEMO}
+      - EIP_DB_USER=${EIP_DB_USER_DEMO}
+      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD_DEMO}
+    volumes:
+      - "./demo/eip/config:/config"
+      - "./demo/eip/routes:/routes"
+    networks:
+      ozone:
+        aliases:
+          - eip-client-demo
+    depends_on:
+      env-substitution:
+        condition: service_completed_successfully
+      openmrs:
+        condition: service_started
+      mysql:
+        condition: service_started

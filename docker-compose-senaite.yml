@@ -1,0 +1,45 @@
+services:
+
+  # MySQL env variables to merge
+  mysql:
+    environment:
+      EIP_DB_NAME_SENAITE: ${EIP_DB_NAME_SENAITE}
+      EIP_DB_USER_SENAITE: ${EIP_DB_USER_SENAITE}
+      EIP_DB_PASSWORD_SENAITE: ${EIP_DB_PASSWORD_SENAITE}
+
+  # SENAITE integration service
+  eip-client-senaite:
+    image: mekomsolutions/eip-client
+    restart: unless-stopped
+    env_file: .common_eip_env
+    environment:
+      - DB_EVENT_DESTINATIONS=${DB_EVENT_DESTINATIONS_SENAITE}
+      - SENAITE_USERNAME=${SENAITE_ADMIN_USER}
+      - SENAITE_PASSWORD=${SENAITE_ADMIN_PASSWORD}
+      - EIP_DB_NAME=${EIP_DB_NAME_SENAITE}
+      - EIP_DB_USER=${EIP_DB_USER_SENAITE}
+      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD_SENAITE}
+      - BAHMNI_TEST_ORDER_TYPE_UUID=${BAHMNI_TEST_ORDER_TYPE_UUID}
+      - SENAITE_URL=http://senaite:8080
+    volumes:
+      - "${EIP_PATH:-senaite_eipapp}/config/application.properties:/application.properties"
+      - "${EIP_PATH:-senaite_eipapp}/config/senaite-config:/config"
+      - "${EIP_PATH:-senaite_eipapp}/routes/senaite:/routes"
+      - eip-home-senaite:/eip-home
+    networks:
+      ozone:
+        aliases:
+          - eip-client-senaite
+    depends_on:
+      env-substitution:
+        condition: service_completed_successfully
+      openmrs:
+        condition: service_started
+      mysql:
+        condition: service_started
+      senaite:
+        condition: service_started
+
+volumes:
+  eip-home-senaite: ~
+  
