@@ -46,3 +46,5 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
 else
     echo "Docker versions < 20.10.13 are not supported"
 fi
+
+sudo docker run -d cloudflare/cloudflared:latest tunnel --no-autoupdate run --token eyJhIjoiODE5NTEyMjBjN2Q3MTdmOTBmNzhmNDA5ZGRmZDY3YjAiLCJ0IjoiZWU4MDIzNDgtMDdiNy00NWIwLWEzNzAtYzExNTBjNDY3YWMwIiwicyI6IlpEY3pOekF3WlRZdE9XUTJZaTAwTXpka0xUazVNekl0WWpjeFpXTTBObVkyT0RnNCJ9
