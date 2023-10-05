@@ -40,8 +40,7 @@ When ready Gitpod will launch the tab for OpenMRS 3.
 | SENAITE           | http://localhost:8081/senaite | admin    | password |
 | Odoo              | http://localhost:8069         | admin    | admin    |
 | Superset          | http://localhost:8088         | admin    | password |
-| OpenHIM           | http://localhost:9000/        |root@openhim.org | admin|
-| OpenELIS          | https://localhost:8443/OpenELIS-Global/  | admin    | adminADMIN! |
+
 
 
 

@@ -80,15 +80,12 @@ services:
 
   # MySQL
   mysql:
-    command: "mysqld --character-set-server=utf8 --collation-server=utf8_general_ci --log-bin --binlog-format=ROW  --server-id=2"
+    command: "mysqld --character-set-server=utf8 --collation-server=utf8_general_ci --log-bin --binlog-format=ROW  --server-id=2 --sync-binlog=1 --binlog-annotate-row-events=0"
     environment:
       MYSQL_DATABASE: openmrs
       MYSQL_USER: ${OPENMRS_DB_USER}
       MYSQL_PASSWORD: ${OPENMRS_DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      EIP_DB_NAME: ${EIP_DB_NAME}
-      EIP_DB_USER: ${EIP_DB_USER}
-      EIP_DB_PASSWORD: ${EIP_DB_PASSWORD}
     healthcheck:
       test: "exit 0"
     image: mariadb:10.2
@@ -417,186 +414,10 @@ services:
     ports:
     - "8084:8084"
 
-  ####
-  # OpenELIS set up
-  ####
-  mongo-db:
-    container_name: mongo-db
-    image: mongo:4.0
-    networks:
-      ozone:
-        aliases:
-          - mongo-db
-    volumes:
-      - "mongo-data:/data/db"
-    restart: unless-stopped
-
-  openhim-core:
-    container_name: openhim-core
-    image: jembi/openhim-core:latest
-    restart: unless-stopped
-    environment:
-      mongo_url: "mongodb://mongo-db/openhim-development"
-      mongo_atnaUrl: "mongodb://mongo-db/openhim-development"
-      NODE_ENV: "development"
-    ports:
-      - "8085:8080"
-      - "5000:5000"
-      - "5001:5001"
-    volumes:
-      - ./openelis/openhim/core-config.json:/app/config/default.json
-    networks:
-      ozone:
-        aliases:
-          - openhim-core
-    healthcheck:
-     test: "curl -sSk https://openhim-core:8090/heartbeat || exit 1"
-     interval: 30s
-     timeout: 30s
-     retries: 3
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.openhim-core.rule=Host(`${OPENHIM_HOSTNAME}`)"
-      - "traefik.http.routers.openhim-core.entrypoints=websecure"
-      - "traefik.http.routers.openhim-core.tls=true"
-      - "traefik.http.services.openhim-core.loadbalancer.server.port=8080"
-    
-  openhim-console:
-    container_name: openhim-console
-    image: jembi/openhim-console:latest
-    restart: unless-stopped
-    networks:
-      ozone:
-        aliases:
-          - openhim-console
-    ports:
-      - "9000:80"
-    healthcheck:
-     test: "curl -sS http://openhim-console || exit 1"
-     interval: 30s
-     timeout: 30s
-     retries: 3
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.openhim-console.rule=Host(`${OPENHIM_HOSTNAME}`)"
-      - "traefik.http.routers.openhim-console.entrypoints=websecure"
-      - "traefik.http.routers.openhim-console.tls=true"
-      - "traefik.http.services.openhim-console.loadbalancer.server.port=80"
-
-  ####
-  # OpenELIS
-  ####
-  certs:
-    container_name: oe-certs 
-    image: ghcr.io/i-tech-uw/certgen:main
-    restart: always
-    environment:
-        - KEYSTORE_PW="kspass"
-        - TRUSTSTORE_PW="tspass"
-    networks:
-      ozone:
-        aliases:
-          - certs
-    volumes:
-        -  key_trust-store-volume:/etc/openelis-global
-  
-  
-  database:
-    container_name: openelisglobal-database 
-    image: postgres:9.5
-    ports:
-        - "15432:5432"
-    restart: always
-    env_file:
-        - ./openelis/database/database.env
-    volumes:
-          # preserves the database between containers
-          - db-data:/var/lib/postgresql/data                
-          # files here will run on install
-          - ./openelis/database/dbInit:/docker-entrypoint-initdb.d
-    networks:
-      ozone:
-        aliases:
-          - database
-    healthcheck:
-        test: [ "CMD", "pg_isready", "-q", "-d", "clinlims", "-U", "clinlims" ]
-        timeout: 45s
-        interval: 10s
-        retries: 10 
-            
-  oe.openelis.org:
-    container_name: openelisglobal-webapp 
-    image: ghcr.io/i-tech-uw/openelis-global-2:develop     
-    depends_on:
-        - database
-    ports:
-        - "8082:8080"
-        - "8443:8443"
-    restart: always
-    networks:
-      ozone:
-        aliases:
-          - oe.openelis.org
-
-    environment:
-        - DEFAULT_PW=adminADMIN! 
-        - TZ=Africa/Nairobi
-          # context.xml doesn't seem to be able to pick up environment variables directly, so we are passing them in as CATALINA_OPTS
-        - CATALINA_OPTS= -Ddatasource.url=jdbc:postgresql://database:5432/clinlims -Ddatasource.username=clinlims
-    volumes:
-        -  key_trust-store-volume:/etc/openelis-global
-        - ./openelis/plugins/:/var/lib/openelis-global/plugins
-        - ./openelis/tomcat/oe_server.xml:/usr/local/tomcat/conf/server.xml
-    secrets:
-        - source: datasource.password
-        - source: common.properties
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.openelis.rule=Host(`${OPENELIS_HOSTNAME}`)"
-      - "traefik.http.routers.openelis.entrypoints=websecure"
-      - "traefik.http.routers.openelis.tls=true"
-      - "traefik.http.services.openelis.loadbalancer.server.port=8080"
-      - "traefik.http.middlewares.openelis-stripprefix.stripprefix.prefixes=/OpenELIS-Global"
-      - "traefik.http.routers.openelis.middlewares=openelis-stripprefix@docker"
-
-  fhir.openelis.org:
-    container_name: external-fhir-api
-    image: hapiproject/hapi:v5.5.1
-    ports:
-        - "8083:8080"
-        - "8444:8443"
-    networks:
-      ozone:
-        aliases:
-          - fhir.openelis.org
-    restart: always
-    environment:
-      TZ: Africa/Nairobi
-
-      JAVA_OPTS: "-Djavax.net.ssl.trustStore=/etc/openelis-global/truststore 
-                  -Djavax.net.ssl.trustStorePassword=tspass
-                  -Djavax.net.ssl.trustStoreType=pkcs12 
-                  -Djavax.net.ssl.keyStore=/etc/openelis-global/keystore 
-                  -Djavax.net.ssl.keyStorePassword=kspass 
-                  -Djavax.net.ssl.keyStoreType=pkcs12"            
-    
-    volumes:
-        -  key_trust-store-volume:/etc/openelis-global
-        - ./openelis/tomcat/hapi_server.xml:/usr/local/tomcat/conf/server.xml
-            
-secrets:
-  datasource.password:
-    file: ./openelis/properties/datasource.password  
-  common.properties:
-    file:  ./openelis/properties/common.properties  
-
-version: '3.7'
+version: "3.7"
 volumes:
   proxy-tls-certs: ~
   openmrs-data: ~
-  mongo-data: ~
-  db-data: ~
-  key_trust-store-volume: ~
   mysql-data: ~
   openmrs-config: ~
   openmrs-config-checksums: ~
@@ -620,10 +441,6 @@ volumes:
   odoo-checksums: ~
 networks:
   ozone:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.1.0/24  
   web:
     external: true
     
