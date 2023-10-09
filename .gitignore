@@ -12,9 +12,6 @@ docker-compose.override.*
 !.env
 *.jar
 
-# Ignore the docker-compose.override.yml file
-docker-compose.override.*
-
 build
 
 # Maven target directory

@@ -3,7 +3,7 @@ services:
   eip-client-demo:
     image: mekomsolutions/eip-client
     restart: "no"
-    env_file: .common_eip_env
+    env_file: ../common_eip_env
     environment:
       - NUMBER_OF_DEMO_PATIENTS=${NUMBER_OF_DEMO_PATIENTS}
       - EIP_DB_NAME=${EIP_DB_NAME_DEMO}

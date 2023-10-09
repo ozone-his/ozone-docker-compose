@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
 export OZONE_DIR=$PWD/ozone && \
 mkdir -p $OZONE_DIR
+
+remoteRepoUrl=https://nexus.mekomsolutions.net/repository/maven-public
+
+# Parse artifact details from project pom.xml
+echo "Parsing details from project pom.xml..."
+version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+artifactId=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
+groupId=$(mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout)
+artifact=${groupId}:${artifactId}:${version}:zip
+
+
 # Downloads the project
-export VERSION=1.0.0-SNAPSHOT && \
-./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -Dtransitive=false --legacy-local-repository && \
-./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
+./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=${remoteRepoUrl} -Dartifact=${artifact} -Dtransitive=false --legacy-local-repository
+./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=${artifact} -DoutputDirectory=$OZONE_DIR/ozone-distro-${version}
 # Exports required environment variables
-export DISTRO_PATH=$OZONE_DIR/ozone-distro-$VERSION
+export DISTRO_PATH=$OZONE_DIR/ozone-distro-${version}
 export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config
 export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config
 export OPENMRS_CORE_PATH=$DISTRO_PATH/openmrs_core
