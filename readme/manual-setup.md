@@ -158,6 +158,22 @@ docker compose -f docker-compose.yml -f docker-compose-proxy.yml -f docker-compo
 ```bash
 docker compose -f docker-compose.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
 ```
+### With Backups Enabled:
+
+Export this additional environment variables:
+
+```bash
+export BACKUP_CRON_SCHEDULE="@every 24h" && \
+export BACKUP_PATH=<path_to_backup_dir>
+```
+
+Set the `BACKUP_PATH` to the directory where you want to store the backups and the `BACKUP_CRON_SCHEDULE` to the desired schedule for the backups.
+
+Start Ozone with the following command(Assumes Apache 2 is used above):
+
+``` bash
+docker compose -f docker-compose.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -f docker-compose-ofelia.yml -p $DISTRO_GROUP up
+```
 
 ### Step 9. Browse Ozone
 Ozone FOSS requires you to log into each component separately:

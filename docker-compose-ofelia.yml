@@ -1,0 +1,168 @@
+version: "3"
+services:
+  openmrs-db-backup:
+    image: mekomsolutions/mysql_backup:48d0823
+    entrypoint: tail -F /dev/null
+    environment:
+      DB_HOST: mysql
+      DB_NAME: openmrs
+      DB_USERNAME: ${OPENMRS_DB_USER}
+      DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
+    networks:
+      ozone:
+        aliases:
+          - openmrs-db-backup
+    volumes:
+      - "${BACKUP_PATH:-backup-path}:/opt/backup/"
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.openmrs-backup.schedule: "${BACKUP_CRON_SCHEDULE}"
+      ofelia.job-exec.openmrs-backup.command: "sh -c 'export BACKUP_PATH=/opt/backup/$$(date +%F-%R)&& mkdir -p $$BACKUP_PATH && /opt/entrypoint.sh'"
+
+  eip-client-backup-odoo:
+    image: mekomsolutions/mysql_backup:48d0823
+    entrypoint: tail -F /dev/null
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${EIP_DB_NAME_ODOO}
+      DB_USERNAME: ${EIP_DB_USER_ODOO}
+      DB_PASSWORD: ${EIP_DB_PASSWORD_ODOO}
+    networks:
+      ozone:
+        aliases:
+          - eip-client-backup-odoo-backup
+    volumes:
+      - "${BACKUP_PATH:-backup-path}:/opt/backup/"
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.eip-client-backup-odoo-backup.schedule: "${BACKUP_CRON_SCHEDULE}"
+      ofelia.job-exec.eip-client-backup-odoo-backup.command: "sh -c 'export BACKUP_PATH=/opt/backup/$$(date +%F-%R)&& mkdir -p $$BACKUP_PATH && /opt/entrypoint.sh'"
+  eip-client-backup-senaite:
+    image: mekomsolutions/mysql_backup:48d0823
+    entrypoint: tail -F /dev/null
+    environment:
+      DB_HOST: mysql
+      DB_NAME: ${EIP_DB_NAME_SENAITE}
+      DB_USERNAME: ${EIP_DB_USER_SENAITE}
+      DB_PASSWORD: ${EIP_DB_PASSWORD_SENAITE}
+    networks:
+      ozone:
+        aliases:
+          - openmrs-db-backup
+    volumes:
+      - "${BACKUP_PATH:-backup-path}:/opt/backup/"
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.eip-client-backup-senaite-backup.schedule: "${BACKUP_CRON_SCHEDULE}"
+      ofelia.job-exec.eip-client-backup-senaite-backup.command: "sh -c 'export BACKUP_PATH=/opt/backup/$$(date +%F-%R)&& mkdir -p $$BACKUP_PATH && /opt/entrypoint.sh'"
+  eip-client-backup-keycloak:
+    image: mekomsolutions/mysql_backup:48d0823
+    entrypoint: tail -F /dev/null
+    environment:
+      DB_HOST: mysql
+      DB_NAME: ${EIP_DB_NAME_KEYCLOAK}
+      DB_USERNAME: ${EIP_DB_USER_KEYCLOAK}
+      DB_PASSWORD: ${EIP_DB_PASSWORD_KEYCLOAK}
+    networks:
+      ozone:
+        aliases:
+          - openmrs-db-backup
+    volumes:
+      - "${BACKUP_PATH:-backup-path}:/opt/backup/"
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.eip-client-backup-keycloak-backup.schedule: "${BACKUP_CRON_SCHEDULE}"
+      ofelia.job-exec.eip-client-backup-keycloak-backup.command: "sh -c 'export BACKUP_PATH=/opt/backup/$$(date +%F-%R)&& mkdir -p $$BACKUP_PATH && /opt/entrypoint.sh'"
+  
+  odoo-db-backup:
+    image: mekomsolutions/postgres_backup:48d0823
+    entrypoint: tail -F /dev/null
+    environment:
+      DB_HOST: odoo-postgresql
+      DB_NAME: odoo
+      DB_USERNAME: ${ODOO_DB_USER}
+      DB_PASSWORD: ${ODOO_DB_PASSWORD}
+      DB_PORT: 5432
+    networks:
+      ozone:
+        aliases:
+          - odoo-db-backup
+    volumes:
+      - "${BACKUP_PATH:-backup-path}:/opt/backup/"
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.odoo-db-backup.schedule: "${BACKUP_CRON_SCHEDULE}"
+      ofelia.job-exec.odoo-db-backup.command: "sh -c 'export BACKUP_PATH=/opt/backup/$$(date +%F-%R)&& mkdir -p $$BACKUP_PATH && /opt/entrypoint.sh'"
+  odoo-filestore-backup:
+    entrypoint: tail -F /dev/null
+    image: mekomsolutions/filestore_backup:48d0823
+    environment:
+      FILESTORE_PATH: /mnt/odoo
+      FILENAME: odoo-filestore
+    volumes:
+      - "${BACKUP_PATH:-backup-path}:/opt/backup/"
+      - ${ODOO_FILESTORE:-odoo-filestore}:/mnt/odoo
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.odoo-filestore-backup.schedule: "${BACKUP_CRON_SCHEDULE}"
+      ofelia.job-exec.odoo-filestore-backup.command: "sh -c 'export BACKUP_PATH=/opt/backup/$$(date +%F-%R)&& mkdir -p $$BACKUP_PATH && /opt/entrypoint.sh'"
+
+  odoo-checksum-backup:
+    entrypoint: tail -F /dev/null
+    image: mekomsolutions/filestore_backup:48d0823
+    environment:
+      FILESTORE_PATH: /mnt/odoo_config_checksum
+      FILENAME: odoo-checksum
+    volumes:
+      - "${BACKUP_PATH:-backup-path}:/opt/backup/"
+      - "${ODOO_CONFIG_CHECKSUM_PATH:-odoo-checksums}:/mnt/odoo_config_checksum"
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.odoo-checksum-backup.schedule: "${BACKUP_CRON_SCHEDULE}"
+      ofelia.job-exec.odoo-checksum-backup.command: "sh -c 'export BACKUP_PATH=/opt/backup/$$(date +%F-%R)&& mkdir -p $$BACKUP_PATH && /opt/entrypoint.sh'"
+
+  openmrs-checksum-backup:
+    image: mekomsolutions/filestore_backup:48d0823
+    entrypoint: tail -F /dev/null
+    environment:
+      FILESTORE_PATH: /mnt/openmrs_config_checksum
+      FILENAME: openmrs-checksum
+    volumes:
+      - "${BACKUP_PATH:-backup-path}:/opt/backup/"
+      - "${OPENMRS_CONFIG_CHECKSUM_PATH:-openmrs-config-checksums}:/mnt/openmrs_config_checksum"
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.openmrs-checksum-backup.schedule: "${BACKUP_CRON_SCHEDULE}"
+      ofelia.job-exec.openmrs-checksum-backup.command: "sh -c 'export BACKUP_PATH=/opt/backup/$$(date +%F-%R)&& mkdir -p $$BACKUP_PATH && /opt/entrypoint.sh'"
+
+  ofelia:
+    image: mcuadros/ofelia:latest
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "${BACKUP_PATH:-backup-path}:/opt/backup/"
+    networks:
+      ozone:
+        aliases:
+          - odoo-postgresql
+          - odoo-14
+          - superset
+          - superset-worker
+    depends_on:
+      - openmrs-db-backup
+      - eip-client-backup-odoo
+      - eip-client-backup-senaite
+      - eip-client-backup-keycloak
+      - odoo-db-backup
+      - odoo-filestore-backup
+      - odoo-checksum-backup
+      - openmrs-checksum-backup
+volumes:
+  backup-path: ~
+  odoo-filestore: ~
+  odoo-checksums: ~
+  openmrs-config-checksums: ~
+
+networks:
+  ozone:
