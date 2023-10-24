@@ -1,0 +1,108 @@
+services:
+
+  # OpenMRS 3 Backend
+  openmrs:
+    depends_on:
+      mysql:
+        condition: service_started
+      env-substitution:
+        condition: service_completed_successfully
+    environment:
+      OMRS_CONFIG_MODULE_WEB_ADMIN: "true"
+      OMRS_CONFIG_AUTO_UPDATE_DATABASE: "true"
+      OMRS_CONFIG_CREATE_TABLES: "true"
+      OMRS_CONFIG_CONNECTION_SERVER: mysql
+      OMRS_CONFIG_CONNECTION_DATABASE: openmrs
+      OMRS_CONFIG_CONNECTION_USERNAME: ${OPENMRS_DB_USER:-openmrs}
+      OMRS_CONFIG_CONNECTION_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - "-f"
+        - "http://localhost:8080/openmrs/"
+      timeout: 5s
+    image: openmrs/openmrs-reference-application-3-backend:${O3_BACKEND_TAG:-nightly}
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.openmrs.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs`)"
+      traefik.http.routers.openmrs.entrypoints: "websecure"
+      traefik.http.services.openmrs.loadbalancer.server.port: 8080
+      traefik.http.routers.openmrs.middlewares: openmrs-spa-redirectregex
+      traefik.http.middlewares.openmrs-spa-redirectregex.redirectregex.regex: https://${O3_HOSTNAME}/openmrs/spa
+      traefik.http.middlewares.openmrs-spa-redirectregex.redirectregex.replacement: https://${O3_HOSTNAME}/openmrs/spa/home
+    networks:
+      - ozone
+      - web
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - "openmrs-data:/openmrs/data"
+      - "${OPENMRS_OWAS_PATH:-openmrs-owas}:/openmrs/distribution/openmrs_owas/"
+      - "${OPENMRS_CORE_PATH:-openmrs-core}:/openmrs/distribution/openmrs_core/"
+      - "${OPENMRS_MODULES_PATH:-openmrs-modules}:/openmrs/distribution/openmrs_modules/"
+      - "${OPENMRS_CONFIG_PATH:-openmrs-config}:/openmrs/distribution/openmrs_config/"
+      - "${OPENMRS_CONFIG_CHECKSUMS_PATH:-openmrs-config-checksums}:/openmrs/data/configuration_checksums"
+      - "${OPENMRS_PROPERTIES_PATH}:/etc/properties/"
+
+  # OpenMRS 3 Frontend
+  frontend:
+    environment:
+      SPA_PATH: /openmrs/spa
+      API_URL: /openmrs
+      SPA_CONFIG_URLS: ${SPA_CONFIG_URLS}
+      SPA_DEFAULT_LOCALE: ${SPA_DEFAULT_LOCALE}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      timeout: 5s
+    image: openmrs/openmrs-reference-application-3-frontend:${O3_FRONTEND_TAG:-nightly}
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.frontend.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs/spa/`)"
+      traefik.http.routers.frontend.entrypoints: "websecure"
+      traefik.http.routers.frontend.middlewares: frontend-stripprefix,gzip
+      traefik.http.services.frontend.loadbalancer.server.port: 80
+
+      traefik.http.routers.home.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/home`)"
+      traefik.http.routers.home.entrypoints: "websecure"
+      traefik.http.routers.home.middlewares: home-redirectregex
+
+      traefik.http.routers.root.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/`)"  
+      traefik.http.routers.root.entrypoints: "websecure"
+      traefik.http.routers.root.middlewares: root-redirectregex
+
+      traefik.http.middlewares.frontend-stripprefix.stripprefix.prefixes: /openmrs/spa
+      traefik.http.middlewares.frontend-stripprefix.stripprefix.forceslash: false
+      traefik.http.middlewares.home-redirectregex.redirectregex.regex: https://${O3_HOSTNAME}/home
+      traefik.http.middlewares.home-redirectregex.redirectregex.replacement: https://${O3_HOSTNAME}/openmrs/spa/home
+      traefik.http.middlewares.root-redirectregex.redirectregex.regex: https://${O3_HOSTNAME}
+      traefik.http.middlewares.root-redirectregex.redirectregex.replacement: https://${O3_HOSTNAME}/openmrs/spa/home
+      traefik.http.middlewares.gzip.compress: true
+    networks:
+      - ozone
+      - web
+    restart: unless-stopped
+    volumes:
+      - "${OPENMRS_FRONTEND_CONFIG_PATH}:/usr/share/nginx/html/ozone"
+
+  mysql:
+    environment:
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
+      OPENMRS_DB_USER: ${OPENMRS_DB_USER}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
+    volumes:
+      - "${SQL_SCRIPTS_PATH}/mysql/openmrs:/docker-entrypoint-initdb.d/db/openmrs"
+
+  env-substitution:
+    environment:
+      - OPENMRS_PUBLIC_URL=https://${O3_HOSTNAME}
+
+volumes:  
+  openmrs-core: ~
+  openmrs-config: ~
+  openmrs-config-checksums: ~
+  openmrs-data: ~
+  openmrs-modules: ~
+  openmrs-owas: ~
+  

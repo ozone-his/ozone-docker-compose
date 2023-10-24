@@ -15,7 +15,7 @@ Type in the following in a terminal:
 ```bash
 git clone https://github.com/ozone-his/ozone-docker
 cd ozone-docker
-./start-demo.sh
+./start-demo.sh 1.0.0-SNASPHOT
 ```
 
 It may take some time to download and setup Ozone for the first time, so hang tight :hourglass_flowing_sand:

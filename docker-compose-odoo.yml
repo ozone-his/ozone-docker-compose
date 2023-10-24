@@ -1,17 +1,71 @@
 services:
 
-  # MySQL env variables to merge
-  mysql:
+  # Odoo
+  odoo:
+    depends_on:
+      postgresql:
+        condition: service_healthy
     environment:
-      EIP_DB_NAME_ODOO: ${EIP_DB_NAME_ODOO}
-      EIP_DB_USER_ODOO: ${EIP_DB_USER_ODOO}
-      EIP_DB_PASSWORD_ODOO: ${EIP_DB_PASSWORD_ODOO}
+      - HOST=${POSTGRES_DB_HOST}
+      - USER=${ODOO_DB_USER}
+      - PASSWORD=${ODOO_DB_PASSWORD}
+      - ADDONS=sale_management,stock,account_account,purchase,mrp,odoo_initializer,ozone_settings,mrp_product_expiry,product_expiry,l10n_generic_coa
+      - INITIALIZER_DATA_FILES_PATH=/mnt/odoo_config
+      - INITIALIZER_CONFIG_FILE_PATH=/mnt/odoo_config/initializer_config.json
+    image: mekomsolutions/odoo
+    labels:
+      traefik.enable: true
+      # https
+      traefik.http.routers.odoo-https.rule: Host(`${ODOO_HOSTNAME}`)
+      traefik.http.routers.odoo-https.entrypoints: websecure
+      traefik.http.routers.odoo-https.service: odoo
+      traefik.http.routers.odoo-https.middlewares: gzip,sslheader,limit
+      #----------------------------- routes for: odoo/web/database || odoo/website/info  -----------------------------
+      # https 
+      traefik.http.routers.odoo-db-https.rule: Host(`${ODOO_HOSTNAME}`) && (PathPrefix(`/web/database`) || PathPrefix(`/website/info`))
+      traefik.http.routers.odoo-db-https.entrypoints: websecure
+      traefik.http.routers.odoo-db-https.service: odoo
+      traefik.http.routers.odoo-db-https.middlewares: gzip,sslheader,limit
+      traefik.http.services.odoo-db-https.loadbalancer.server.port: 8069
+      #---------------------------------------- routes for: odoo/longpolling ------------------------------------------------
+      # https 
+      traefik.http.routers.odoo-im-https.rule: Host(`${ODOO_HOSTNAME}`) && (PathPrefix(`/longpolling`))
+      traefik.http.routers.odoo-im-https.entrypoints: websecure
+      traefik.http.routers.odoo-im-https.service: odoo-im
+      traefik.http.routers.odoo-im-https.middlewares: gzip,sslheader,limit
 
-  # Odoo integration service
-  eip-client-odoo:
-    image: mekomsolutions/eip-client
+      #====================================================== services ===========================================================
+      traefik.http.services.odoo.loadbalancer.server.port: 8069
+      traefik.http.services.odoo-im.loadbalancer.server.port: 8072
+
+      #===================================================== middlewares =========================================================
+      traefik.http.middlewares.gzip.compress: true
+      traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto: https
+      traefik.http.middlewares.limit.buffering.memRequestBodyBytes: 20971520
+      traefik.http.middlewares.limit.buffering.maxRequestBodyBytes: 20971520
+    networks:
+      - ozone
+      - web
     restart: unless-stopped
-    env_file: .common_eip_env
+    volumes:
+      - "${ODOO_FILESTORE:-odoo-filestore}:/var/lib/odoo/filestore"
+      - "${ODOO_EXTRA_ADDONS:-odoo-extra-addons}:/mnt/extra-addons"
+      - "${ODOO_CONFIG_PATH:-odoo-config}:/mnt/odoo_config"
+      - "${ODOO_CONFIG_FILE_PATH:-odoo-config}:/etc/properties/odoo.conf"
+      - "${ODOO_CONFIG_CHECKSUMS_PATH:-odoo-checksums}:/mnt/checksums"
+    
+  # Odoo - OpenMRS integration service
+  eip-odoo-openmrs:
+    depends_on:
+      env-substitution:
+        condition: service_completed_successfully
+      openmrs:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      odoo:
+        condition: service_started
+    env_file: eip.env
     environment:
       - DB_EVENT_DESTINATIONS=${DB_EVENT_DESTINATIONS_ODOO}
       - EIP_DB_NAME=${EIP_DB_NAME_ODOO}
@@ -28,24 +82,43 @@ services:
       - ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE=${ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE}
       - ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE=${ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE}
       - ODOO_URL=http://odoo:8069
-    volumes:
-      - "${EIP_PATH:-odoo_eipapp}/config/application.properties:/application.properties"
-      - "${EIP_PATH:-odoo_eipapp}/config/odoo-config:/config"
-      - "${EIP_PATH:-odoo_eipapp}/routes/odoo:/routes"
-      - eip-home-odoo:/eip-home
+    image: mekomsolutions/eip-client
     networks:
       ozone:
         aliases:
           - eip-client-odoo
-    depends_on:
-      env-substitution:
-        condition: service_completed_successfully
-      openmrs:
-        condition: service_started
-      mysql:
-        condition: service_started
-      odoo:
-        condition: service_started
+          - eip-odoo-openmrs
+    restart: unless-stopped
+    volumes:
+      - "${EIP_ODOO_OPENMRS_PROPERTIES_PATH}:/config"
+      - "${EIP_ODOO_OPENMRS_ROUTES_PATH}:/routes"
+      - eip-home-odoo:/eip-home
+    
+  postgresql:
+    environment:
+      ODOO_DB_NAME: ${ODOO_DATABASE}
+      ODOO_DB_USER: ${ODOO_DB_USER}
+      ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD}
+    volumes:
+      - "${SQL_SCRIPTS_PATH}/postgresql/odoo:/docker-entrypoint-initdb.d/db/odoo"
+
+  mysql:
+    environment:
+      EIP_DB_NAME_ODOO: ${EIP_DB_NAME_ODOO}
+      EIP_DB_USER_ODOO: ${EIP_DB_USER_ODOO}
+      EIP_DB_PASSWORD_ODOO: ${EIP_DB_PASSWORD_ODOO}
+    volumes:
+      - "${SQL_SCRIPTS_PATH}/mysql/eip-odoo-openmrs:/docker-entrypoint-initdb.d/db/eip-odoo-openmrs"
+
+  env-substitution:
+    environment:
+      - ODOO_PUBLIC_URL=https://${ODOO_HOSTNAME}
 
 volumes:
   eip-home-odoo: ~
+  odoo-checksums: ~
+  odoo-config: ~
+  odoo-extra-addons: ~
+  odoo-filestore: ~
+  odoo-web-data: ~
+  

@@ -1,9 +1,9 @@
 services:
 
-  eip-client-demo:
+  eip-demo:
     image: mekomsolutions/eip-client
     restart: "no"
-    env_file: ../common_eip_env
+    env_file: eip.env
     environment:
       - NUMBER_OF_DEMO_PATIENTS=${NUMBER_OF_DEMO_PATIENTS}
       - EIP_DB_NAME=${EIP_DB_NAME_DEMO}
@@ -16,10 +16,11 @@ services:
       ozone:
         aliases:
           - eip-client-demo
+          - eip-demo
     depends_on:
       env-substitution:
         condition: service_completed_successfully
       openmrs:
-        condition: service_started
+        condition: service_healthy
       mysql:
         condition: service_started
