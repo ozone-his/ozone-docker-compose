@@ -69,28 +69,11 @@ export VERSION=1.0.0-alpha.7&& \
 ### Step 6. Export all needed environment variables
 
 The Ozone Docker project relies on a number of environment variables (env vars) to document where the distro assets are expected to be found.
-For the sample demo you can export the following env vars:
+For the sample demo those vars are provided in the  [start-demo.env](../start-demo.env) file.
 ```bash
-export DISTRO_GROUP=ozone-demo; \
-
-export DISTRO_PATH=$OZONE_DIR/ozone-distro-$VERSION;  \
-
-export OPENMRS_CONFIG_PATH=$DISTRO_PATH/openmrs_config;  \
-export OZONE_CONFIG_PATH=$DISTRO_PATH/ozone_config;  \
-export OPENMRS_CORE_PATH=$DISTRO_PATH/openmrs_core;  \
-export OPENMRS_MODULES_PATH=$DISTRO_PATH/openmrs_modules;  \
-export EIP_PATH=$DISTRO_PATH/eip_config; \
-export SPA_PATH=$DISTRO_PATH/spa;  \
-export SENAITE_CONFIG_PATH=$DISTRO_PATH/senaite_config; \
-export SUPERSET_CONFIG_PATH=$DISTRO_PATH/superset_config;  \
-
-export ODOO_EXTRA_ADDONS=$DISTRO_PATH/odoo_config/addons;  \
-export ODOO_CONFIG_PATH=$DISTRO_PATH/odoo_config/odoo_csv;  \
-export ODOO_INITIALIZER_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/initializer_config.json;  \
-export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/odoo_config/config/odoo.conf;  \
-export O3_FRONTEND_TAG=3.0.0-beta.13;  \
-export O3_BACKEND_TAG=3.0.0-beta.13;
+source start-demo.env
 ```
+
 #### How to activate Ozone demo data generation
 
 The generation of demo data is handled by a separate service that can be opted in or out. This service is configured with an EIP route that takes care of generating demo data 10 minutes after Ozone has started.
@@ -151,12 +134,12 @@ export SUPERSET_HOSTNAME=analytics-"${IP}.traefik.me";
 #### With Apache 2
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose-proxy.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
+docker compose -f docker-compose-common.yml -f docker-compose-openmrs.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-superset.yml -f demo/docker-compose.yml  -f proxy/docker-compose.yml up -d --build
 ```
 #### With Traefik
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-demo.yml -p $DISTRO_GROUP up
+docker compose -f docker-compose-common.yml -f docker-compose-openmrs.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-superset.yml -f demo/docker-compose.yml up -d
 ```
 
 ### Step 9. Browse Ozone

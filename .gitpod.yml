@@ -1,5 +1,5 @@
 tasks:
-  - command: ./start-demo.sh
+  - command: ./start-demo.sh 1.0.0-SNAPSHOT
 ports:
   - name: OpenMRS
     description: OpenMRS 3

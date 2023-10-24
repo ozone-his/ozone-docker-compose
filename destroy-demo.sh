@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 export OZONE_DIR=$PWD/ozone
-mkdir -p $OZONE_DIR
+rm -rf $OZONE_DIR
 
 # Source the required environment variables
 source start-demo.env

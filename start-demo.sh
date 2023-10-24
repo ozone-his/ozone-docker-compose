@@ -5,7 +5,7 @@ set -e
 if [ -z "$1" ]
 then
       echo "Missing parameter. Please provide the Ozone Distro version as a parameter"
-      echo "Eg: $0 1.0.0-SNAPSHOT"
+      echo "Eg: $0 1.0.0-alpha.6"
       exit 1
 fi
 
@@ -19,6 +19,13 @@ export OZONE_DISTRO_VERSION=$1
 
 # Source the required environment variables
 source start-demo.env
+
+# Provide the Ref App images tags
+O3_FRONTEND_TAG=
+O3_BACKEND_TAG=
+
+# Set the demo patients props
+NUMBER_OF_DEMO_PATIENTS=50
 
 INSTALLED_DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
 MINIMUM_REQUIRED_DOCKER_VERSION_REGEX="^((([2-9][1-9]|[3-9][0]|[0-9]{3,}).*)|(20\.([0-9]{3,}|[1-9][1-9]|[2-9][0]).*)|(20\.10\.([0-9]{3,}|[2-9][0-9]|[1][3-9])))"
