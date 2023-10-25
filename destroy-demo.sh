@@ -2,7 +2,7 @@
 export OZONE_DIR=$PWD/ozone
 rm -rf $OZONE_DIR
 
-# Source the required environment variables
+# Export the required environment variables
 source start-demo.env
 
 INSTALLED_DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")

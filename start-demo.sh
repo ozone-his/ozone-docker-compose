@@ -17,12 +17,8 @@ export OZONE_DISTRO_VERSION=$1
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=com.ozonehis:ozone-distro:$OZONE_DISTRO_VERSION:zip -Dtransitive=false --legacy-local-repository && \
 ./mvnw clean org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=com.ozonehis:ozone-distro:$OZONE_DISTRO_VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$OZONE_DISTRO_VERSION
 
-# Source the required environment variables
+# Export the required environment variables
 source start-demo.env
-
-# Provide the Ref App images tags
-O3_FRONTEND_TAG=
-O3_BACKEND_TAG=
 
 # Set the demo patients props
 NUMBER_OF_DEMO_PATIENTS=50
@@ -34,8 +30,8 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
     if command -v gp version &> /dev/null; then
         export PROXY_TLS="-DgitPodEnvironment"
     fi
-   docker network inspect web >/dev/null 2>&1 ||  docker network create web
-   docker compose -f docker-compose-common.yml -f docker-compose-openmrs.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-superset.yml -f demo/docker-compose.yml  -f proxy/docker-compose.yml up -d --build
+    docker network inspect web >/dev/null 2>&1 ||  docker network create web
+    docker compose -f docker-compose-common.yml -f docker-compose-openmrs.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-superset.yml -f demo/docker-compose.yml -f proxy/docker-compose.yml up -d --build
 else
     echo "Docker versions < 20.10.13 are not supported"
 fi
