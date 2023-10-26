@@ -9,7 +9,7 @@ services:
 
   # SENAITE integration service
   eip-client-senaite:
-    image: mekomsolutions/eip-client
+    image: mekomsolutions/eip-client:sha-553ea01
     restart: unless-stopped
     env_file: .common_eip_env
     environment:
