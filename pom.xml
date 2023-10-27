@@ -20,12 +20,44 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <ozoneDemoDataVersion>1.0.0-SNAPSHOT</ozoneDemoDataVersion>
+    <true>true</true>
   </properties>
 
-  <dependencies/>
-  
+  <modules>
+    <module>demo</module>
+  </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.ozonehis</groupId>
+      <artifactId>ozone-demo-data</artifactId>
+      <type>zip</type>
+      <version>${ozoneDemoDataVersion}</version>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
+      <plugin>
+        <artifactId>exec-maven-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <executions>
+          <execution>
+            <id>Retreive Ozone access URLs from README.md</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>${basedir}/scripts/get-urls-from-readme.sh</executable>
+              <commandlineArgs>
+                ${basedir}/README.md ${project.build.directory}/${project.artifactId}-${project.version}/ozone-urls.md</commandlineArgs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- Package as a Zip file -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -50,32 +82,63 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
         <version>3.2.0</version>
-        <configuration>
-          <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
-          <resources>
-            <resource>
-              <directory>${project.basedir}</directory>
-              <excludes>
-                <!-- Exclude some unneeded files from the package-->
-                <exclude>.gitignore</exclude>
-                <exclude>*override*</exclude>
-                <exclude>pom.xml</exclude>
-                <exclude>assembly.xml</exclude>
-                <exclude>senaite/senaite-data/**</exclude>
-              </excludes>
-            </resource>
-          </resources>
-        </configuration>
         <executions>
           <execution>
-            <id>copy-resources</id>
-            <phase>validate</phase>
+            <id>Copy local resources</id>
+            <phase>generate-resources</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}</directory>
+                  <includes>
+                    <include>proxy/</include>
+                    <include>*docker-compose*</include>
+                    <include>*env</include>
+                    <include>scripts/</include>
+                  </includes>
+                  <excludes>
+                    <exclude>scripts/ozone/</exclude>
+                    <exclude>scripts/start-demo.sh</exclude>
+                  </excludes>
+                </resource>
+                <resource>
+                  <directory>${project.basedir}</directory>
+                  <includes>
+                    <include>scripts/start-demo.sh</include>
+                  </includes>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+          <execution>
+            <id>Copy Demo Data resources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <excludeTransitive>true</excludeTransitive>
+              <useBaseVersion>true</useBaseVersion>
+              <outputDirectory>
+                ${project.build.directory}/${project.artifactId}-${project.version}/demo</outputDirectory>
+              <includeArtifactIds>ozone-demo-data</includeArtifactIds>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 </project>
