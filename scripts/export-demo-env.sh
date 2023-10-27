@@ -1,4 +1,3 @@
-export DISTRO_PATH=$OZONE_DIR/ozone-distro-$OZONE_DISTRO_VERSION
 export OPENMRS_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/initializer_config
 export OPENMRS_PROPERTIES_PATH=$DISTRO_PATH/configs/openmrs/properties
 export OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/openmrs/modules
