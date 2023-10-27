@@ -34,6 +34,7 @@ git clone https://github.com/ozone-his/ozone-docker
 
 ```bash
 cd ozone-docker
+cd scripts/
 ```
 
 ### Step 2. (Optional) Destroy any running containers from previous trials
@@ -53,17 +54,24 @@ mkdir -p $OZONE_DIR
 
 Set the Ozone distro version to use:
 ```bash
-export VERSION=1.0.0-alpha.7&& \
-./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -Dtransitive=false --legacy-local-repository && \
-./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=com.ozonehis:ozone-distro:$VERSION:zip -DoutputDirectory=$OZONE_DIR/ozone-distro-$VERSION
+export OZONE_DISTRO_VERSION=1.0.0-SNAPSHOT
+```
+
+Download and extract Ozone distro:
+```bash
+export DISTRO_PATH=$OZONE_DIR/ozone-distro
+
+rm -rf $OZONE_DIR/target/dependency-maven-plugin-markers/
+./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=com.ozonehis:ozone-distro:$OZONE_DISTRO_VERSION:zip -Dtransitive=false --legacy-local-repository && \
+./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:unpack -Dproject.basedir=$OZONE_DIR -Dartifact=com.ozonehis:ozone-distro:$OZONE_DISTRO_VERSION:zip -DoutputDirectory=$DISTRO_PATH
 ```
 
 ### Step 4. Export needed environment variables
 
 The Ozone Docker project relies on a number of environment variables (env vars) to document where the distro assets are expected to be found.
-For the sample demo those vars are provided in the [start-demo.env](../start-demo.env) file.
+For the sample demo those vars are provided in the [export-demo-env.sh](../scripts/export-demo-env.sh) file.
 ```bash
-source start-demo.env
+source export-demo-env.sh
 ```
 
 ### Step 5. (Optional) Activate Ozone demo data generation
@@ -126,12 +134,12 @@ export SUPERSET_HOSTNAME=analytics-"${IP}.traefik.me";
 #### With Apache 2
 
 ```bash
-docker compose -f docker-compose-common.yml -f docker-compose-openmrs.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-superset.yml -f demo/docker-compose.yml -f proxy/docker-compose.yml up -d --build
+docker compose -p ozone -f ../docker-compose-common.yml -f ../docker-compose-openmrs.yml -f ../docker-compose-senaite.yml -f ../docker-compose-odoo.yml -f ../docker-compose-superset.yml -f ../demo/docker-compose.yml -f ../proxy/docker-compose.yml up -d --build
 ```
 #### With Traefik
 
 ```bash
-docker compose -f docker-compose-common.yml -f docker-compose-openmrs.yml -f docker-compose-senaite.yml -f docker-compose-odoo.yml -f docker-compose-superset.yml -f demo/docker-compose.yml up -d
+docker compose -p ozone -f ../docker-compose-common.yml -f ../docker-compose-openmrs.yml -f ../docker-compose-senaite.yml -f ../docker-compose-odoo.yml -f ../docker-compose-superset.yml -f ../demo/docker-compose.yml up -d
 ```
 
 ### Step 9. Browse Ozone
@@ -148,3 +156,14 @@ Ozone FOSS requires you to log into each component separately:
 ⚠️ If you started the project with Traefik on macOS the coordinates for the components will be different and you will have to replace "`172-17-0-1`" with your host IP.
 E.g. if your host IP is 192.168.200.197, https://emr-172-17-0-1.traefik.me will have to become https://emr-192-168-200-197.traefik.me, etc.
 
+### Step 10. (Optional) Stop Ozone
+
+To simply stop:
+```bash
+docker compose -p ozone -f ../docker-compose-common.yml -f ../docker-compose-openmrs.yml -f ../docker-compose-senaite.yml -f ../docker-compose-odoo.yml -f ../docker-compose-superset.yml -f ../demo/docker-compose.yml -f ../proxy/docker-compose.yml stop
+```
+
+To completely remove the containers and volumes:
+```bash
+docker compose -p ozone -f ../docker-compose-common.yml -f ../docker-compose-openmrs.yml -f ../docker-compose-senaite.yml -f ../docker-compose-odoo.yml -f ../docker-compose-superset.yml -f ../demo/docker-compose.yml -f ../proxy/docker-compose.yml down -v
+```
