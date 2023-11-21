@@ -64,7 +64,6 @@ services:
       EIP_DB_PASSWORD_SENAITE: ${EIP_DB_PASSWORD_SENAITE}
     volumes:
       - "${SQL_SCRIPTS_PATH}/mysql/eip-openmrs-senaite:/docker-entrypoint-initdb.d/db/eip-openmrs-senaite"
-
     
   env-substitution:
     environment:

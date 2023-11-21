@@ -9,8 +9,10 @@ then
       exit 1
 fi
 
+source utils.sh
+
 # Create the OZONE_DIR and export DISTRO_PATH
-source setup-dirs.sh
+setupDirs
 
 # Download Ozone distro
 export OZONE_DISTRO_VERSION=$1

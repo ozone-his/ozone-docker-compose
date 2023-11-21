@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
-# Export the DISTRO_PATH variable
-source setup-dirs.sh
+source utils.sh
 
-# Export the demo environment variables
-source export-demo-env.sh
+# Set CLI options
+setDockerComposeCLIOptions
+
+# Export the DISTRO_PATH variable
+setupDirs
+
+# Export the paths variables to point to distro artifacts
+exportPaths
 
 # Set the demo patients props
 export NUMBER_OF_DEMO_PATIENTS=50
@@ -16,20 +21,42 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
     if command -v gp version &> /dev/null; then
         export PROXY_TLS="-DgitPodEnvironment"
     fi
+
+    # Set the Docker Compose command for Ozone
+    dockerComposeOzoneCommand="docker compose -p ozone $dockerComposeOzoneCLIOptions up -d --build"
+    echo "[INFO] Running Ozone..."
+    echo ""
+    echo "$dockerComposeOzoneCommand"
+    echo ""
+
+    # Create the networks
     docker network inspect web >/dev/null 2>&1 ||  docker network create web
-    
-    dockerComposeCommand() {
-        docker compose -p ozone -f ../docker-compose-common.yml -f ../docker-compose-openmrs.yml -f ../docker-compose-senaite.yml -f ../docker-compose-odoo.yml -f ../docker-compose-superset.yml -f ../demo/docker-compose.yml -f ../proxy/docker-compose.yml up -d --build
-        }
-    echo "[INFO] $(declare -f dockerComposeCommand)"
-    dockerComposeCommand
+
+    # Run Ozone
+    ($dockerComposeOzoneCommand)
+
+    # Run the Proxy service
+    dockerComposeProxyCommand="docker compose -p ozone $dockerComposeProxyCLIOptions up -d --build"
+    echo "[INFO] Running proxy service..."
+    echo ""
+    echo "$dockerComposeProxyCommand"
+    echo ""
+    ($dockerComposeProxyCommand)
+
+    # Run the Demo service
+    dockerComposeDemoCommand="docker compose -p ozone $dockerComposeDemoCLIOptions up -d"
+    echo "[INFO] Running demo service..."
+    echo ""
+    echo "$dockerComposeDemoCommand"
+    echo ""
+    ($dockerComposeDemoCommand)
 
 else
     echo "Docker versions < 20.10.13 are not supported"
 fi
 
 #
-# The following lines will display the Ozone access URLs to the user.
+# The following lines will display the Ozone access URLs in the terminal.
 # However, the commands differ when running from the Maven package or directly from source.
 # Handling this by using Maven filtering to define if operating in a Maven package or from source.
 #
