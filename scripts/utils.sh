@@ -1,12 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function setupDirs () {
     # Create the Ozone directory
-    export OZONE_DIR=$PWD/ozone
+    source ozone-dir.env
     mkdir -p $OZONE_DIR
 
     # Export the DISTRO_PATH value
-    export DISTRO_PATH=$OZONE_DIR/distro
+    export DISTRO_PATH=$OZONE_DIR
 }
 
 function exportPaths () {

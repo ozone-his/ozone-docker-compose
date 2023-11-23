@@ -44,7 +44,7 @@ If you have already set up Ozone before you may need to clean up your local envi
 ./destroy-demo.sh
 ```
 
-### Step 3. Download the Ozone distribution
+### Step 3. Set up and download the Ozone distribution
 
 Create a directory to download Ozone distro:
 ```bash
