@@ -14,11 +14,5 @@ build
 # Maven target directory
 target/
 
-
-# Ignore start-demo.sh folders and downloaded resources
-ozone/
-ozone-distro-demo
-*.ozone-distro-demo.zip
-
 # IDE
 .vscode

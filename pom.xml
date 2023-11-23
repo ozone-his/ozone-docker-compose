@@ -103,7 +103,7 @@
                     <include>scripts/</include>
                   </includes>
                   <excludes>
-                    <exclude>scripts/ozone/</exclude>
+                    <exclude>scripts/distro/</exclude>
                     <exclude>scripts/start-demo.sh</exclude>
                   </excludes>
                 </resource>
@@ -111,6 +111,28 @@
                   <directory>${project.basedir}</directory>
                   <includes>
                     <include>scripts/start-demo.sh</include>
+                  </includes>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Copy and substitute some helper files (for demo and Gitpod) -->
+            <id>Copy and substitute some helper files</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>
+                ${project.build.directory}/</outputDirectory>
+              <overwrite>true</overwrite>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/scripts/</directory>
+                  <includes>
+                    <include>go-to-scripts-dir.sh</include>
                   </includes>
                   <filtering>true</filtering>
                 </resource>

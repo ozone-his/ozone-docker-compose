@@ -22,6 +22,10 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
         export PROXY_TLS="-DgitPodEnvironment"
     fi
 
+    # Pull Ozone Docker images
+    echo "[INFO] Pulling Ozone images..."
+    docker compose -p ozone $dockerComposeOzoneCLIOptions pull
+    
     # Set the Docker Compose command for Ozone
     dockerComposeOzoneCommand="docker compose -p ozone $dockerComposeOzoneCLIOptions up -d --build"
     echo "[INFO] Running Ozone..."

@@ -14,7 +14,7 @@ Type in the following in a terminal:
 
 ```bash
 git clone https://github.com/ozone-his/ozone-docker
-cd ozone-docker/scripts/
+cd target/ && source go-to-scripts-dir.sh
 ./fetch-ozone-distro.sh 1.0.0-SNASPHOT
 ./start-demo.sh
 ```
