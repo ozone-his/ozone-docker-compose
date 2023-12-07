@@ -12,6 +12,12 @@ setupDirs
 # Export the paths variables to point to distro artifacts
 exportPaths
 
+# Set the Traefik host names
+if [ "$TRAEFIK" == "true" ]; then
+    echo "[INFO] \$TRAEFIK=true, setting Traefik hostnames..."
+    setTraefikHostnames
+fi
+
 # Set the demo patients props
 export NUMBER_OF_DEMO_PATIENTS=50
 
@@ -39,13 +45,17 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
     # Run Ozone
     ($dockerComposeOzoneCommand)
 
-    # Run the Proxy service
-    dockerComposeProxyCommand="docker compose -p ozone $dockerComposeProxyCLIOptions up -d --build"
-    echo "[INFO] Running proxy service..."
-    echo ""
-    echo "$dockerComposeProxyCommand"
-    echo ""
-    ($dockerComposeProxyCommand)
+    # Run the Apache2 Proxy service, if $TRAEFIK!=true
+    if [ "$TRAEFIK" != "true" ]; then
+        dockerComposeProxyCommand="docker compose -p ozone $dockerComposeProxyCLIOptions up -d --build"
+        echo "[INFO] Running Apache2 proxy service (\$TRAEFIK!=true)..."
+        echo ""
+        echo "$dockerComposeProxyCommand"
+        echo ""
+        ($dockerComposeProxyCommand)
+    else
+        echo "[INFO] Skipping running Apache 2 proxy... (\$TRAEFIK=true)"
+    fi
 
     # Run the Demo service
     dockerComposeDemoCommand="docker compose -p ozone $dockerComposeDemoCLIOptions up -d"

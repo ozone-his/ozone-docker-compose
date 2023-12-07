@@ -33,6 +33,16 @@ It may take some time to download and setup Ozone for the first time, so hang ti
 
 When ready Gitpod will launch the tab for OpenMRS 3.
 
+### Run Ozone FOSS with Traefik as the proxy
+
+```bash
+git clone https://github.com/ozone-his/ozone-docker
+source target/go-to-scripts-dir.sh
+./fetch-ozone-distro.sh 1.0.0-SNAPSHOT # Replace by the version of your choice
+export TRAEFIK="true"
+./start-demo.sh
+```
+
 ## 2. Browse Ozone
 
 Access each Ozone FOSS components at the following URL:

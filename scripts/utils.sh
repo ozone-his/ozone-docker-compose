@@ -49,3 +49,26 @@ function setDockerComposeCLIOptions () {
     # Set args for the demo service
     export dockerComposeDemoCLIOptions="--env-file ../.env -f ../demo/docker-compose.yml"
 }
+
+function setTraefikHostnames {
+
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # Linux
+        # Using the static Docker IP
+        export IP="172.17.0.1"
+        echo "'linux-gnu' OS detected, using Docker static IP ($IP) in Traefik hostnames..."
+        export IP="172.17.0.1"
+        export IP_WITH_DASHES="${IP//./-}"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        # Mac OSX
+        # Fetching the LAN IP
+        export IP=$(ipconfig getifaddr en0)
+        echo "'darwin' OS detected, using LAN IP ($IP) in Traefik hostnames..."
+        export IP_WITH_DASHES="${IP//./-}"
+    fi
+
+    export O3_HOSTNAME=emr-"${IP_WITH_DASHES}.traefik.me"
+    export ODOO_HOSTNAME=erp-"${IP_WITH_DASHES}.traefik.me"
+    export SENAITE_HOSTNAME=lims-"${IP_WITH_DASHES}.traefik.me"
+    export SUPERSET_HOSTNAME=analytics-"${IP_WITH_DASHES}.traefik.me"
+}

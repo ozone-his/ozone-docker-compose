@@ -15,6 +15,7 @@ services:
       OMRS_CONFIG_CONNECTION_DATABASE: openmrs
       OMRS_CONFIG_CONNECTION_USERNAME: ${OPENMRS_DB_USER:-openmrs}
       OMRS_CONFIG_CONNECTION_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
+      HOST_URL: https://${O3_HOSTNAME}
     healthcheck:
       test:
         - CMD
