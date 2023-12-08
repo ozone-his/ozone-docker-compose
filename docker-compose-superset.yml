@@ -16,7 +16,7 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - ADMIN_PASSWORD=${SUPERSET_ADMIN_PASSWORD}
       - ANALYTICS_DB_PASSWORD=${ANALYTICS_DB_PASSWORD}
-    image: &superset-image amancevice/superset:1.5.1
+    image: &superset-image amancevice/superset:2.1.0
     labels:
       traefik.enable: "true"
       traefik.http.routers.superset.rule: "Host(`${SUPERSET_HOSTNAME}`)"
