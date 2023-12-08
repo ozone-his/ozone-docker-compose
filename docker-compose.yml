@@ -2,7 +2,7 @@ services:
 
   # Bahmni Appointments
   appointments:
-    image: mekomsolutions/appointments:4a3d534
+    image: mekomsolutions/appointments
     restart: unless-stopped
     healthcheck:
       test:
@@ -18,7 +18,7 @@ services:
           
   # mekomsolutions/env-substitution
   env-substitution:
-    image: mekomsolutions/env-substitution:1e6fa02
+    image: mekomsolutions/env-substitution
     restart: on-failure
     environment:
       - ODOO_PUBLIC_URL=https://${ODOO_HOSTNAME}
@@ -34,7 +34,7 @@ services:
         
   # OpenMRS 3 Backend
   openmrs:
-    image: openmrs/openmrs-reference-application-3-backend:3.0.0-beta.16
+    image: openmrs/openmrs-reference-application-3-backend:${O3_BACKEND_TAG:-nightly}
     restart: unless-stopped
     depends_on:
       mysql:
@@ -145,7 +145,7 @@ services:
     depends_on:
       postgresql:
         condition: service_healthy
-    image: mekomsolutions/odoo:2c1706f
+    image: mekomsolutions/odoo
     restart: unless-stopped
     environment:
       - HOST=${POSTGRES_DB_HOST}
@@ -199,7 +199,7 @@ services:
 
   # OpenMRS 3 Frontend
   frontend:
-    image: openmrs/openmrs-reference-application-3-frontend:3.0.0-beta.16
+    image: openmrs/openmrs-reference-application-3-frontend:${O3_FRONTEND_TAG:-nightly}
     restart: unless-stopped
     environment:
       SPA_PATH: /openmrs/spa
@@ -335,7 +335,7 @@ services:
       - SITE=${SITE}
       - ADMIN_USER=${SENAITE_ADMIN_USER}
       - ADMIN_PASSWORD=${SENAITE_ADMIN_PASSWORD}
-    image: mekomsolutions/senaite:sha-272c0f5
+    image: mekomsolutions/senaite:latest
     restart: unless-stopped
     volumes:
     - ${SENAITE_CONFIG_PATH}/data:/data/importdata/senaite
