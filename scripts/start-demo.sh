@@ -14,12 +14,15 @@ exportPaths
 
 # Set the Traefik host names
 if [ "$TRAEFIK" == "true" ]; then
-    echo "[INFO] \$TRAEFIK=true, setting Traefik hostnames..."
+    echo "$INFO \$TRAEFIK=true, setting Traefik hostnames..."
+    setTraefikIP
     setTraefikHostnames
 fi
 
 # Set the demo patients props
+echo "$INFO Setting the number of demo patients..."
 export NUMBER_OF_DEMO_PATIENTS=50
+echo "→ NUMBER_OF_DEMO_PATIENTS=$NUMBER_OF_DEMO_PATIENTS"
 
 INSTALLED_DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
 MINIMUM_REQUIRED_DOCKER_VERSION_REGEX="^((([2-9][1-9]|[3-9][0]|[0-9]{3,}).*)|(20\.([0-9]{3,}|[1-9][1-9]|[2-9][0]).*)|(20\.10\.([0-9]{3,}|[2-9][0-9]|[1][3-9])))"
@@ -29,12 +32,12 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
     fi
 
     # Pull Ozone Docker images
-    echo "[INFO] Pulling Ozone images..."
+    echo "$INFO Pulling Ozone images..."
     docker compose -p ozone $dockerComposeOzoneCLIOptions pull
     
     # Set the Docker Compose command for Ozone
     dockerComposeOzoneCommand="docker compose -p ozone $dockerComposeOzoneCLIOptions up -d --build"
-    echo "[INFO] Running Ozone..."
+    echo "$INFO Running Ozone..."
     echo ""
     echo "$dockerComposeOzoneCommand"
     echo ""
@@ -48,25 +51,25 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
     # Run the Apache2 Proxy service, if $TRAEFIK!=true
     if [ "$TRAEFIK" != "true" ]; then
         dockerComposeProxyCommand="docker compose -p ozone $dockerComposeProxyCLIOptions up -d --build"
-        echo "[INFO] Running Apache2 proxy service (\$TRAEFIK!=true)..."
+        echo "$INFO Running Apache2 proxy service (\$TRAEFIK!=true)..."
         echo ""
         echo "$dockerComposeProxyCommand"
         echo ""
         ($dockerComposeProxyCommand)
     else
-        echo "[INFO] Skipping running Apache 2 proxy... (\$TRAEFIK=true)"
+        echo "$INFO Skipping running Apache 2 proxy... (\$TRAEFIK=true)"
     fi
 
     # Run the Demo service
     dockerComposeDemoCommand="docker compose -p ozone $dockerComposeDemoCLIOptions up -d"
-    echo "[INFO] Running demo service..."
+    echo "$INFO Running demo service..."
     echo ""
     echo "$dockerComposeDemoCommand"
     echo ""
     ($dockerComposeDemoCommand)
 
 else
-    echo "Docker versions < 20.10.13 are not supported"
+    echo "$ERROR Docker versions < 20.10.13 are not supported"
 fi
 
 #
