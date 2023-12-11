@@ -71,10 +71,10 @@ function setDockerComposeCLIOptions () {
     export dockerComposeOzoneCLIOptions="$dockerComposeEnvFileCLIOption $dockerComposeFilesCLIOptions"
 
     # Set args for the proxy service
-    export dockerComposeProxyCLIOptions="--env-file $concatenatedEnvFilePath -f ../proxy/docker-compose.yml"
+    export dockerComposeProxyCLIOptions="$dockerComposeEnvFileCLIOption -f ../proxy/docker-compose.yml"
 
     # Set args for the demo service
-    export dockerComposeDemoCLIOptions="--env-file $concatenatedEnvFilePath -f ../demo/docker-compose.yml"
+    export dockerComposeDemoCLIOptions="$dockerComposeEnvFileCLIOption -f ../demo/docker-compose.yml"
 }
 
 function setTraefikIP {
