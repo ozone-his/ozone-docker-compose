@@ -1,0 +1,14 @@
+name: Build and Publish
+
+on:
+  push:
+jobs:
+  build-and-publish:
+    uses: mekomsolutions/mekom-github-workflow-maven/.github/workflows/build-publish-workflow.yml@main
+    with:
+      webhook-url: https://openmrs-cd.mekomsolutions.net/generic-webhook-trigger/invoke
+    secrets:
+      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      OCD3_USERNAME: ${{ secrets.OCD3_USERNAME }}
+      OCD3_PASSWORD: ${{ secrets.OCD3_PASSWORD }}
