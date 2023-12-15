@@ -1,8 +1,8 @@
 # Ozone - The Docker Compose Project
 
-👉 Please refer to the [Ozone](https://github.com/ozone-his/ozone-distro) repository to try and run Ozone 👈
+👉 **Recommended:** Please refer to the [Ozone](https://github.com/ozone-his/ozone-distro) repository to try and run Ozone 👈
 
-Even if it is not the recommended way, developpers can also run Ozone directly from this project. See instructions below.
+While is not the recommended way, developpers can also run Ozone directly from this project. See instructions below.
 
 ## (option 1) Try Ozone FOSS in Gitpod
 
