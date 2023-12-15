@@ -39,26 +39,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <artifactId>exec-maven-plugin</artifactId>
-        <groupId>org.codehaus.mojo</groupId>
-        <version>3.1.0</version>
-        <executions>
-          <execution>
-            <id>Retreive Ozone access URLs from README.md</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>${basedir}/scripts/get-urls-from-readme.sh</executable>
-              <commandlineArgs>
-                ${basedir}/README.md ${project.build.directory}/${project.artifactId}-${project.version}/ozone-urls.md</commandlineArgs>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
       <!-- Package as a Zip file -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
