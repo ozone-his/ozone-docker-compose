@@ -84,15 +84,7 @@
                   </includes>
                   <excludes>
                     <exclude>scripts/distro/</exclude>
-                    <exclude>scripts/start-demo.sh</exclude>
                   </excludes>
-                </resource>
-                <resource>
-                  <directory>${project.basedir}</directory>
-                  <includes>
-                    <include>scripts/start-demo.sh</include>
-                  </includes>
-                  <filtering>true</filtering>
                 </resource>
               </resources>
             </configuration>
