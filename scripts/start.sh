@@ -37,12 +37,12 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
     fi
 
     # Pull Ozone Docker images
-    echo "$INFO Pulling Ozone images..."
+    echo "$INFO Pulling ${OZONE_LABEL:-Ozone FOSS} images..."
     docker compose -p ozone $dockerComposeOzoneCLIOptions pull
     
     # Set the Docker Compose command for Ozone
     dockerComposeOzoneCommand="docker compose -p ozone $dockerComposeOzoneCLIOptions up -d --build"
-    echo "$INFO Running Ozone..."
+    echo "$INFO Running ${OZONE_LABEL:-Ozone FOSS}..."
     echo ""
     echo "$dockerComposeOzoneCommand"
     echo ""
@@ -81,7 +81,7 @@ fi
 
 envsubst < ozone-urls-template.csv > .urls_1.txt
 echo ""
-echo "$INFO 🔗 Access each Ozone FOSS components at the following URL:"
+echo "$INFO 🔗 Access each ${OZONE_LABEL:-Ozone FOSS} components at the following URL:"
 echo ""
 
 set +e
