@@ -108,3 +108,17 @@ function setTraefikHostnames {
     echo "→ SUPERSET_HOSTNAME=$SUPERSET_HOSTNAME"
 
 }
+
+function setApache2Hostnames {
+    echo "$INFO Exporting Apache 2 hostnames..."
+
+    export O3_HOSTNAME="localhost"
+    export ODOO_HOSTNAME="localhost:8089"
+    export SENAITE_HOSTNAME="localhost:8081"
+    export SUPERSET_HOSTNAME="localhost:8088"
+    echo "→ O3_HOSTNAME=$O3_HOSTNAME"
+    echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
+    echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
+    echo "→ SUPERSET_HOSTNAME=$SUPERSET_HOSTNAME"
+
+}

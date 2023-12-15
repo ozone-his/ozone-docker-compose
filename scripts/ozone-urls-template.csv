@@ -1,0 +1,7 @@
+HIS Component,URL,Username,Password
+-,-,-,-
+OpenMRS 3,${O3_HOSTNAME}/openmrs/spa,admin,Admin123
+OpenMRS Legacy UI,${O3_HOSTNAME}/openmrs,admin,Admin123
+SENAITE,${SENAITE_HOSTNAME},admin,password
+Odoo,${ODOO_HOSTNAME},admin,admin
+Superset,${SUPERSET_HOSTNAME},admin,password
