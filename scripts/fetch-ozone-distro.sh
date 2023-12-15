@@ -16,6 +16,7 @@ setupDirs
 
 # Download Ozone distro
 export OZONE_DISTRO_VERSION=$1
+echo "$INFO Fetching Ozone distro $OZONE_DISTRO_VERSION..."
 ./mvnw org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=com.ozonehis:ozone-distro:$OZONE_DISTRO_VERSION:zip -Dtransitive=false
 
 # Remove the Maven Dependency plugin markers
