@@ -56,10 +56,10 @@ export TRAEFIK="true"
 ## Browse Ozone
 
 Once complete, the startup script will output the URLs to access the services in the terminal.
+
 For example:
-
 ![Access Ozone](./readme/browse.png)
-
 Ozone FOSS requires you to log into each component separately.
 
 💡 **Did you know?** Ozone Pro comes with single sign-on (SSO) and all its integration layer is secured with OAuth2.
+
