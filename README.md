@@ -37,7 +37,7 @@ source target/go-to-scripts-dir.sh
 
 Clone
 ```bash
-git clone https://github.com/ozone-his/ozone-distro
+git clone https://github.com/ozone-his/ozone-docker
 ```
 
 Build
