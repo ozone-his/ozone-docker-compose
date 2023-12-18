@@ -150,5 +150,5 @@
       <url>https://nexus.mekomsolutions.net/repository/maven-snapshots</url>
     </snapshotRepository>
   </distributionManagement>
-  
+
 </project>
