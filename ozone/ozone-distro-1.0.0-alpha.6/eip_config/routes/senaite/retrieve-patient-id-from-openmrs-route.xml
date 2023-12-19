@@ -1,0 +1,24 @@
+<routes
+    xmlns="http://camel.apache.org/schema/spring">
+    <route id="retrieve-patient-id-from-openmrs">
+        <from uri="direct:retrieve-patient-id-from-openmrs"/>
+        
+        <log message="Retrieve patient id" />
+        
+        <to uri="direct:authenticate-to-openmrs"/>
+                                
+        <setHeader name="CamelHttpMethod">
+            <constant>GET</constant>
+        </setHeader>
+        
+        <toD cacheSize="-1" uri="{{fhirR4.baseUrl}}/${exchangeProperty.patient-reference}"/>
+        <unmarshal>
+            <json library="Jackson"/>
+        </unmarshal>
+        
+        <setProperty name="patient-id">
+            <jsonpath>$.id</jsonpath>
+        </setProperty>
+        
+    </route>
+</routes>

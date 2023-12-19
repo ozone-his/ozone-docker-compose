@@ -1,0 +1,2 @@
+"id","name","field_description","model_id","ttype","index","store","readonly","relation","size"
+"init.557e289b-6842-45cb-86ab-55d335adafd2","x_external_identifier","External Id","Contact","char","","True","","","38"

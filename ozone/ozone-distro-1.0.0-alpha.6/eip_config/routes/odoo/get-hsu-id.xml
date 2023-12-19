@@ -1,0 +1,63 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--
+        Gets the HSU identifier of the specified patient
+
+        @bodyIn patient (Map) - The patient resource
+
+        @bodyOut (String) - The HSU id if found otherwise null
+    -->
+
+    <route id="get-hsu-id" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:get-hsu-id" />
+
+        <log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+
+        <log loggingLevel="DEBUG" message="Getting the HSU id for the patient" />
+
+        <setProperty name="${routeId}-endLoop">
+            <simple>${null}</simple>
+        </setProperty>
+        <setProperty name="${routeId}-currentItem">
+            <simple>${null}</simple>
+        </setProperty>
+        <setProperty name="${routeId}-hsuId">
+            <simple>${null}</simple>
+        </setProperty>
+
+        <when>
+            <simple>${body.get('identifiers').size()} > 0</simple>
+            <loop doWhile="true">
+                <simple>${exchangeProperty.${routeId}-endLoop} != true</simple>
+                <setProperty name="${routeId}-currentItem">
+                    <simple>${body.get('identifiers').get(${exchangeProperty.CamelLoopIndex})}</simple>
+                </setProperty>
+
+                <when>
+                    <simple>${exchangeProperty.${routeId}-currentItem.get('identifierType').get('uuid')} == '{{openmrs.identifier.type.uuid}}'</simple>
+                    <setProperty name="${routeId}-hsuId">
+                        <simple>${exchangeProperty.${routeId}-currentItem.get('identifier')}</simple>
+                    </setProperty>
+                    <setProperty name="${routeId}-endLoop">
+                        <simple>true</simple>
+                    </setProperty>
+                </when>
+
+                <when>
+                    <spel>#{getProperty('CamelLoopIndex') == body.get('identifiers').size() - 1}</spel>
+                    <setProperty name="${routeId}-endLoop">
+                        <simple>true</simple>
+                    </setProperty>
+                </when>
+            </loop>
+        </when>
+
+        <log loggingLevel="DEBUG" message="HSU id -> ${exchangeProperty.${routeId}-hsuId}" />
+
+        <setBody>
+            <exchangeProperty>${routeId}-hsuId</exchangeProperty>
+        </setBody>
+
+        <log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+    </route>
+</routes>

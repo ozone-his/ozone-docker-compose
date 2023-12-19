@@ -1,0 +1,39 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="odoo-get-external-id-map" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:odoo-get-external-id-map" />
+
+        <log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+		<setProperty name="modelCriterion">
+			<spel>#{new Object[]{'model', '=', getProperty('modelName')}}</spel>
+		</setProperty>
+		<setProperty name="extIdCriterion">
+			<spel>#{new Object[]{'name', '=', getProperty('externalId')}}</spel>
+		</setProperty>
+        <setProperty name="extIdSearchQuery">
+            <spel>#{new Object[]{new Object[]{getProperty('modelCriterion'), getProperty('extIdCriterion')}}}</spel>
+        </setProperty>
+        <setProperty name="getUnitsParams">
+            <spel>#{new java.util.ArrayList(6)}</spel>
+        </setProperty>
+        <script>
+            <spel>
+                #{getProperty('getUnitsParams').add('{{odoo.database}}')}
+                #{getProperty('getUnitsParams').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+                #{getProperty('getUnitsParams').add('{{odoo.password}}')}
+                #{getProperty('getUnitsParams').add('ir.model.data')}
+                #{getProperty('getUnitsParams').add('search_read')}
+                #{getProperty('getUnitsParams').add(getProperty('extIdSearchQuery'))}
+            </spel>
+        </script>
+        <setBody>
+            <spel>
+                #{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('getUnitsParams'))}
+            </spel>
+        </setBody>
+
+        <log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+    </route>
+
+</routes>

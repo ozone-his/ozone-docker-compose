@@ -1,0 +1,33 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="odoo-get-country" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:odoo-get-country" />
+
+        <log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+        <setProperty name="countrySearchQuery">
+            <spel>#{new Object[]{new Object[]{new Object[]{'name', '=', getProperty('countryName')}}}}</spel>
+        </setProperty>
+        <setProperty name="getCountryParams">
+            <spel>#{new java.util.ArrayList(6)}</spel>
+        </setProperty>
+        <script>
+            <spel>
+                #{getProperty('getCountryParams').add('{{odoo.database}}')}
+                #{getProperty('getCountryParams').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+                #{getProperty('getCountryParams').add('{{odoo.password}}')}
+                #{getProperty('getCountryParams').add('res.country')}
+                #{getProperty('getCountryParams').add('search')}
+                #{getProperty('getCountryParams').add(getProperty('countrySearchQuery'))}
+            </spel>
+        </script>
+        <setBody>
+            <spel>
+                #{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('getCountryParams'))}
+            </spel>
+        </setBody>
+
+        <log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+    </route>
+
+</routes>

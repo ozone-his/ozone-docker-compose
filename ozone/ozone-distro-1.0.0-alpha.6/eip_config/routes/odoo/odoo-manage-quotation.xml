@@ -1,0 +1,55 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-manage-quotation" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-manage-quotation" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+        <setProperty name="requestData">
+            <spel>#{new java.util.ArrayList(2)}</spel>
+        </setProperty>
+
+        <when>
+			<simple>${exchangeProperty.odoo-operation} == 'create'</simple>
+			<setProperty name="quotationData">
+				<spel>#{T(java.util.Collections).singletonMap('partner_id', getProperty('patient-odoo-id'))}</spel>
+			</setProperty>
+		</when>
+        
+		<when>
+			<simple>${exchangeProperty.odoo-operation} == 'write'</simple>
+            <script>
+                <spel>#{getProperty('requestData').add(new Object[]{getProperty('quotation-id')})}</spel>
+            </script>
+            <setProperty name="quotationData">
+                <spel>#{T(java.util.Collections).singletonMap('state', 'cancel')}</spel>
+			</setProperty>
+		</when>
+        
+        <script>
+            <spel>#{getProperty('requestData').add(getProperty('quotationData'))}</spel>
+        </script>
+
+		<setProperty name="callParams">
+			<spel>#{new java.util.ArrayList(6)}</spel>
+		</setProperty>
+		<script>
+			<spel>
+				#{getProperty('callParams').add('{{odoo.database}}')}
+				#{getProperty('callParams').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+				#{getProperty('callParams').add('{{odoo.password}}')}
+				#{getProperty('callParams').add('sale.order')}
+				#{getProperty('callParams').add(getProperty('odoo-operation'))}
+				#{getProperty('callParams').add(getProperty('requestData'))}
+			</spel>
+		</script>
+		<setBody>
+			<spel>
+				#{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('callParams'))}
+			</spel>
+		</setBody>
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+
+</routes>

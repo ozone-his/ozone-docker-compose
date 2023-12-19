@@ -1,0 +1,44 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--
+        This route converts a concept mapping to a concept uuid if the value passed to it contains a colon
+        otherwise keeps the origin value.
+
+        @bodyIn value (String) - The concept value to convert
+
+        @bodyOut (String) - The concept uuid of the found concept otherwise the original value
+    -->
+
+    <route id="convert-to-concept-uuid-if-is-mapping" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:convert-to-concept-uuid-if-is-mapping" />
+
+        <log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+
+        <when>
+            <simple>${body.indexOf(':')} > 0</simple>
+            <log loggingLevel="DEBUG" message="Converting concept map to uuid" />
+
+            <setProperty name="conceptSource">
+                <simple>${body.split(':')[0]}</simple>
+            </setProperty>
+            <setProperty name="conceptCode">
+                <simple>${body.split(':')[1]}</simple>
+            </setProperty>
+
+            <to uri="direct:get-concept-by-mapping-from-openmrs" />
+
+            <when>
+                <simple>${body} == null</simple>
+                <throwException exceptionType="org.openmrs.eip.EIPException" message="No concept found with mapping matching source: ${exchangeProperty.conceptSource} and code: ${exchangeProperty.conceptCode}" />
+            </when>
+
+            <setBody>
+                <simple>${body.get('uuid')}</simple>
+            </setBody>
+
+            <log loggingLevel="DEBUG" message="Resolved concept uuid -> ${body}" />
+        </when>
+
+        <log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+    </route>
+</routes>

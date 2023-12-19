@@ -1,0 +1,49 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="write-bahmniorder-as-openmrsorder" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:write-bahmniorder-as-openmrsorder"/>
+        <log message="Processing Test Order from Order : ${body}" />
+
+        <choice>
+            <when>
+                <simple>${body.tableName} == 'orders' &amp;&amp; ${body.operation} == 'c'</simple>
+                <setProperty name="lab-order-uuid">
+                    <simple>${body.identifier}</simple>
+                </setProperty>
+
+                <setProperty name="lab-order-id">
+                    <simple>${body.primaryKeyId}</simple>
+                </setProperty>
+
+                <toD cacheSize="-1" uri="sql:SELECT COUNT(*) total FROM test_order WHERE order_id=${exchangeProperty.lab-order-id}?dataSource=openmrsDataSource" />
+
+                <choice>
+                    <when>
+                        <jsonpath>$.[?(@.total == 0)]</jsonpath>
+                        <!--fetch associated order, check whether it is of a lab order type and create test_order entry-->
+
+                        <to uri="direct:authenticate-to-openmrs"/>
+
+                        <setHeader name="CamelHttpMethod">
+                            <constant>GET</constant>
+                        </setHeader>
+
+                        <toD cacheSize="-1" uri="{{openmrs.baseUrl}}/ws/rest/v1/order/${exchangeProperty.lab-order-uuid}"/>
+                        <unmarshal>
+                            <json library="Jackson"/>
+                        </unmarshal>
+
+                        <choice>
+                            <when>
+                                <jsonpath>$.[?(@.orderType.uuid == '{{bahmni.test.orderType.uuid}}')]</jsonpath>
+                                <toD cacheSize="-1" uri="sql:INSERT INTO test_order(order_id) VALUES (${exchangeProperty.lab-order-id})?dataSource=openmrsDataSource" />
+                            </when>
+                        </choice>
+                    </when>
+                    <otherwise>
+                        <!-- Do nothing because related test order exists. This is necessary becuase is may be a retry event being processed -->
+                    </otherwise>
+                </choice>
+            </when>
+        </choice>
+    </route>
+</routes>

@@ -1,0 +1,70 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--
+        Gets a resource from odoo matching the specified id and modelName
+
+        @param id (Integer) - The id of the resource to match
+        @param modelName (String) - The name of the model to match
+
+        @bodyOut (Map) - The resource if a match is found otherwise null
+    -->
+
+	<route id="get-resource-by-id-from-odoo" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:get-resource-by-id-from-odoo" />
+
+        <log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+
+        <setProperty name="${routeId}-idCriterion">
+            <spel>#{new java.util.ArrayList(3)}</spel>
+        </setProperty>
+
+        <script>
+            <spel>
+                #{getProperty('get-resource-by-id-from-odoo-idCriterion').add('id')}
+                #{getProperty('get-resource-by-id-from-odoo-idCriterion').add('=')}
+                #{getProperty('get-resource-by-id-from-odoo-idCriterion').add(body.get('id'))}
+            </spel>
+        </script>
+
+        <setProperty name="${routeId}-searchQuery">
+            <spel>#{T(java.util.Collections).singletonList(T(java.util.Collections).singletonList(getProperty('get-resource-by-id-from-odoo-idCriterion')))}</spel>
+        </setProperty>
+        <setProperty name="${routeId}-rpcArgs">
+            <spel>#{new java.util.ArrayList(6)}</spel>
+        </setProperty>
+        
+        <script>
+            <spel>
+                #{getProperty('get-resource-by-id-from-odoo-rpcArgs').add('{{odoo.database}}')}
+                #{getProperty('get-resource-by-id-from-odoo-rpcArgs').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+                #{getProperty('get-resource-by-id-from-odoo-rpcArgs').add('{{odoo.password}}')}
+                #{getProperty('get-resource-by-id-from-odoo-rpcArgs').add(body.get('modelName'))}
+                #{getProperty('get-resource-by-id-from-odoo-rpcArgs').add('search_read')}
+                #{getProperty('get-resource-by-id-from-odoo-rpcArgs').add(getProperty('get-resource-by-id-from-odoo-searchQuery'))}
+            </spel>
+        </script>
+        
+        <setBody>
+            <spel>
+                #{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('get-resource-by-id-from-odoo-rpcArgs'))}
+            </spel>
+        </setBody>
+        
+        <choice>
+            <when>
+                <simple>${body.length} == 1</simple>
+                <setBody>
+                    <simple>${body[0]}</simple>
+                </setBody>
+            </when>
+            <otherwise>
+                <setBody>
+                    <simple>${null}</simple>
+                </setBody>
+            </otherwise>
+        </choice>
+
+		<log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+	</route>
+
+</routes>

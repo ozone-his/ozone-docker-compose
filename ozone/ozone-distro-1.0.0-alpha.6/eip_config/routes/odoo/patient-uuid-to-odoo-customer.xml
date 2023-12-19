@@ -1,0 +1,43 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="patient-uuid-to-odoo-customer" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:patient-uuid-to-odoo-customer" />
+
+        <log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+
+        <log message="Fetching patient record from OpenMRS with uuid: ${body}" />
+
+        <setProperty name="isSubResource">
+            <simple>false</simple>
+        </setProperty>
+        <setProperty name="resourceName">
+            <simple>patient</simple>
+        </setProperty>
+        <setProperty name="resourceId">
+            <simple>${body}</simple>
+        </setProperty>
+
+        <to uri="direct:get-entity-by-uuid-from-openmrs" />
+
+        <choice>
+            <when>
+                <simple>${body} != null</simple>
+                <setProperty name="patient">
+                    <jsonpath>$</jsonpath>
+                </setProperty>
+
+                <log loggingLevel="DEBUG" message="Fetched patient -> ${exchangeProperty.patient}" />
+
+                <setProperty name="createCustomerIfNotExist">
+                    <simple>true</simple>
+                </setProperty>
+
+                <to uri="direct:odoo-patient-handler" />
+            </when>
+            <otherwise>
+                <log message="No patient found in OpenMRS with uuid: ${exchangeProperty.resourceId}" />
+            </otherwise>
+        </choice>
+
+        <log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+    </route>
+</routes>

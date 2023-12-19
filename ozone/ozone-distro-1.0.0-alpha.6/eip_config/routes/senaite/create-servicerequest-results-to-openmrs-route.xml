@@ -1,0 +1,198 @@
+<routes
+    xmlns="http://camel.apache.org/schema/spring">
+    <!-- No need to add error handling for this route because it is called by the parent inboud-main route which does not need to go through retries given an error occured -->
+    <route id="create-servicerequest-results-to-openmrs">
+        <from uri="direct:create-servicerequest-results-to-openmrs"/>
+        
+        <log message="Creating ServiceRequest results for order." />
+
+        <to uri="direct:authenticate-to-openmrs"/>
+                                    
+        <setHeader name="CamelHttpMethod">
+            <constant>GET</constant>
+        </setHeader>
+
+        <toD cacheSize="-1" uri="{{openmrs.baseUrl}}/ws/rest/v1/encounter?encounterType={{results.encounterType.uuid}}&amp;patient=${exchangeProperty.patient-uuid}&amp;v=custom:(uuid,encounterDatetime,patient:(uuid),location:(uuid))"/>
+        <unmarshal>
+            <json library="Jackson"/>
+        </unmarshal>
+
+        <choice>
+            <when>
+                <jsonpath suppressExceptions="true">$.[?(@.results)]</jsonpath>
+
+                <setBody>
+                    <jsonpath>$.results</jsonpath>
+                </setBody>
+                <marshal>
+                    <json library="Jackson"/>
+                </marshal>
+
+                <setProperty name="results-encounter-uuid">
+                    <method beanType="net.mekomsolutions.eip.utils.JsonUtils" method="getPropertyValueWhereKeyMatchesValue(${body}, uuid, encounterDatetime, ${exchangeProperty.service-request-encounter-datetime})" />
+                </setProperty>
+            </when>
+        </choice>
+
+        <choice>
+            <when>
+                <!---Create results encounter if it does not exist -->
+                <simple>${exchangeProperty.results-encounter-uuid} == null || ${exchangeProperty.results-encounter-uuid} == ""</simple>
+
+                <setBody>
+                    <simple>{"location": "${exchangeProperty.service-request-location-uuid}","encounterType": "{{results.encounterType.uuid}}","encounterDatetime": "${exchangeProperty.service-request-encounter-datetime}","patient": "${exchangeProperty.patient-uuid}","visit":"${exchangeProperty.service-request-visit-uuid}", "encounterProviders":[{"provider": "${exchangeProperty.service-request-requester}","encounterRole": "a0b03050-c99b-11e0-9572-0800200c9a66"}]}</simple>
+                </setBody>
+
+                <setHeader name="CamelHttpMethod">
+                    <constant>POST</constant>
+                </setHeader>
+
+                <toD cacheSize="-1" uri="{{openmrs.baseUrl}}/ws/rest/v1/encounter"/>
+                <unmarshal>
+                    <json library="Jackson"/>
+                </unmarshal>
+
+                <setProperty name="results-encounter-uuid">
+                    <jsonpath>$.uuid</jsonpath>
+                </setProperty>
+            </when>
+        </choice>
+
+        <setBody>
+            <simple>${exchangeProperty.service-request-tests}</simple>
+        </setBody>
+
+        <!---Create result obs or results array of obs -->
+
+        <split streaming="false" strategyRef="splitBodyConcatAggregationStrategy">
+            <simple>${body}</simple>
+
+            <marshal>
+                <json library="Jackson"/>
+            </marshal>
+
+            <setProperty name="analysis-api_url">
+                <jsonpath>$.api_url</jsonpath>
+            </setProperty>
+
+            <to uri="direct:authenticate-to-senaite"/>
+
+            <setHeader name="CamelHttpMethod">
+                <constant>GET</constant>
+            </setHeader>
+
+            <toD cacheSize="-1" uri="${exchangeProperty.analysis-api_url}"/>
+            
+            <unmarshal>
+                <json library="Jackson"/>
+            </unmarshal>
+            
+            <setProperty name="service-request-result">
+                <jsonpath>$.items[0].Result</jsonpath>
+            </setProperty>
+
+            <setProperty name="service-request-resultCaptureDate">
+                <jsonpath>$.items[0].ResultCaptureDate</jsonpath>
+            </setProperty>
+
+            <setBody>
+                <jsonpath>$.items[0].description</jsonpath>
+            </setBody>
+
+            <convertBodyTo type="java.lang.String"/>
+
+            <setProperty name="start-index">
+                <simple>${body.lastIndexOf("(")}++</simple>
+            </setProperty>
+
+            <setProperty name="last-index">
+                <simple>${body.lastIndexOf(")")}</simple>
+            </setProperty>
+
+            <setProperty name="service-request-test-concept-uuid">
+                <simple>${body.substring(${exchangeProperty.start-index},${exchangeProperty.last-index})}</simple>
+            </setProperty>
+            
+            <choice>
+                <when>
+                    <simple>${properties:is.integration.with.bahmniEmr:false} == true</simple>
+                    <setBody>
+                        <simple>{"concept":"${exchangeProperty.service-request-test-concept-uuid}","order": "${exchangeProperty.service-request-id}","person": "${exchangeProperty.patient-uuid}","obsDatetime": "${exchangeProperty.service-request-resultCaptureDate}","groupMembers":[{"concept":"${exchangeProperty.service-request-test-concept-uuid}","order": "${exchangeProperty.service-request-id}","person": "${exchangeProperty.patient-uuid}","obsDatetime": "${exchangeProperty.service-request-resultCaptureDate}","groupMembers":[{"value":"${exchangeProperty.service-request-result}","order": "${exchangeProperty.service-request-id}","person": "${exchangeProperty.patient-uuid}","obsDatetime": "${exchangeProperty.service-request-resultCaptureDate}","concept":"${exchangeProperty.service-request-test-concept-uuid}"}]}]}</simple>
+                    </setBody>
+                </when>
+                <otherwise>
+                    <setBody>
+                        <simple>{"value": "${exchangeProperty.service-request-result}", "order": "${exchangeProperty.service-request-id}", "person": "${exchangeProperty.patient-uuid}", "obsDatetime": "${exchangeProperty.service-request-resultCaptureDate}", "concept": "${exchangeProperty.service-request-test-concept-uuid}"}</simple>
+                    </setBody>
+                </otherwise>
+            </choice>
+
+        </split>
+
+        <convertBodyTo type="java.lang.String"/>
+
+        <setProperty name="result-obs">
+            <simple>${body}</simple>
+        </setProperty>  
+
+        <choice>
+            <!---Create panel results obs if results are more than 1 otherwise attach encounter to test obs-->
+            <when>
+                <simple>${exchangeProperty.number-of-service-request-tests} &gt; 1 </simple>
+
+                <setProperty name="result-obs">
+                    <simple>{"concept":"${exchangeProperty.service-request-concept-uuid}","order": "${exchangeProperty.service-request-id}","person": "${exchangeProperty.patient-uuid}","encounter": "${exchangeProperty.results-encounter-uuid}","obsDatetime": "${exchangeProperty.service-request-resultCaptureDate}","groupMembers":[${exchangeProperty.result-obs}]}</simple>
+                </setProperty>
+            </when>
+            <otherwise>
+                <setProperty name="result-obs">
+                    <simple>{"encounter": "${exchangeProperty.results-encounter-uuid}",${body.substring(1)}</simple>
+                </setProperty>
+            </otherwise>
+        </choice>
+
+        <to uri="direct:authenticate-to-openmrs"/>
+                                
+        <setHeader name="CamelHttpMethod">
+            <constant>GET</constant>
+        </setHeader>
+        
+        <setProperty name="tempPayload">
+            <simple>${body}</simple>
+        </setProperty>
+
+        <toD cacheSize="-1" uri="{{fhirR4.baseUrl}}/Observation?code=${exchangeProperty.service-request-concept-uuid}&amp;subject=${exchangeProperty.patient-uuid}&amp;encounter=${exchangeProperty.results-encounter-uuid}&amp;date=${exchangeProperty.service-request-resultCaptureDate}"/>
+        <unmarshal>
+            <json library="Jackson"/>
+        </unmarshal>
+
+        <setProperty name="payload">
+            <simple>${body}</simple>
+        </setProperty>
+
+        <!-- To create results observations only if they never where created -->
+        <choice>
+            <when>
+                <jsonpath>$.[?(@.total > 0)]</jsonpath>
+                <!-- Do not recreate results -->
+                <log message="Results already exist for order." />
+            </when>
+            <otherwise>
+                <!-- Creating results Observations -->
+                <setBody>
+                    <simple>${exchangeProperty.payload}</simple>
+                </setBody>
+
+                <setHeader name="CamelHttpMethod">
+                    <constant>POST</constant>
+                </setHeader>
+                
+                <setBody>
+                    <simple>${exchangeProperty.result-obs}</simple>
+                </setBody>
+
+                <toD cacheSize="-1" uri="{{openmrs.baseUrl}}/ws/rest/v1/obs"/>
+            </otherwise>
+        </choice>
+    </route>
+</routes>

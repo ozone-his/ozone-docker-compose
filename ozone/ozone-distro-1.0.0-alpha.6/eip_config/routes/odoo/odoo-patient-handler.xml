@@ -1,0 +1,195 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-patient-handler" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-patient-handler" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+        <log message="Looking up existing customer in odoo" loggingLevel="DEBUG" />
+
+        <to uri="direct:odoo-get-customer" />
+        
+        <when>
+            <simple>${body.length} > 1</simple>
+            <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} existing customers in odoo with ref: ${exchangeProperty.patient.get('uuid')}" />
+        </when>
+
+        <when>
+            <simple>${body.length} == 1</simple>
+            <setProperty name="patient-odoo-id">
+                <simple>${body[0]}</simple>
+            </setProperty>
+        </when>
+
+        <choice>
+            <when>
+                <simple>${exchangeProperty.patient-odoo-id} == null &amp;&amp; ${exchangeProperty.patient.get('patientVoided')} == true</simple>
+                <log message="No action to take for voided patient since they have no customer record in odoo" />
+            </when>
+            <otherwise>
+                <setProperty name="updateExistingCustomer">
+                    <spel>#{getProperty('patient-odoo-id') != null &amp;&amp; getProperty('skipCustomerUpdate') != true}</spel>
+                </setProperty>
+                <choice>
+                    <when>
+                        <!-- Only process events for patients with customer records in Odoo and skip update is not set to true or if we MUST create one -->
+                        <simple>${exchangeProperty.updateExistingCustomer} == true || ${exchangeProperty.createCustomerIfNotExist} == true || ${properties:create.customer.if.not.exist:false} == true</simple>
+                        <setProperty name="isPatientVoidedOrDeleted">
+                            <!-- TODO support deleted patient -->
+                            <spel>#{getProperty('patient').get('patientVoided') == true}</spel>
+                        </setProperty>
+
+                        <when>
+                            <simple>${exchangeProperty.isPatientVoidedOrDeleted} != true</simple>
+                            <setProperty name="isSubResource">
+                                <simple>false</simple>
+                            </setProperty>
+                            <setProperty name="resourceName">
+                                <simple>patient</simple>
+                            </setProperty>
+                            <setProperty name="resourceId">
+                                <simple>${exchangeProperty.patient.get('uuid')}</simple>
+                            </setProperty>
+                            <setProperty name="person">
+                                <simple>${exchangeProperty.patient.get('person')}</simple>
+                            </setProperty>
+                            <setProperty name="patient-name">
+                                <simple>${exchangeProperty.person.get('display')}</simple>
+                            </setProperty>
+                            <setProperty name="preferredAddress">
+                                <simple>${exchangeProperty.person.get('preferredAddress')}</simple>
+                            </setProperty>
+
+                            <setProperty name="idTypeIdKey">
+                                <simple>${routeId}-idTypeId</simple>
+                            </setProperty>
+
+                            <setProperty name="idTypeId">
+                                <method beanType="org.openmrs.eip.AppContext" method="get(${exchangeProperty.idTypeIdKey})" />
+                            </setProperty>
+
+                            <when>
+                                <simple>${exchangeProperty.idTypeId} == null</simple>
+
+                                <log message="Looking up id for patient identifier type with uuid: {{openmrs.identifier.type.uuid}}" />
+
+                                <toD uri="sql:SELECT t.patient_identifier_type_id FROM patient_identifier_type t WHERE t.uuid = '{{openmrs.identifier.type.uuid}}'?dataSource=openmrsDataSource" />
+
+                                <when>
+                                    <simple>${body.size()} == 0</simple>
+                                    <throwException exceptionType="org.openmrs.eip.EIPException" message="No patient identifier type found with uuid: {{openmrs.identifier.type.uuid}}" />
+                                </when>
+
+                                <setProperty name="idTypeId">
+                                    <simple>${body[0].get("patient_identifier_type_id")}</simple>
+                                </setProperty>
+                                <script>
+                                    <spel>
+                                        #{T(org.openmrs.eip.AppContext).add(getProperty('idTypeIdKey'), getProperty('idTypeId'))}
+                                    </spel>
+                                </script>
+                            </when>
+
+                            <toD uri="sql:SELECT i.identifier FROM patient_identifier i WHERE i.patient_id = (SELECT person_id FROM person WHERE uuid='${exchangeProperty.patient.get('uuid')}') AND i.identifier_type = ${exchangeProperty.idTypeId} AND i.voided = 0?dataSource=openmrsDataSource" />
+
+                            <setProperty name="patientIdentifier">
+                                <simple>${body[0].get("identifier")}</simple>
+                            </setProperty>
+
+                            <choice>
+                                <when>
+                                    <simple>${exchangeProperty.preferredAddress} != null</simple>
+
+                                    <to uri="direct:odoo-process-person-address" />
+                                </when>
+                                <otherwise>
+                                    <log message="Patient has no address" loggingLevel="DEBUG" />
+                                </otherwise>
+                            </choice>
+
+                            <setProperty name="customPatientData">
+                                <spel>#{new java.util.HashMap()}</spel>
+                            </setProperty>
+
+                            <setProperty name="customDataCallback">
+                                <simple>${properties:custom.customer.data.callback.endpoint:null}</simple>
+                            </setProperty>
+
+                            <choice>
+                                <when>
+                                    <simple>${exchangeProperty.customDataCallback} != 'null'</simple>
+                                    <toD uri="${exchangeProperty.customDataCallback}" />
+                                </when>
+                                <otherwise>
+                                    <log loggingLevel="DEBUG" message="No custom data callback endpoint defined" />
+                                </otherwise>
+                            </choice>
+                        </when>
+
+                        <choice>
+                            <when>
+                                <simple>${exchangeProperty.patient-odoo-id} == null</simple>
+                                <log message="No existing customer found in odoo" />
+                                <setProperty name="odoo-operation">
+                                    <simple>create</simple>
+                                </setProperty>
+
+                                <log message="Creating customer in odoo" />
+
+                                <to uri="direct:odoo-manage-customer" />
+
+                                <setProperty name="patient-odoo-id">
+                                    <simple>${body}</simple>
+                                </setProperty>
+                            </when>
+                            <otherwise>
+                                <log message="Patient exists in odoo with id: ${exchangeProperty.patient-odoo-id}" />
+                                <when>
+                                    <simple>${exchangeProperty.skipCustomerUpdate} != true</simple>
+                                    <choice>
+                                        <when>
+                                            <simple>${exchangeProperty.isPatientVoidedOrDeleted} == true</simple>
+
+                                            <to uri="direct:odoo-get-quotations" />
+
+                                            <when>
+                                                <simple>${body.length} > 0</simple>
+                                                <setProperty name="quotationIds">
+                                                    <simple>${body}</simple>
+                                                </setProperty>
+
+                                                <log message="Cancelling ${body.length} existing quotation(s) in odoo for the patient -> ${exchangeProperty.quotationIds}" />
+
+                                                <to uri="direct:odoo-cancel-quotations" />
+                                            </when>
+
+                                            <log message="Archiving existing customer in odoo" />
+                                        </when>
+                                        <otherwise>
+                                            <log message="Updating existing customer in odoo" />
+                                        </otherwise>
+                                    </choice>
+
+                                    <setProperty name="odoo-operation">
+                                        <simple>write</simple>
+                                    </setProperty>
+
+                                    <to uri="direct:odoo-manage-customer" />
+                                </when>
+                            </otherwise>
+                        </choice>
+                    </when>
+                    <otherwise>
+                        <when>
+                            <simple>${exchangeProperty.patient-odoo-id} == null</simple>
+                            <log message="Patient has no customer record in Odoo, there is nothing to be processed" loggingLevel="DEBUG" />
+                        </when>
+                    </otherwise>
+                </choice>
+            </otherwise>
+        </choice>
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+
+</routes>

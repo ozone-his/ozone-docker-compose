@@ -1,0 +1,51 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="odoo-add-extra-customer-details" >
+        <from uri="direct:odoo-add-extra-customer-details" />
+
+        <log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+        <choice>
+            <when>
+                <simple>${properties:odoo.dob.field:null} != null &amp;&amp; ${properties:odoo.dob.field:null} != '' &amp;&amp; ${properties:odoo.weight.field:null} != null &amp;&amp; ${properties:odoo.weight.field:null}  != ''</simple>
+                
+                <setProperty name="odooWeightField">
+                    <simple>{{odoo.weight.field}}</simple>
+                </setProperty>
+                <setProperty name="odooDobField">
+                    <simple>{{odoo.dob.field}}</simple>
+                </setProperty>
+
+                <setProperty name="birthdate">
+                    <simple>${exchangeProperty.person.get('birthdate')}</simple>
+                </setProperty>
+
+                <toD cacheSize="-1" uri="{{openmrs.baseUrl}}/ws/rest/v1/obs?concept={{emr.weight.concept}}&amp;patient=${exchangeProperty.patient.get('uuid')}" />
+                <unmarshal>
+                    <json library="Jackson"/>
+                </unmarshal>
+                <choice>
+                    <when>
+                        <jsonpath suppressExceptions="true">$.[?(@.results)]</jsonpath>
+                        <setProperty name="weight">
+                            <jsonpath suppressExceptions="true">$.results[0].display</jsonpath>
+                        </setProperty>
+                    </when>
+                    <otherwise>
+                        <setProperty name="weight">
+                            <simple>''</simple>
+                        </setProperty>
+                    </otherwise>
+                </choice>
+
+                <script>
+                    <spel>
+                        #{getProperty('patientData').put(getProperty('odooDobField'), getProperty('birthdate'))}
+                        #{getProperty('patientData').put(getProperty('odooWeightField'), getProperty('weight'))}
+                    </spel>
+                </script>
+            </when>
+        </choice>
+        <log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+    </route>
+</routes>

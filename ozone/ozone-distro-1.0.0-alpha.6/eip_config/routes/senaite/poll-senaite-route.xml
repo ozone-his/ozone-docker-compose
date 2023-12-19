@@ -1,0 +1,177 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <!-- No error handling for this route because of its polling nature and that it does not listen for DB/Watcher Events-->
+    <route id="poll-senaite">
+        <from uri="scheduler:taskUpdate?initialDelay=10000&amp;delay=10000" />
+        
+        <log message="Sheduled FHIR Task status updater " />
+
+        <!-- Fetch requested & accepted  orders to transition each to either accepted, rejected or completed-->
+        
+        <to uri="direct:fetch-servicerequest-tasks-from-openmrs"/>
+
+        <unmarshal>
+            <json library="Jackson"/>
+        </unmarshal>
+
+        <choice>
+            <!-- Process Tasks status if tasks are present -->
+            <when>
+                <jsonpath>$.[?(@.length() > 0)]</jsonpath>
+
+                <split streaming="false">
+                    <simple>${body}</simple>
+
+                    <setProperty name="task-id">
+                        <jsonpath>$.resource.id</jsonpath>
+                    </setProperty>
+
+                    <setProperty name="service-request-id">
+                        <jsonpath>$.resource.basedOn[0].reference</jsonpath>
+                    </setProperty>
+
+                    <setProperty name="service-request-current-status">
+                        <jsonpath>$.resource.status</jsonpath>
+                    </setProperty> 
+
+                    <!-- Retrieving associated ServiceRequest -->
+			        <to uri="direct:authenticate-to-openmrs"/>
+			        
+			        <setHeader name="CamelHttpMethod">
+			            <constant>GET</constant>
+			        </setHeader>
+			        
+                    <toD cacheSize="-1" uri="{{fhirR4.baseUrl}}/ServiceRequest/${exchangeProperty.service-request-id}?throwExceptionOnFailure=false"/>
+                    <unmarshal>
+                        <json library="Jackson"/>
+                    </unmarshal>
+                    
+                    <choice>
+                        <!-- Transition FHIR Task to 'rejected' if Associated ServiceRequest was voided/deleted-->
+                        <when>
+                            <jsonpath>$.[?((@.issue &amp;&amp; @.issue[0].diagnostics contains 'is gone/deleted') || (@.issue &amp;&amp; @.issue[0].diagnostics contains 'is not known'))] </jsonpath>
+
+                            <setHeader name="CamelHttpMethod">
+                                <constant>PUT</constant>
+                            </setHeader>
+
+                            <setBody>
+                                <simple>{"resourceType": "Task", "id": "${exchangeProperty.task-id}", "status": "rejected", "intent": "order"}</simple>
+                            </setBody>
+
+                            <toD cacheSize="-1" uri="{{fhirR4.baseUrl}}/Task/${exchangeProperty.task-id}"/>
+                            <log message="Updated FHIR Task :  '${body}'"/>
+                        </when>
+                        <!-- Associated ServiceRequest to Task actually exists -->
+                        <when>
+                            <jsonpath>$.[?(@.resourceType &amp;&amp; @.resourceType == 'ServiceRequest')] </jsonpath>
+
+                            <setProperty name="service-request-concept-uuid">
+                                <jsonpath>$.code.coding[0].code</jsonpath>
+                            </setProperty>
+
+                            <setProperty name="service-request-encounter-reference">
+                                <jsonpath resultType="String">$.encounter.reference</jsonpath>
+                            </setProperty>
+                            <setProperty name="service-request-encounter-reference">
+                                <simple>${exchangeProperty.service-request-encounter-reference.substring(10)}</simple>
+                            </setProperty>
+
+                            <setProperty name="service-request-requester">
+                                <jsonpath resultType="String">$.requester.reference</jsonpath>
+                            </setProperty>
+                            <setProperty name="service-request-requester">
+                                <simple>${exchangeProperty.service-request-requester.substring(13)}</simple>
+                            </setProperty>
+
+                            <setProperty name="patient-reference">
+                                <jsonpath resultType="String">$.subject.reference</jsonpath>
+                            </setProperty>
+
+                            <setProperty name="patient-uuid">
+                                <simple>${exchangeProperty.patient-reference.substring(8)}</simple>
+                            </setProperty>
+                            
+                            <!--processing patient's identification number (to be used as SENAITE's client id)-->
+                            <to uri="direct:retrieve-patient-id-from-openmrs"/>
+
+                            <!---retrieving associated location and visit-->
+
+                            <toD cacheSize="-1" uri="{{openmrs.baseUrl}}/ws/rest/v1/encounter/${exchangeProperty.service-request-encounter-reference}"/>
+                            <unmarshal>
+                                <json library="Jackson"/>
+                            </unmarshal>
+
+                            <setProperty name="service-request-location-uuid">
+                                <jsonpath>$.location.uuid</jsonpath>
+                            </setProperty>
+
+                            <setProperty name="service-request-visit-uuid">
+                                <jsonpath>$.visit.uuid</jsonpath>
+                            </setProperty>
+
+                            <setProperty name="service-request-encounter-datetime">
+                                <jsonpath>$.encounterDatetime</jsonpath>
+                            </setProperty> 
+
+                            <!---retrieving equivalent analysis-request from SENAITE -->
+
+                            <to uri="direct:authenticate-to-senaite"/>
+
+                            <setHeader name="CamelHttpMethod">
+                                <constant>GET</constant>
+                            </setHeader>
+                            <setHeader name="Content-Type">
+                                <constant>application/json</constant>
+                            </setHeader>
+
+                            <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/search?getClientSampleID=${exchangeProperty.service-request-id}&amp;getClientID=${exchangeProperty.patient-id}&amp;catalog=senaite_catalog_sample&amp;complete=true"/>
+                            <unmarshal>
+                                <json library="Jackson"/>
+                            </unmarshal>
+
+                            <choice>
+                                <when>
+                                    <jsonpath>$.[?(@.count == 0)]</jsonpath>
+                                    <log message="No Analysis Request was found for order:" />
+                                </when>
+                                <otherwise>
+                                    <!-- Process order status -->
+                                    <to uri="direct:process-servicerequest-task-state"/>
+
+                                    <setProperty name="service-request-tests">
+                                        <jsonpath>$.items[0].Analyses</jsonpath>
+                                    </setProperty>
+
+                                    <setProperty name="number-of-service-request-tests">
+                                        <jsonpath>$.items[0].Analyses.length()</jsonpath>
+                                    </setProperty>
+                                    
+                                    <choice>
+                                        <!---to create lab results once the ServiceRequest is completed -->
+                                        <when>
+                                            <simple>${exchangeProperty.service-request-transitioned-status} != null &amp;&amp; ${exchangeProperty.service-request-transitioned-status} == 'completed'</simple>
+
+                                            <to uri="direct:create-servicerequest-results-to-openmrs"/>
+                                        </when>
+                                    </choice>
+
+                                    <choice>
+                                        <!---to only update Task status if it is valid(not null - happens if the associated ServiceRequest was never created on senaite) and has actually changed -->
+                                        <when>
+                                            <simple>${exchangeProperty.service-request-current-status} != null &amp;&amp; ${exchangeProperty.service-request-transitioned-status} != null &amp;&amp; ${exchangeProperty.service-request-current-status} != ${exchangeProperty.service-request-transitioned-status}</simple>
+
+                                            <to uri="direct:update-servicerequest-task-to-openmrs"/>
+                                        </when>
+                                    </choice>
+                                </otherwise>
+                            </choice>
+                        </when>
+                        <otherwise>
+                            <log message="Something went wrong when updating FHIR Task for ServiceRequest identified by uuid: '${exchangeProperty.task-id}'"/>
+                        </otherwise>
+                    </choice>
+                </split>
+            </when>
+        </choice>
+    </route>
+</routes>

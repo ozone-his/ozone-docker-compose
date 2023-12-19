@@ -1,0 +1,11 @@
+Uuid,Void/Retire,Same as mappings,Fully specified name:en,Short name:en,Description:en,Data class,Data type,Complex data handler,Answers,Members,Allow decimals,Units,Normal low,Normal high,Absolute low,Absolute high,_version:1,_order:1900
+2653b570-aac6-48fc-b6e2-14e4b83b1b1a,,,Farmer,Farmer,Farmer,Misc,N/A,,,,,,,,,,,
+be89f042-c347-4283-a5a9-7c9caba2ece9,,,Seller/Small business,Seller/Small business,Seller/Small business,Misc,N/A,,,,,,,,,,,
+cfde10f9-068a-444e-89e4-52fbb99f5480,,,Businessman,Businessman,Businessman,Misc,N/A,,,,,,,,,,,
+f3f63fce-4ded-4357-8b91-7081f6562066,,,Civil servant,Civil servant,Civil servant,Misc,N/A,,,,,,,,,,,
+e8085ca2-9e6e-4544-9e83-c14e63f3808a,,,Policeman/Soldier,Policeman/Soldier,Policeman/Soldier,Misc,N/A,,,,,,,,,,,
+dfb9714c-8729-4fb2-8371-d887106addc8,,,Construction worker,Construction worker,Construction worker,Misc,N/A,,,,,,,,,,,
+c4c9156d-a70a-4fb1-b773-c6239e2238f6,,,Housewife,Housewife,Housewife,Misc,N/A,,,,,,,,,,,
+44316bf5-2460-4d86-a747-5680fb3bb037,,,Factory worker,Factory worker,Factory worker,Misc,N/A,,,,,,,,,,,
+535bd0dc-77b2-4dca-82a9-3f2f73a4f67a,,,Entertainment worker,Entertainment worker,Entertainment worker,Misc,N/A,,,,,,,,,,,
+2ef163b6-eec8-4678-abed-0dd261220168,,,Occupation,Occupation,Occupation,Question,Coded,,Farmer;Seller/Small business;Businessman;Civil servant;Policeman/Soldier;Construction worker;Housewife;Factory worker;Entertainment worker;Other,,,,,,,,,

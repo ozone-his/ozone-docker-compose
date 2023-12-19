@@ -1,0 +1,42 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-process-revision-order" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-process-revision-order" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+		<choice>
+			<when>
+				<simple>${exchangeProperty.order-line} == null</simple>
+				<setProperty name="odoo-operation">
+					<simple>create</simple>
+				</setProperty>
+
+				<log message="Adding new order line to the quotation" />
+
+				<to uri="direct:odoo-manage-order-line" />
+			</when>
+			<otherwise>
+				<choice>
+					<when>
+						<simple>${exchangeProperty.is-drug-order} == true</simple>
+                        <setProperty name="odoo-operation">
+                            <simple>write</simple>
+                        </setProperty>
+
+                        <log message="Updating existing order line on the quotation" />
+
+                        <to uri="direct:odoo-manage-order-line" />
+					</when>
+					<otherwise>
+						<!-- There is nothing we can update about an order in odoo except quantity and units which only apply to drug orders -->
+						<log message="There is nothing to update in odoo about a non drug order" />
+					</otherwise>
+				</choice>
+			</otherwise>
+		</choice>
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+
+</routes>

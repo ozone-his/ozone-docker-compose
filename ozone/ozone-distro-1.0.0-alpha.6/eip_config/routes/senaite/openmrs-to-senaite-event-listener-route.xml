@@ -1,0 +1,190 @@
+<routes
+    xmlns="http://camel.apache.org/schema/spring">
+    <route id="openmrs-to-senaite-event-listener" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:openmrs-to-senaite-event-listener"/>
+        <log message="Processing db event: ${body}" />
+        <choice>
+            <when>
+                <simple>${body.tableName} == 'test_order' || ${body.tableName} == 'orders'</simple>
+                
+                <setProperty name="lab-order-uuid">
+                    <simple>${body.identifier}</simple>
+                </setProperty>
+                
+                <setProperty name="event">
+                    <simple>${body}</simple>
+                </setProperty>
+                
+                <setHeader name="Content-Type">
+                    <constant>application/json</constant>
+                </setHeader>
+                
+                <!-- Main route starts -->
+                <choice>
+                    <!-- Handling deletions -->
+                    <when>
+                        <simple>${exchangeProperty.event.tableName} == 'test_order' &amp;&amp; ${exchangeProperty.event.operation} == 'd'</simple>
+                        
+                        <setProperty name="order-to-cancel">
+                            <simple>${exchangeProperty.lab-order-uuid}</simple>
+                        </setProperty>
+                        
+                        <setBody>
+                            <simple>${exchangeProperty.order-to-cancel} </simple>
+                        </setBody>
+                        <!-- cancel -->
+                        <to uri="direct:cancel-order-to-senaite"/>
+                    </when>
+                    
+                    <!-- Handling voided -->
+                    <when>
+                        <simple>${exchangeProperty.event.tableName} == 'orders' &amp;&amp; ${exchangeProperty.event.operation} == 'u'</simple>
+                        
+                        <!-- Retrieving service request from openmrs FHIR -->
+                        <to uri="direct:authenticate-to-openmrs"/>
+                        
+                        <setHeader name="CamelHttpMethod">
+                            <constant>GET</constant>
+                        </setHeader>
+                        
+                        <toD cacheSize="-1" uri="{{fhirR4.baseUrl}}/ServiceRequest/${exchangeProperty.lab-order-uuid}?throwExceptionOnFailure=false"/>
+                        <unmarshal>
+                            <json library="Jackson"/>
+                        </unmarshal>
+                        
+                        <choice>
+                            <!-- If true, cancel related SENAITE analysis request -->
+                            <when>
+                                <jsonpath>$.[?(@.issue &amp;&amp; @.issue[0].diagnostics contains 'is gone/deleted')] </jsonpath>
+                                
+                                <setProperty name="order-to-cancel">
+                                    <simple>${exchangeProperty.lab-order-uuid}</simple>
+                                </setProperty>
+                                
+                                <setBody>
+                                    <simple>${exchangeProperty.order-to-cancel} </simple>
+                                </setBody>
+                                
+                                <!-- Cancel -->
+                                <to uri="direct:cancel-order-to-senaite"/>
+                            </when>
+                        </choice>
+                    </when>
+                    <!-- Handling creation, revision, discontinuation -->
+                    <when>
+                        <simple>${exchangeProperty.event.tableName} == 'test_order' &amp;&amp; ${exchangeProperty.event.operation} == 'c'</simple>
+                        
+                        <!--retrieving FHIR ServiceRequest from OpenMRS -->
+                        <to uri="direct:authenticate-to-openmrs"/>
+                        
+                        <setHeader name="CamelHttpMethod">
+                            <constant>GET</constant>
+                        </setHeader>
+                        
+                        <toD cacheSize="-1" uri="{{fhirR4.baseUrl}}/ServiceRequest/${exchangeProperty.lab-order-uuid}?throwExceptionOnFailure=false"/>
+                        <unmarshal>
+                            <json library="Jackson"/>
+                        </unmarshal>
+                        
+                        <setProperty name="service-analysis-template">
+                            <jsonpath>$.code.coding[0].code</jsonpath>
+                        </setProperty>
+                        
+                        <setProperty name="lab-order-start-date">
+                            <jsonpath>$.occurrencePeriod.start</jsonpath>
+                        </setProperty>
+                        
+                        <setProperty name="patient-reference">
+                            <jsonpath>$.subject.reference</jsonpath>
+                        </setProperty>
+                        
+                        <setProperty name="requester-reference">
+                            <jsonpath>$.requester.reference</jsonpath>
+                        </setProperty>
+                        
+                        <choice>
+                            <!-- If discontinuation order, then cancel their previous analysis request on SENAITE -->
+                            <when>
+                                <jsonpath>$.[?((@.status == 'revoked' || @.status == 'unknown') &amp;&amp; @.replaces)]</jsonpath>
+                                
+                                <setProperty name="order-to-cancel">
+                                    <jsonpath>$.replaces[0].reference</jsonpath>
+                                </setProperty>
+                                
+                                <!-- Order to cancel uuid is set as body -->
+                                <setBody>
+                                    <simple>${exchangeProperty.order-to-cancel.substring(15)} </simple>
+                                </setBody>
+                                
+                                <!-- cancel -->
+                                <to uri="direct:cancel-order-to-senaite"/>
+                            </when>
+                            <!-- If revision/renewed or new order -->
+                            <when>
+                                <jsonpath>$.[?(@.status == 'active')]</jsonpath>
+                                <choice>
+                                    <!-- If revision/renewed order, first cancel their previous one on SENAITE -->
+                                    <when>
+                                        <jsonpath>$.[?(@.basedOn)]</jsonpath>
+                                        
+                                        <setProperty name="order-to-cancel">
+                                            <jsonpath>$.basedOn[0].reference</jsonpath>
+                                        </setProperty>
+                                        
+                                        <setBody>
+                                            <simple>${exchangeProperty.order-to-cancel.substring(15)} </simple>
+                                        </setBody>
+                                        
+                                        <!-- cancel -->
+                                        <to uri="direct:cancel-order-to-senaite"/>
+                                    </when>
+                                </choice>
+                                
+                                <!--retrieving real patient names using OpenMRS FHIR-->
+                                <to uri="direct:retrieve-patient-names-from-openmrs"/>
+                                
+                                <!--retrieving requester's names using FHIR (to be used as SENAITE's client contact's)-->
+                                <to uri="direct:retrieve-orderer-names-from-openmrs"/>
+                                
+                                <!--retrieving patient's identification number (to be used as SENAITE's client id)-->
+                                <to uri="direct:retrieve-patient-id-from-openmrs"/>
+
+                                <!--create client(from ServiceRequest.subject) on SENAITE and save client UID property-->
+                                <to uri="direct:create-client-to-senaite"/>
+                                
+                                <!--create client contact from ServiceRequest.requester and save contact UID property-->
+                                <to uri="direct:create-contact-to-senaite"/>
+                                
+                                <!-- create analysis request on senaite -->
+                                <to uri="direct:create-analysisrequest-to-senaite"/>
+                                
+                                <!--creating FHIR Task to track progress of the ServiceRequest(Analysis Requests registered) starting with 'accepted' status-->
+                                <to uri="direct:create-servicerequest-task-to-openmrs"/>
+                                
+                            </when>
+                        </choice>
+                    </when>
+                </choice>
+            </when>
+            <when>
+                <simple>${body.tableName} == 'person_name' || ${body.tableName} == 'patient_identifier' &amp;&amp; ${exchangeProperty.event.operation} == 'u'</simple>
+
+                <to uri="direct:retrieve-patient-uuid-from-openmrs"/>
+
+                <setProperty name="patient-reference">
+                    <simple>Patient/${exchangeProperty.patient-uuid}</simple>
+                </setProperty>
+
+                <!--retrieving real patient names using OpenMRS FHIR-->
+                <to uri="direct:retrieve-patient-names-from-openmrs"/>
+
+                <!--processing patient's identification number (to be used as SENAITE's client id)-->
+                <to uri="direct:retrieve-patient-id-from-openmrs"/>
+
+                <!--create client(from ServiceRequest.subject) on SENAITE and save client UID property-->
+                <to uri="direct:update-client-to-senaite"/>
+
+            </when>
+        </choice>
+    </route>
+</routes>

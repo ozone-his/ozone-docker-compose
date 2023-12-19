@@ -1,0 +1,61 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-patient-association-handler" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-patient-association-handler" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+        <log message="Looking up uuid for person associated to the ${exchangeProperty.patientAssociationName} from the DB" />
+
+        <choice>
+            <when>
+                <simple>${exchangeProperty.event.tableName} == 'patient_identifier'</simple>
+                <setProperty name="lookUpColumn">
+                    <simple>patient_id</simple>
+                </setProperty>
+            </when>
+            <otherwise>
+                <setProperty name="lookUpColumn">
+                    <simple>person_id</simple>
+                </setProperty>
+            </otherwise>
+        </choice>
+        
+        <toD uri="sql:SELECT uuid FROM person WHERE person_id = (SELECT t.${exchangeProperty.lookUpColumn} FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.entity-instance.get('uuid')}')?dataSource=openmrsDataSource" />
+
+        <!-- TODO Check if no row was found -->
+        <setProperty name="resourceId">
+            <simple>${body[0].get('uuid')}</simple>
+        </setProperty>
+
+        <log message="Retrieved person uuid: ${exchangeProperty.resourceId}, fetching patient associated to the ${exchangeProperty.patientAssociationName} from OpenMRS..." />
+
+        <setProperty name="isSubResource">
+            <simple>false</simple>
+        </setProperty>
+        <setProperty name="resourceName">
+            <simple>patient</simple>
+        </setProperty>
+
+        <to uri="direct:get-entity-by-uuid-from-openmrs" />
+
+        <choice>
+            <when>
+                <simple>${body} != null</simple>
+                <setProperty name="patient">
+                    <jsonpath>$</jsonpath>
+                </setProperty>
+
+                <log loggingLevel="TRACE" message="Fetched patient -> ${exchangeProperty.patient}" />
+
+                <to uri="direct:odoo-patient-handler" />
+            </when>
+            <otherwise>
+                <log loggingLevel="WARN" message="No associated patient found with uuid: ${exchangeProperty.resourceId}" />
+            </otherwise>
+        </choice>
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+
+</routes>

@@ -1,0 +1,70 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--
+        Saves a new calendar event in odoo
+
+        @exchangePropertyIn subject (String) - The subject name of the event
+        @exchangePropertyIn description (String) - The description of the event
+        @exchangePropertyIn attendeePartnerIds (array or Collection) - An array or collection of the partner ids of the attendees
+        @exchangePropertyIn startDateTime (LocalDatetime) - The description of the event
+        @exchangePropertyIn duration (int) - The duration of the event in minutes
+
+
+        @bodyOut (Integer) - The id of the created calender event
+    -->
+
+	<route id="save-calendar-event-in-odoo" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:save-calendar-event-in-odoo" />
+
+        <log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+
+        <setProperty name="calendarEventData">
+            <spel>#{new java.util.HashMap()}</spel>
+        </setProperty>
+        <setProperty name="partnerIdsAsManyToMany">
+            <spel>#{new java.util.ArrayList(3)}</spel>
+        </setProperty>
+
+        <script>
+            <spel>
+                #{getProperty('partnerIdsAsManyToMany').add(6)}
+                #{getProperty('partnerIdsAsManyToMany').add(0)}
+                #{getProperty('partnerIdsAsManyToMany').add(getProperty('attendeePartnerIds'))}
+            </spel>
+        </script>
+        
+        <script>
+            <spel>
+                #{getProperty('calendarEventData').put('name', getProperty('subject'))}
+                #{getProperty('calendarEventData').put('description', getProperty('description'))}
+                #{getProperty('calendarEventData').put('partner_ids', T(java.util.Collections).singletonList(getProperty('partnerIdsAsManyToMany')))}
+                #{getProperty('calendarEventData').put('start', getProperty('startDateTime').format(T(java.time.format.DateTimeFormatter).ofPattern("yyyy-MM-dd HH:mm:ss")))}
+                #{getProperty('calendarEventData').put('stop', getProperty('startDateTime').plusMinutes(getProperty('duration')).format(T(java.time.format.DateTimeFormatter).ofPattern("yyyy-MM-dd HH:mm:ss")))}
+            </spel>
+        </script>
+
+        <setProperty name="rpcArgs">
+            <spel>#{new java.util.ArrayList(6)}</spel>
+        </setProperty>
+
+        <script>
+			<spel>
+				#{getProperty('rpcArgs').add('{{odoo.database}}')}
+				#{getProperty('rpcArgs').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+				#{getProperty('rpcArgs').add('{{odoo.password}}')}
+				#{getProperty('rpcArgs').add('calendar.event')}
+                #{getProperty('rpcArgs').add('create')}
+				#{getProperty('rpcArgs').add(T(java.util.Collections).singletonList(getProperty('calendarEventData')))}
+			</spel>
+		</script>
+        
+		<setBody>
+			<spel>
+				#{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('rpcArgs'))}
+			</spel>
+		</setBody>
+
+		<log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+	</route>
+
+</routes>

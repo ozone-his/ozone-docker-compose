@@ -1,0 +1,48 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--
+        Fetches the partner ids for users matching the specified user ids. The returned fields are partner_id and id.
+
+        @bodyOut (array) - An array of matches
+    -->
+
+	<route id="get-partner-ids-by-user-ids" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:get-partner-ids-by-user-ids" />
+
+		<log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+
+        <setProperty name="${routeId}-userIdCriterion">
+			<spel>#{T(java.util.Arrays).asList('id', 'in', body.get('userIds'))}</spel>
+		</setProperty>
+		<setProperty name="${routeId}-searchQuery">
+			<spel>#{T(java.util.Collections).singletonList(T(java.util.Collections).singletonList(getProperty('get-partner-ids-by-user-ids-userIdCriterion')))}</spel>
+		</setProperty>
+		<setProperty name="${routeId}-fieldsToReturn">
+			<spel>#{T(java.util.Collections).singletonMap('fields', T(java.util.Collections).singletonList('partner_id'))}</spel>
+		</setProperty>
+		<setProperty name="${routeId}-rpcArgs">
+			<spel>#{new java.util.ArrayList(7)}</spel>
+		</setProperty>
+
+		<script>
+			<spel>
+				#{getProperty('get-partner-ids-by-user-ids-rpcArgs').add('{{odoo.database}}')}
+				#{getProperty('get-partner-ids-by-user-ids-rpcArgs').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+				#{getProperty('get-partner-ids-by-user-ids-rpcArgs').add('{{odoo.password}}')}
+				#{getProperty('get-partner-ids-by-user-ids-rpcArgs').add('res.users')}
+				#{getProperty('get-partner-ids-by-user-ids-rpcArgs').add('search_read')}
+				#{getProperty('get-partner-ids-by-user-ids-rpcArgs').add(getProperty('get-partner-ids-by-user-ids-searchQuery'))}
+				#{getProperty('get-partner-ids-by-user-ids-rpcArgs').add(getProperty('get-partner-ids-by-user-ids-fieldsToReturn'))}
+			</spel>
+		</script>
+        
+		<setBody>
+			<spel>
+				#{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('get-partner-ids-by-user-ids-rpcArgs'))}
+			</spel>
+		</setBody>
+
+		<log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+	</route>
+
+</routes>

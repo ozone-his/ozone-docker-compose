@@ -1,0 +1,81 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-order-handler" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-order-handler" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+        <log message="Processing Order with action: ${exchangeProperty.entity-instance.get('action')}" />
+
+        <choice>
+            <when>
+                <simple>${exchangeProperty.event.operation} == 'c' &amp;&amp; ${exchangeProperty.event.tableName} == 'orders' || ${exchangeProperty.entity-instance.get('voided')} == true</simple>
+                <setProperty name="orderAction">
+                    <simple>${exchangeProperty.entity-instance.get('action')}</simple>
+                </setProperty>
+
+                <choice>
+                    <when>
+                        <simple>${exchangeProperty.orderAction} == 'NEW' || ${exchangeProperty.orderAction} == 'REVISE' || ${exchangeProperty.orderAction} == 'DISCONTINUE'</simple>
+                        <when>
+                            <simple>${exchangeProperty.entity-instance.get('type')} == 'drugorder'</simple>
+                            <setProperty name="is-drug-order">
+                                <simple>true</simple>
+                            </setProperty>
+                        </when>
+
+                        <when>
+                            <simple>${exchangeProperty.entity-instance.get('voided')} != true</simple>
+                            <setProperty name="is-new">
+                                <spel>#{getProperty('entity-instance').get('action') == 'NEW' || getProperty('entity-instance').get('action') == 'RENEW'}</spel>
+                            </setProperty>
+                        </when>
+
+                        <setProperty name="modelName">
+                            <simple>product.product</simple>
+                        </setProperty>
+                        <setProperty name="externalId">
+                            <simple>${exchangeProperty.entity-instance.get('concept').get('uuid')}</simple>
+                        </setProperty>
+
+                        <when>
+                            <simple>${exchangeProperty.is-drug-order} == true</simple>
+                            <setProperty name="externalId">
+                                <simple>${exchangeProperty.entity-instance.get('drug').get('uuid')}</simple>
+                            </setProperty>
+                        </when>
+
+                        <to uri="direct:odoo-get-external-id-map" />
+
+                        <when>
+                            <simple>${body.length} == 0</simple>
+                            <throwException exceptionType="org.openmrs.eip.EIPException" message="No product found in odoo mapped to uuid: ${exchangeProperty.externalId}" />
+                        </when>
+
+                        <when>
+                            <simple>${body.length} > 1</simple>
+                            <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} products in odoo mapped to uuid: ${exchangeProperty.externalId}" />
+                        </when>
+
+                        <setProperty name="odooProductId">
+                            <simple>${body[0].get('res_id')}</simple>
+                        </setProperty>
+
+                        <log message="Odoo product id: ${exchangeProperty.odooProductId}" loggingLevel="DEBUG" />
+
+                        <to uri="direct:odoo-process-order" />
+                    </when>
+                    <otherwise>
+                        <log message="Don't know how to handle Order with action: ${exchangeProperty.orderAction}" loggingLevel="WARN" />
+                    </otherwise>
+                </choice>
+            </when>
+            <otherwise>
+                <log message="Skipping event with operation: ${exchangeProperty.event.operation}" />
+            </otherwise>
+        </choice>
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+
+</routes>

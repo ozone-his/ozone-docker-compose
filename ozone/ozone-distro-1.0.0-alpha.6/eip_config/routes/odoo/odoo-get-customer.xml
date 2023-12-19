@@ -1,0 +1,33 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-get-customer" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-get-customer" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+		<setProperty name="searchQuery">
+			<spel>#{new Object[]{new Object[]{new Object[]{'ref', '=', getProperty('patient').uuid}}}}</spel>
+		</setProperty>
+		<setProperty name="getQuotationParams">
+			<spel>#{new java.util.ArrayList(6)}</spel>
+		</setProperty>
+		<script>
+			<spel>
+				#{getProperty('getQuotationParams').add('{{odoo.database}}')}
+				#{getProperty('getQuotationParams').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+				#{getProperty('getQuotationParams').add('{{odoo.password}}')}
+				#{getProperty('getQuotationParams').add('res.partner')}
+				#{getProperty('getQuotationParams').add('search')}
+				#{getProperty('getQuotationParams').add(getProperty('searchQuery'))}
+			</spel>
+		</script>
+		<setBody>
+			<spel>
+				#{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('getQuotationParams'))}
+			</spel>
+		</setBody>
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+
+</routes>

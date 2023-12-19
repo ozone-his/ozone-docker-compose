@@ -1,0 +1,27 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="generate-demo-data">
+        <!-- Triggering generation of demo data on OpenMRS EMR after 10 minutes  -->
+        <from uri="scheduler:generateDemoData?initialDelay=600000&amp;repeatCount=1" />
+        
+        <log message="Sheduled demo data generation." />
+
+        <to uri="direct:authenticate-to-openmrs"/>
+
+        <setProperty name="number-of-demo-patients">
+            <simple>${properties:number.of.demo.patients:50}</simple>
+        </setProperty>
+
+        <setHeader name="CamelHttpMethod">
+            <constant>POST</constant>
+        </setHeader>
+        <setHeader name="Content-Type">
+            <constant>application/json</constant>
+        </setHeader>
+
+        <setBody>
+            <simple>{"numberOfDemoPatients" : ${exchangeProperty.number-of-demo-patients}, "createIfNotExists" : true }</simple>
+        </setBody>
+
+        <toD cacheSize="-1" uri="{{openmrs.baseUrl}}/ws/rest/v1/referencedemodata/generate"/>
+    </route>
+</routes>

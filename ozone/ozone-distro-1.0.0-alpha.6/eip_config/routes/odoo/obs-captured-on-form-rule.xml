@@ -1,0 +1,84 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--
+        Checks if the specified obs belongs to an encounter that is associated to a form matching the specified uuid
+
+        @exchangePropertyIn obs (Map) - The OpenMRS obs rest resource to check
+        @exchangePropertyIn formUuid (String) - The uuid of the form to match against
+
+        @bodyOut (boolean) - True if the obs belongs to an encounter associated to the form otherwise false
+    -->
+
+    <route id="obs-captured-on-form-rule" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:obs-captured-on-form-rule" />
+
+        <log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+        
+        <log loggingLevel="DEBUG" message="Fetching the Obs encounter from OpenMRS..." />
+
+        <setProperty name="rulePassed">
+            <simple>false</simple>
+        </setProperty>
+
+        <choice>
+            <when>
+                <simple>${exchangeProperty.obs.get('encounter')} != null</simple>
+                <setProperty name="isSubResource">
+                    <simple>false</simple>
+                </setProperty>
+                <setProperty name="resourceName">
+                    <simple>encounter</simple>
+                </setProperty>
+                <setProperty name="resourceId">
+                    <simple>${exchangeProperty.obs.get('encounter').get('uuid')}</simple>
+                </setProperty>
+                <setProperty name="resourceRepresentation">
+                    <simple>full</simple>
+                </setProperty>
+
+                <to uri="direct:get-entity-by-uuid-from-openmrs" />
+
+                <choice>
+                    <when>
+                        <simple>${body} != null</simple>
+                        <setProperty name="encounter">
+                            <jsonpath>$</jsonpath>
+                        </setProperty>
+
+                        <log loggingLevel="TRACE" message="Fetched encounter -> ${exchangeProperty.encounter}" />
+                        <log loggingLevel="DEBUG" message="Checking if the obs encounter was recorded on the form with uuid: ${exchangeProperty.formUuid}" />
+
+                        <choice>
+                            <when>
+                                <simple>${exchangeProperty.encounter.get('form')} != null</simple>
+                                <when>
+                                    <simple>${exchangeProperty.encounter.get('form').get('uuid')} == ${exchangeProperty.formUuid}</simple>
+                                    <setProperty name="rulePassed">
+                                        <simple>true</simple>
+                                    </setProperty>
+
+                                    <log loggingLevel="DEBUG" message="Obs was recorded on the form with uuid: ${exchangeProperty.formUuid}" />
+                                </when>
+                            </when>
+                            <otherwise>
+                                <log message="Obs encounter does not belong to any form" />
+                            </otherwise>
+                        </choice>
+                    </when>
+                    <otherwise>
+                        <throwException exceptionType="org.openmrs.eip.EIPException" message="No encounter found with uuid: ${exchangeProperty.obs.get('encounter').get('uuid')}" />
+                    </otherwise>
+                </choice>
+            </when>
+            <otherwise>
+                <log message="Obs does not belong to any encounter" />
+            </otherwise>
+        </choice>
+        
+        <setBody>
+            <simple>${exchangeProperty.rulePassed}</simple>
+        </setBody>
+
+        <log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+    </route>
+</routes>

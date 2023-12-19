@@ -1,0 +1,44 @@
+<routes
+    xmlns="http://camel.apache.org/schema/spring">
+    <!-- No need to add error handling for this route because it is called by the parent inboud-main route which does not need to go through retries given an error occured -->
+    <route id="fetch-servicerequest-tasks-from-openmrs">
+        <from uri="direct:fetch-servicerequest-tasks-from-openmrs"/>
+        
+        <log message="Fetching Tasks associated with ServiceRequests " />
+
+        <!-- Fetch FHIR requested & accepted Tasks from OpenMRS -->
+        <to uri="direct:authenticate-to-openmrs"/>
+
+        <setHeader name="CamelHttpMethod">
+            <constant>GET</constant>
+        </setHeader>
+
+        <toD cacheSize="-1" uri="{{fhirR4.baseUrl}}/Task?status=requested,accepted"/>
+        <unmarshal>
+            <json library="Jackson"/>
+        </unmarshal>
+
+        <choice>
+            <when>
+                <jsonpath>$.[?(@.entry)]</jsonpath>
+
+                <setBody>
+                    <jsonpath>$.entry</jsonpath>
+                </setBody>
+
+                <setBody>
+                    <jsonpath suppressExceptions="true">$.[?(@.resource.basedOn[0].type == 'ServiceRequest')]</jsonpath>
+                </setBody>
+
+                <marshal>
+                    <json library="Jackson"/>
+                </marshal>
+            </when>
+            <otherwise>
+                <setBody>
+                    <simple>[]</simple>
+                </setBody>
+            </otherwise>
+        </choice>
+    </route>
+</routes>

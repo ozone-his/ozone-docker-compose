@@ -1,0 +1,22 @@
+<routes
+    xmlns="http://camel.apache.org/schema/spring">
+    <!-- No need to add error handling for this route because it is called by the parent inboud-main route which does not need to go through retries given an error occured -->
+    <route id="update-servicerequest-task-to-openmrs">
+        <from uri="direct:update-servicerequest-task-to-openmrs"/>
+
+        <log message="Updating FHIR Task for order. " />
+        
+        <to uri="direct:authenticate-to-openmrs"/>
+
+        <setHeader name="CamelHttpMethod">
+            <constant>PUT</constant>
+        </setHeader>
+
+        <setBody>
+            <simple>{"resourceType": "Task", "id": "${exchangeProperty.task-id}", "status": "${exchangeProperty.service-request-transitioned-status}", "intent": "order"}</simple>
+        </setBody>
+
+        <toD cacheSize="-1" uri="{{fhirR4.baseUrl}}/Task/${exchangeProperty.task-id}"/>
+        
+    </route>
+</routes>

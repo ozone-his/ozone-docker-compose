@@ -1,0 +1,30 @@
+<routes
+    xmlns="http://camel.apache.org/schema/spring">
+    <route id="retrieve-patient-uuid-from-openmrs">
+        <from uri="direct:retrieve-patient-uuid-from-openmrs"/>
+        
+        <choice>
+            <when>
+                <simple>${exchangeProperty.event.tableName} == 'patient_identifier'</simple>
+                <setProperty name="lookUpColumn">
+                    <simple>patient_id</simple>
+                </setProperty>
+            </when>
+            <when>
+                <simple>${exchangeProperty.event.tableName} == 'person_name'</simple>
+                <setProperty name="lookUpColumn">
+                    <simple>person_id</simple>
+                </setProperty>
+            </when>
+        </choice>
+
+        <toD cacheSize="-1" uri="sql:SELECT uuid FROM person WHERE person_id = (SELECT t.${exchangeProperty.lookUpColumn} FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=openmrsDataSource" />
+
+        <!-- TODO Check if no row was found -->
+
+        <setProperty name="patient-uuid">
+            <simple>${body[0].get('uuid')}</simple>
+        </setProperty>
+        
+    </route>
+</routes>

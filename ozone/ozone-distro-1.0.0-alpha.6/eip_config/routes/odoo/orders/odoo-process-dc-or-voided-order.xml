@@ -1,0 +1,35 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-process-dc-or-voided-order" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-process-dc-or-voided-order" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+		<setProperty name="odoo-operation">
+			<simple>unlink</simple>
+		</setProperty>
+
+        <when>
+            <simple>${exchangeProperty.order-line} != null</simple>
+		    <log message="Removing order line from the quotation in odoo" />
+
+		    <to uri="direct:odoo-manage-order-line" />
+        </when>
+
+        <!-- TODO Cancel the quotation if it was created by user for this application -->
+        <when>
+            <simple>${exchangeProperty.order-line-count} &lt; 2</simple>
+            <log message="Cancelling the quotation because it has no more order lines left" />
+
+            <setProperty name="odoo-operation">
+                <simple>write</simple>
+            </setProperty>
+
+            <to uri="direct:odoo-manage-quotation" />
+        </when>
+       
+
+        <log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+    </route>
+
+</routes>

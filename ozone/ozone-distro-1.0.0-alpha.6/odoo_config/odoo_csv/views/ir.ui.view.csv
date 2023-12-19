@@ -1,0 +1,2 @@
+"id","priority","name","type","model","inherit_id","arch_base"
+"init.6690cf30-e961-4ec5-a191-ee8aef754c97","16","x_external_identifier_view","Form","res.partner","res.partner.form","<?xml version=""1.0""?><data><xpath expr=""//field[@name='function']"" position=""before""><field name=""x_external_identifier"" /></xpath></data>"

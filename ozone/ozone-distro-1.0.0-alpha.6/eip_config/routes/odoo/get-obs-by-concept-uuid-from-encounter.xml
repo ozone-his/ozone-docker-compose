@@ -1,0 +1,72 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--
+        Gets the non-voided obs from the specified encounter that has a question concept with a uuid matching the
+        specified uuid
+
+        @exchangePropertyIn encounter (Map) - The encounter resource to search
+        @exchangePropertyIn questionConceptUuid (String) - The concept uuid to match
+
+        @bodyOut (Map) - The obs resource if a match is found otherwise null
+    -->
+    
+    <route id="get-obs-by-concept-uuid-from-encounter" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:get-obs-by-concept-uuid-from-encounter" />
+
+        <log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+
+        <log loggingLevel="DEBUG" message="Looking up an obs from the encounter that has a question concept with uuid: ${exchangeProperty.questionConceptUuid}" />
+
+        <setProperty name="${routeId}-encObs">
+            <simple>${exchangeProperty.encounter.get('obs')}</simple>
+        </setProperty>
+        <setBody>
+            <exchangeProperty>${routeId}-encObs</exchangeProperty>
+        </setBody>
+        <setProperty name="${routeId}-lastIndex">
+            <spel>#{body.size() - 1}</spel>
+        </setProperty>
+        <setProperty name="${routeId}-endLoop">
+            <simple>${null}</simple>
+        </setProperty>
+        <setProperty name="${routeId}-currentItem">
+            <simple>${null}</simple>
+        </setProperty>
+        <setProperty name="${routeId}-match">
+            <simple>${null}</simple>
+        </setProperty>
+
+        <when>
+            <simple>${body.size()} > 0</simple>
+            <loop doWhile="true">
+                <simple>${exchangeProperty.${routeId}-endLoop} != true</simple>
+                <setProperty name="${routeId}-currentItem">
+                    <simple>${exchangeProperty.${routeId}-encObs.get(${exchangeProperty.CamelLoopIndex})}</simple>
+                </setProperty>
+
+                <when>
+                    <simple>${exchangeProperty.${routeId}-currentItem.get('concept').get('uuid')} == ${exchangeProperty.questionConceptUuid} &amp;&amp; ${exchangeProperty.${routeId}-currentItem.get('voided')} != true</simple>
+                    <setProperty name="${routeId}-match">
+                        <exchangeProperty>${routeId}-currentItem</exchangeProperty>
+                    </setProperty>
+                    <setProperty name="${routeId}-endLoop">
+                        <simple>true</simple>
+                    </setProperty>
+                </when>
+
+                <when>
+                    <simple>${exchangeProperty.CamelLoopIndex} == ${exchangeProperty.${routeId}-lastIndex}</simple>
+                    <setProperty name="${routeId}-endLoop">
+                        <simple>true</simple>
+                    </setProperty>
+                </when>
+            </loop>
+        </when>
+
+        <setBody>
+            <exchangeProperty>${routeId}-match</exchangeProperty>
+        </setBody>
+
+        <log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+    </route>
+</routes>

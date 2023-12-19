@@ -1,0 +1,9 @@
+Uuid,Void/Retire,Name,display:en,Description,Format,Foreign uuid,Searchable,Edit privilege
+14d4f066-15f5-102d-96e4-000c29c2a5d7,,Telephone Number,Telephone Number,The telephone number for the person,java.lang.String,,,
+8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47,,Unknown patient,Unknown patient,Used to flag patients that cannot be identified during the check-in process,java.lang.String,,,
+7e142fa0-64ca-4220-ae90-a8f7f955458b,,Occupation,Occupation,Patient occupation list,org.openmrs.Concept,2ef163b6-eec8-4678-abed-0dd261220168,,
+632d27a5-58c6-49f3-acb1-2a7b5855eaca,,Ethnicity,Ethnicity,Ethnicity list,org.openmrs.Concept,c8b01687-086e-4f7e-ad0d-db77c423a2a7,,
+4752b0ca-d8dd-4de9-b59a-7c77895b7657,,Place of Birth,Place of Birth,Place of birth attribute,java.lang.String,,,
+157d3d3c-fdc7-443d-82be-71b7b3d92940,,Marital Status,Marital Status,Situation matrimoniale,org.openmrs.Concept,4e7a07f2-345f-419c-8d30-b060d9b8681a,,
+a6cac115-4369-4bf2-a3b2-8e86276cbc65,,Education,Education,Patient education list,org.openmrs.Concept,27059c69-511a-47af-b987-16580c36905a,,
+cd36e567-7bec-465c-9a3e-32684861c17c,,Sexual Orientation,Do you think of yourself as?,Do you think of yourself as?,org.openmrs.Concept,12634919-8592-428f-8ae3-f14518d914c5,,

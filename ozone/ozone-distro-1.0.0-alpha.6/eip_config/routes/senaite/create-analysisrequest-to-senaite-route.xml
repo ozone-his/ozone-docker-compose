@@ -1,0 +1,78 @@
+<routes
+    xmlns="http://camel.apache.org/schema/spring">
+    <route id="create-analysisrequest-to-senaite">
+        <from uri="direct:create-analysisrequest-to-senaite"/>
+        
+        <log message="Creating AnalysisRequest for order in SENAITE " />
+
+        <to uri="direct:authenticate-to-senaite"/>
+
+        <setHeader name="CamelHttpMethod">
+            <constant>GET</constant>
+        </setHeader>
+
+        <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/search?getClientSampleID=${exchangeProperty.lab-order-uuid}&amp;getClientID=${exchangeProperty.patient-id}&amp;catalog=senaite_catalog_sample&amp;complete=true"/>
+        <unmarshal>
+            <json library="Jackson"/>
+        </unmarshal>
+
+        <choice>
+            <when>
+                <jsonpath>$.[?(@.count == 0)]</jsonpath>
+                
+                <!--retrieve Analysis Template from SENAITE-->
+
+                <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/search?complete=true&amp;Description=${exchangeProperty.service-analysis-template}&amp;catalog=senaite_catalog_setup&amp;portal_type=ARTemplate"/>
+                <unmarshal>
+                    <json library="Jackson"/>
+                </unmarshal>
+                
+                <setProperty name="sample-type-uid">
+                    <jsonpath>$.items[0].SampleType.uid</jsonpath>
+                </setProperty>
+                
+                <setProperty name="sample-template-uid">
+                    <jsonpath>$.items[0].uid</jsonpath>
+                </setProperty>
+                
+                <choice>
+                    <when>
+                        <jsonpath>$.[?(@.items[0].AnalysisProfile != null)]</jsonpath>
+                        
+                        <setProperty name="sample-analyses-profile-uid">
+                            <jsonpath>$.items[0].AnalysisProfile.uid</jsonpath>
+                        </setProperty>
+                    </when>
+                </choice>
+                
+                <setBody>
+                    <jsonpath>$.items[0].Analyses</jsonpath>
+                </setBody>
+                <marshal>
+                    <json library="Jackson"/>
+                </marshal>
+                
+                <setProperty name="sample-analyses-uids">
+                    <method beanType="net.mekomsolutions.eip.utils.JsonUtils" method="convertToValuesArrayForKey(${body}, service_uid)" />
+                </setProperty>
+                
+                <!--fill sample payload-->
+                <setBody>
+                    <simple>{"Contact": "${exchangeProperty.client-contact-uid}","SampleType": "${exchangeProperty.sample-type-uid}","DateSampled": "${exchangeProperty.lab-order-start-date}","Template": "${exchangeProperty.sample-template-uid}","Profiles": "${exchangeProperty.sample-analyses-profile-uid}","Analyses": [${exchangeProperty.sample-analyses-uids}],"ClientSampleID": "${exchangeProperty.lab-order-uuid}"}</simple>
+                </setBody>
+                
+                <!--post sample to SENAITE-->
+                <setHeader name="CamelHttpMethod">
+                    <constant>POST</constant>
+                </setHeader>
+                
+                <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/AnalysisRequest/create/${exchangeProperty.client-uid}"/>
+                <log message="Senaite Analysis/Sample posted results             :          ${body}"/>
+                
+            </when>
+            <otherwise>
+                <!-- Do nothing since AnalysisRequests was created already -->
+            </otherwise>
+        </choice>
+    </route>
+</routes>

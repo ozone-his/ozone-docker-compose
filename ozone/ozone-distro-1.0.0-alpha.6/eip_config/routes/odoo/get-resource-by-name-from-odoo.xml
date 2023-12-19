@@ -1,0 +1,75 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--
+        Gets a resource from odoo matching the specified name and modelName, the route assumes names for are unique
+        implying that the route will fail if multiple matches are found.
+
+        @exchangePropertyIn name (String) - The name of the resource to match
+        @exchangePropertyIn modelName (String) - The name of the model to match
+
+        @bodyOut (Map) - The resource if a match is found otherwise null
+    -->
+
+	<route id="get-resource-by-name-from-odoo" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:get-resource-by-name-from-odoo" />
+
+        <log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+
+        <setProperty name="nameCriterion">
+            <spel>#{new java.util.ArrayList(3)}</spel>
+        </setProperty>
+
+        <script>
+            <spel>
+                #{getProperty('nameCriterion').add('name')}
+                #{getProperty('nameCriterion').add('=')}
+                #{getProperty('nameCriterion').add(getProperty('name'))}
+            </spel>
+        </script>
+
+        <setProperty name="searchQuery">
+            <spel>#{T(java.util.Collections).singletonList(T(java.util.Collections).singletonList(getProperty('nameCriterion')))}</spel>
+        </setProperty>
+        <setProperty name="rpcArgs">
+            <spel>#{new java.util.ArrayList(6)}</spel>
+        </setProperty>
+        
+        <script>
+            <spel>
+                #{getProperty('rpcArgs').add('{{odoo.database}}')}
+                #{getProperty('rpcArgs').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+                #{getProperty('rpcArgs').add('{{odoo.password}}')}
+                #{getProperty('rpcArgs').add(getProperty('modelName'))}
+                #{getProperty('rpcArgs').add('search_read')}
+                #{getProperty('rpcArgs').add(getProperty('searchQuery'))}
+            </spel>
+        </script>
+
+        <setBody>
+            <spel>
+                #{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('rpcArgs'))}
+            </spel>
+        </setBody>
+        
+        <choice>
+            <when>
+                <simple>${body.length} == 1</simple>
+                <setBody>
+                    <simple>${body[0]}</simple>
+                </setBody>
+            </when>
+            <when>
+                <simple>${body.length} == 0</simple>
+                <setBody>
+                    <simple>${null}</simple>
+                </setBody>
+            </when>
+            <otherwise>
+                <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} resources (${exchangeProperty.modelName}) in odoo with name: ${exchangeProperty.name}" />
+            </otherwise>
+        </choice>
+
+		<log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+	</route>
+
+</routes>

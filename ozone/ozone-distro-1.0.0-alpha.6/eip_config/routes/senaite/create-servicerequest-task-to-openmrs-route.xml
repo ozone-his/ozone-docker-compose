@@ -1,0 +1,35 @@
+<routes
+    xmlns="http://camel.apache.org/schema/spring">
+    <route id="create-servicerequest-task-to-openmrs">
+        <from uri="direct:create-servicerequest-task-to-openmrs"/>
+        
+        <log message="Creating FHIR Task for order. " />
+        
+        <to uri="direct:authenticate-to-openmrs"/>
+                        
+        <setHeader name="CamelHttpMethod">
+            <constant>GET</constant>
+        </setHeader>
+        
+        <toD cacheSize="-1" uri="{{fhirR4.baseUrl}}/Task?based-on:ServiceRequest=${exchangeProperty.lab-order-uuid}&amp;throwExceptionOnFailure=false"/>
+        <unmarshal>
+            <json library="Jackson"/>
+        </unmarshal>
+                    
+        <choice>
+            <!-- Only create FHIR Task if no associated Task exists -->
+            <when>
+                <jsonpath>$.[?(@.total == 0 )]</jsonpath>
+                <setHeader name="CamelHttpMethod">
+                    <constant>POST</constant>
+                </setHeader>
+                
+                <setBody>
+                    <simple>{"resourceType": "Task", "status": "requested", "intent": "order", "basedOn": [{"reference":"${exchangeProperty.lab-order-uuid}", "type": "ServiceRequest"}]}</simple>
+                </setBody>
+                
+                <toD cacheSize="-1" uri="{{fhirR4.baseUrl}}/Task"/>
+            </when>
+        </choice>         
+    </route>
+</routes>

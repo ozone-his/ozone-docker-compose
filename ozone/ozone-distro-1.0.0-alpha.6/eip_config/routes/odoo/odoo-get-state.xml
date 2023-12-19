@@ -1,0 +1,33 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="odoo-get-state" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:odoo-get-state" />
+
+        <log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+        <setProperty name="stateSearchQuery">
+            <spel>#{new Object[]{new Object[]{new Object[]{'name', '=', getProperty('stateName')}}}}</spel>
+        </setProperty>
+        <setProperty name="getStateParams">
+            <spel>#{new java.util.ArrayList(6)}</spel>
+        </setProperty>
+        <script>
+            <spel>
+                #{getProperty('getStateParams').add('{{odoo.database}}')}
+                #{getProperty('getStateParams').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+                #{getProperty('getStateParams').add('{{odoo.password}}')}
+                #{getProperty('getStateParams').add('res.country.state')}
+                #{getProperty('getStateParams').add('search')}
+                #{getProperty('getStateParams').add(getProperty('stateSearchQuery'))}
+            </spel>
+        </script>
+        <setBody>
+            <spel>
+                #{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('getStateParams'))}
+            </spel>
+        </setBody>
+
+        <log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+    </route>
+
+</routes>

@@ -1,0 +1,8 @@
+Uuid,Void/Retire,Same as mappings,Fully specified name:en,Fully specified name:km,Short name:en,Short name:km,Description:en,Data class,Data type,Complex data handler,Answers,Members,Allow decimals,Units,Normal low,Normal high,Absolute low,Absolute high,_version:1,_order:1700
+b1e082af-795e-431b-a3e7-149206e30c16,,,Illiterate,,Illiterate,,Illiterate,Misc,N/A,,,,,,,,,,,
+6bb7abb5-4562-4de3-9c70-ad3624b46c18,,,Primary School,,Primary School,,Primary School,Misc,N/A,,,,,,,,,,,
+351b7b4a-c14c-4adb-9d7a-3f775d8aca7f,,,Secondary School,,Secondary School,,Secondary School,Misc,N/A,,,,,,,,,,,
+c6fe3d03-2854-41a4-a2ec-b134e2287d88,,,High School,,High School,,High School,Misc,N/A,,,,,,,,,,,
+ac2d1172-77c2-4c1d-afbb-cb3b61c42787,,,Graduate,,Graduate,,Graduate,Misc,N/A,,,,,,,,,,,
+b8740be5-2b1e-4b73-9cda-166463355eb1,,,Post Graduate,,Post Graduate,,Post Graduate,Misc,N/A,,,,,,,,,,,
+27059c69-511a-47af-b987-16580c36905a,,,Education,,Education,,Education,Question,Coded,,Illiterate;Primary School;Secondary School;High School;Graduate;Post Graduate,,,,,,,,,

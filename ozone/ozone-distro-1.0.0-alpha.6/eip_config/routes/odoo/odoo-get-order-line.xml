@@ -1,0 +1,43 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-get-order-line" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-get-order-line" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+		<setProperty name="quotation-criterion">
+			<spel>#{new Object[]{'order_id', '=', getProperty('quotation-id')}}</spel>
+		</setProperty>
+		<setProperty name="product-criterion">
+			<spel>#{new Object[]{'product_id', '=', getProperty('odooProductId')}}</spel>
+		</setProperty>
+		<setProperty name="search-query">
+			<spel>#{new Object[]{new Object[]{getProperty('quotation-criterion'), getProperty('product-criterion')}}}</spel>
+		</setProperty>
+		<setProperty name="search-attributes">
+			<spel>#{T(java.util.Collections).singletonMap('fields', new Object[]{'id', 'product_uom_qty', 'product_uom'})}</spel>
+		</setProperty>
+		<setProperty name="get-order-lines-params">
+			<spel>#{new java.util.ArrayList(7)}</spel>
+		</setProperty>
+		<script>
+			<spel>
+				#{getProperty('get-order-lines-params').add('{{odoo.database}}')}
+				#{getProperty('get-order-lines-params').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+				#{getProperty('get-order-lines-params').add('{{odoo.password}}')}
+				#{getProperty('get-order-lines-params').add('sale.order.line')}
+				#{getProperty('get-order-lines-params').add('search_read')}
+				#{getProperty('get-order-lines-params').add(getProperty('search-query'))}
+				#{getProperty('get-order-lines-params').add(getProperty('search-attributes'))}
+			</spel>
+		</script>
+		<setBody>
+			<spel>
+				#{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('get-order-lines-params'))}
+			</spel>
+		</setBody>
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+
+</routes>

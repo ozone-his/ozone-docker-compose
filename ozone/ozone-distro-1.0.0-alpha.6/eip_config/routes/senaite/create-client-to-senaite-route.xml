@@ -1,0 +1,56 @@
+<routes
+    xmlns="http://camel.apache.org/schema/spring">
+    <route id="create-client-to-senaite">
+        <from uri="direct:create-client-to-senaite"/>
+        
+        <log message="Creating client for order. " />
+
+         <to uri="direct:authenticate-to-senaite"/>
+                                
+        <setHeader name="CamelHttpMethod">
+            <constant>GET</constant>
+        </setHeader>
+        
+        <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/search?portal_type=Client&amp;getClientID=${exchangeProperty.patient-id}"/>
+        <unmarshal>
+            <json library="Jackson"/>
+        </unmarshal>
+        
+        <choice>
+            <when>
+                <jsonpath>$.[?(@.count==1)]</jsonpath>
+                
+                <setProperty name="client-uid">
+                    <jsonpath>$.items[0].uid</jsonpath>
+                </setProperty>
+                
+                <setProperty name="client-storage-path">
+                    <jsonpath>$.items[0].path</jsonpath>
+                </setProperty>
+            </when>
+            <otherwise>
+                <setBody>
+                    <simple>{"portal_type":"Client","title":"${exchangeProperty.patient-name-unique}","ClientID":"${exchangeProperty.patient-id}","parent_path":"/senaite/clients"}</simple>
+                </setBody>
+                
+                <setHeader name="CamelHttpMethod">
+                    <constant>POST</constant>
+                </setHeader>
+                
+                <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/create"/>
+                <unmarshal>
+                    <json library="Jackson"/>
+                </unmarshal>
+                
+                <setProperty name="client-uid">
+                    <jsonpath>$.items[0].uid</jsonpath>
+                </setProperty>
+                
+                <setProperty name="client-storage-path">
+                    <jsonpath>$.items[0].path</jsonpath>
+                </setProperty>
+            </otherwise>
+        </choice>
+        
+    </route>
+</routes>

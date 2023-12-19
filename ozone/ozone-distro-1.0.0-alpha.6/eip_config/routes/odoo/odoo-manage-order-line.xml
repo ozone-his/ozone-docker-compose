@@ -1,0 +1,102 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-manage-order-line" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-manage-order-line" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+		<setProperty name="request-data">
+			<spel>#{new java.util.ArrayList(2)}</spel>
+		</setProperty>
+
+		<choice>
+			<when>
+				<simple>${exchangeProperty.odoo-operation} == 'unlink'</simple>
+				<script>
+					<spel>
+						#{getProperty('request-data').add(new Object[]{getProperty('order-line').get('id')})}
+					</spel>
+				</script>
+			</when>
+			<otherwise>
+				<setProperty name="order-line-data">
+					<spel>#{new java.util.HashMap(3)}</spel>
+				</setProperty>
+
+				<when>
+					<simple>${exchangeProperty.odoo-operation} == 'create'</simple>
+					<script>
+						<spel>
+							#{getProperty('order-line-data').put('order_id', getProperty('quotation-id'))}
+							#{getProperty('order-line-data').put('product_id', getProperty('odooProductId'))}
+						</spel>
+					</script>
+				</when>
+				
+				<when>
+					<simple>${exchangeProperty.odoo-operation} == 'write'</simple>
+					<script>
+						<spel>
+							#{getProperty('request-data').add(new Object[]{getProperty('order-line').get('id')})}
+						</spel>
+					</script>
+				</when>
+				
+				<when>
+					<simple>${exchangeProperty.order-quantity} != null</simple>
+					<script>
+						<spel>
+							#{getProperty('order-line-data').put('product_uom_qty', getProperty('order-quantity'))}
+						</spel>
+					</script>
+				</when>
+
+                <when>
+                    <simple>${exchangeProperty.unitsId} != null</simple>
+                    <script>
+                        <spel>
+                            #{getProperty('order-line-data').put('product_uom', getProperty('unitsId'))}
+                        </spel>
+                    </script>
+                </when>
+
+                <when>
+                    <simple>${exchangeProperty.description} != null</simple>
+                    <script>
+                        <spel>
+                            #{getProperty('order-line-data').put('name', getProperty('description'))}
+                        </spel>
+                    </script>
+                </when>
+
+				<script>
+					<spel>
+						#{getProperty('request-data').add(getProperty('order-line-data'))}
+					</spel>
+				</script>
+			</otherwise>
+		</choice>
+		
+		<setProperty name="call-params">
+			<spel>#{new java.util.ArrayList(6)}</spel>
+		</setProperty>
+		<script>
+			<spel>
+				#{getProperty('call-params').add('{{odoo.database}}')}
+				#{getProperty('call-params').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+				#{getProperty('call-params').add('{{odoo.password}}')}
+				#{getProperty('call-params').add('sale.order.line')}
+				#{getProperty('call-params').add(getProperty('odoo-operation'))}
+				#{getProperty('call-params').add(getProperty('request-data'))}
+			</spel>
+		</script>
+		<setBody>
+			<spel>
+				#{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('call-params'))}
+			</spel>
+		</setBody>
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+
+</routes>

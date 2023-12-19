@@ -1,0 +1,253 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-process-order" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-process-order" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+        <setProperty name="isSubResource">
+            <simple>false</simple>
+        </setProperty>
+        <setProperty name="resourceName">
+            <simple>patient</simple>
+        </setProperty>
+        <setProperty name="resourceId">
+            <simple>${exchangeProperty.entity-instance.get('patient').get('uuid')}</simple>
+        </setProperty>
+
+        <log message="Fetching patient associated to the order from OpenMRS..." loggingLevel="DEBUG" />
+
+        <to uri="direct:get-entity-by-uuid-from-openmrs" />
+
+        <!-- TODO Check if no matching patient was found -->
+        <setProperty name="patient">
+            <jsonpath>$</jsonpath>
+        </setProperty>
+
+        <log message="Fetched patient -> ${exchangeProperty.patient}" loggingLevel="DEBUG" />
+
+        <setProperty name="createCustomerIfNotExist">
+            <spel>#{getProperty('is-new') == true || getProperty('entity-instance').get('action') == 'REVISE'}</spel>
+        </setProperty>
+        <setProperty name="skipCustomerUpdate">
+            <simple>true</simple>
+        </setProperty>
+
+        <to uri="direct:odoo-patient-handler" />
+
+        <setProperty name="isDcOrVoidedOrder">
+            <spel>#{getProperty('entity-instance').get('voided') == true || getProperty('entity-instance').get('action') == 'DISCONTINUE'}</spel>
+        </setProperty>
+        
+        <choice>
+            <when>
+                <simple>${exchangeProperty.isDcOrVoidedOrder} == true &amp;&amp; ${exchangeProperty.patient-odoo-id} == null</simple>
+                <log message="No action to take for a voided or discontinuation order because the patient has no customer record in odoo" />
+            </when>
+            <otherwise>
+                <!-- TODO Replace logic below with call to concept-to-order-line-processor route -->
+                <to uri="direct:odoo-get-draft-quotations" />
+
+                <log message="Found ${body.length} existing draft quotation(s) for the patient in Odoo" loggingLevel="DEBUG" />
+
+                <choice>
+                    <when>
+                        <simple>${body.length} > 1</simple>
+                        <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} existing draft quotation(s) for the same patient created by this system in odoo" />
+                    </when>
+                    <when>
+                        <simple>${body.length} == 0</simple>
+                        <when>
+                            <simple>${exchangeProperty.is-new} == true || ${exchangeProperty.entity-instance.get('action')} == 'REVISE'</simple>
+                            <setProperty name="odoo-operation">
+                                <simple>create</simple>
+                            </setProperty>
+
+                            <log message="Creating new quotation" />
+
+                            <to uri="direct:odoo-manage-quotation" />
+
+                            <setProperty name="quotation-id">
+                                <simple>${body}</simple>
+                            </setProperty>
+                            <setProperty name="order-line-count">
+                                <spel>#{T(java.lang.Integer).valueOf(0)}</spel>
+                            </setProperty>
+                        </when>
+                    </when>
+                    <otherwise>
+                        <log message="Existing draft quotation id: ${body[0].get('id')}" loggingLevel="DEBUG" />
+                        <setProperty name="quotation-id">
+                            <spel>#{T(java.lang.Integer).valueOf(body[0].get('id'))}</spel>
+                        </setProperty>
+                        <setProperty name="order-line-count">
+                            <spel>#{T(java.lang.Integer).valueOf(body[0].get('order_line').length)}</spel>
+                        </setProperty>
+
+                        <log message="Order line count on the existing draft quotation in odoo: ${exchangeProperty.order-line-count}" loggingLevel="DEBUG" />
+
+                        <when>
+                            <simple>${exchangeProperty.order-line-count} > 0</simple>
+                            <to uri="direct:odoo-get-order-line" />
+
+                            <choice>
+                                <when>
+                                    <simple>${body.length} > 1</simple>
+                                    <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} lines for the same product added to the draft quotation in odoo" />
+                                </when>
+                                <when>
+                                    <simple>${body.length} == 1</simple>
+                                    <log message="Found existing order line in odoo on the draft quotation for the orderable" />
+
+                                    <setProperty name="order-line">
+                                        <simple>${body[0]}</simple>
+                                    </setProperty>
+                                </when>
+                            </choice>
+                        </when>
+
+                        <when>
+                            <simple>${exchangeProperty.order-line} == null</simple>
+                            <log message="No order line found on the draft quotation in odoo" />
+                        </when>
+                    </otherwise>
+                </choice>
+
+                <choice>
+                    <when>
+                        <simple>${exchangeProperty.is-new} == true || ${exchangeProperty.entity-instance.get('action')} == 'REVISE'</simple>
+
+                        <setProperty name="seperator">
+                            <simple>${properties:orderline.description-seperator: | }</simple>
+                        </setProperty>
+
+                        <when>
+                            <simple>${exchangeProperty.is-drug-order} == true</simple>
+
+                            <setProperty name="order-quantity">
+                                <simple>${exchangeProperty.entity-instance.get('quantity')}</simple>
+                            </setProperty>
+                            <setProperty name="description">
+                                <simple>${exchangeProperty.entity-instance.get('drug').get('display')}</simple>
+                            </setProperty>
+
+                            <when>
+                                <simple>${exchangeProperty.order-quantity} != null</simple>
+                                <setProperty name="description">
+                                    <simple>${exchangeProperty.description}${exchangeProperty.seperator}${exchangeProperty.order-quantity} ${exchangeProperty.entity-instance.get('quantityUnits').get('display')}</simple>
+                                </setProperty>
+                                <setProperty name="modelName">
+                                    <simple>uom.uom</simple>
+                                </setProperty>
+                                <setProperty name="externalId">
+                                    <simple>${exchangeProperty.entity-instance.get('quantityUnits').get('uuid')}</simple>
+                                </setProperty>
+
+                                <to uri="direct:odoo-get-external-id-map" />
+
+                                <when>
+                                    <simple>${body.length} == 0</simple>
+                                    <throwException exceptionType="org.openmrs.eip.EIPException" message="No units of measure found in odoo mapped to uuid: ${exchangeProperty.externalId}" />
+                                </when>
+
+                                <when>
+                                    <simple>${body.length} > 1</simple>
+                                    <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} units of measure in odoo mapped to uuid: ${exchangeProperty.externalId}" />
+                                </when>
+
+                                <setProperty name="unitsId">
+                                    <simple>${body[0].get('res_id')}</simple>
+                                </setProperty>
+
+                                <log message="Odoo units of measure id: ${exchangeProperty.unitsId}" loggingLevel="DEBUG" />
+                            </when>
+
+                            <when>
+                                <simple>${exchangeProperty.entity-instance.get('dose')} != null</simple>
+                                <setProperty name="description">
+                                    <simple>${exchangeProperty.description}${exchangeProperty.seperator}${exchangeProperty.entity-instance.get('dose')} ${exchangeProperty.entity-instance.get('doseUnits').get('display')}</simple>
+                                </setProperty>
+                                <setProperty name="seperator">
+                                    <spel>#{' - '}</spel>
+                                </setProperty>
+                            </when>
+
+                            <when>
+                                <simple>${exchangeProperty.entity-instance.get('frequency')} != null</simple>
+                                <setProperty name="description">
+                                    <simple>${exchangeProperty.description}${exchangeProperty.seperator}${exchangeProperty.entity-instance.get('frequency').get('display')}</simple>
+                                </setProperty>
+                                <setProperty name="seperator">
+                                    <spel>#{' - '}</spel>
+                                </setProperty>
+                            </when>
+
+                            <when>
+                                <simple>${exchangeProperty.entity-instance.get('duration')} != null</simple>
+                                <setProperty name="description">
+                                    <simple>${exchangeProperty.description}${exchangeProperty.seperator}${exchangeProperty.entity-instance.get('duration')} ${exchangeProperty.entity-instance.get('durationUnits').get('display')}</simple>
+                                </setProperty>
+                                <setProperty name="seperator">
+                                    <spel>#{' - '}</spel>
+                                </setProperty>
+                            </when>
+
+                            <when>
+                                <simple>${exchangeProperty.entity-instance.get('dosingInstructions')} != null</simple>
+                                <setProperty name="description">
+                                    <simple>${exchangeProperty.description}${exchangeProperty.seperator}${exchangeProperty.entity-instance.get('dosingInstructions')}</simple>
+                                </setProperty>
+                                <setProperty name="seperator">
+                                    <spel>#{' - '}</spel>
+                                </setProperty>
+                            </when>
+
+                        </when>
+
+                        <setProperty name="seperator">
+                            <simple>${properties:orderline.description-seperator: | }</simple>
+                        </setProperty>
+
+                        <when>
+                            <simple>${exchangeProperty.entity-instance.get('type')} == 'testorder' || ${exchangeProperty.entity-instance.get('type')} == 'order'</simple>
+                            <setProperty name="description">
+                                <simple>${exchangeProperty.entity-instance.get('display')}</simple>
+                            </setProperty>
+                        </when>
+
+                        <when>
+                            <simple>${exchangeProperty.entity-instance.get('commentToFulfiller')} != null</simple>
+                            <setProperty name="description">
+                                <simple>${exchangeProperty.description}${exchangeProperty.seperator}Notes: ${exchangeProperty.entity-instance.get('commentToFulfiller')}</simple>
+                            </setProperty>
+                        </when>
+                    
+                        <when>
+                            <simple>${exchangeProperty.entity-instance.get('orderer')} != null</simple>
+                            <setProperty name="description">
+                                <simple>${exchangeProperty.description}${exchangeProperty.seperator}Orderer: ${exchangeProperty.entity-instance.get('orderer').get('display').split(' - ')[1]}</simple>
+                            </setProperty>
+                        </when>
+
+                        <choice>
+                            <when>
+                                <simple>${exchangeProperty.is-new} == true</simple>
+                                <to uri="direct:odoo-process-new-order" />
+                            </when>
+                            <otherwise>
+                                <to uri="direct:odoo-process-revision-order" />
+                            </otherwise>
+                        </choice>
+                    </when>
+                    <otherwise>
+                        <!-- This is a DC order or a voided (NEW, RENEW, REVISE) order -->
+                        <to uri="direct:odoo-process-dc-or-voided-order" />
+                    </otherwise>
+                </choice>
+            </otherwise>
+        </choice>
+        
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+
+</routes>

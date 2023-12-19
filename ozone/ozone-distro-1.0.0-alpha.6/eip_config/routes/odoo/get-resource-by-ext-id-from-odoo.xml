@@ -1,0 +1,69 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!--
+        Gets a resource from odoo matching the specified external id and modelName
+
+        @param externalId (String) - The external id of the resource to match
+        @param modelName (String) - The name of the model to match
+
+        @bodyOut (Map) - The resource if a match is found otherwise null
+    -->
+
+	<route id="get-resource-by-ext-id-from-odoo" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:get-resource-by-ext-id-from-odoo" />
+
+        <log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+
+        <setProperty name="${routeId}-extId">
+            <simple>${body.get('externalId')}</simple>
+        </setProperty>
+        <setProperty name="${routeId}-modelName">
+            <simple>${body.get('modelName')}</simple>
+        </setProperty>
+
+        <setProperty name="externalId">
+            <exchangeProperty>${routeId}-extId</exchangeProperty>
+        </setProperty>
+        <setProperty name="modelName">
+            <exchangeProperty>${routeId}-modelName</exchangeProperty>
+        </setProperty>
+        
+        <to uri="direct:odoo-get-external-id-map" />
+
+        <when>
+            <simple>${body.length} > 1</simple>
+            <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} resources(${exchangeProperty.${routeId}-modelName}) in odoo mapped to external id: ${exchangeProperty.${routeId}-extId}" />
+        </when>
+
+        <choice>
+            <when>
+                <simple>${body.length} == 0</simple>
+                <setBody>
+                    <simple>${null}</simple>
+                </setBody>
+            </when>
+            <otherwise>
+                <setProperty name="${routeId}-resId">
+                    <simple>${body[0].get('res_id')}</simple>
+                </setProperty>
+
+                <log loggingLevel="DEBUG" message="Resource id: ${exchangeProperty.${routeId}-resId}" />
+
+                <setBody>
+                    <spel>#{new java.util.HashMap()}</spel>
+                </setBody>
+                <script>
+                    <simple>
+                        ${body.put('id', ${exchangeProperty.${routeId}-resId})}
+                        ${body.put('modelName', ${exchangeProperty.${routeId}-modelName})}
+                    </simple>
+                </script>
+
+                <to uri="direct:get-resource-by-id-from-odoo" />
+            </otherwise>
+        </choice>
+
+		<log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+	</route>
+
+</routes>

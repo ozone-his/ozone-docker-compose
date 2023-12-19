@@ -1,0 +1,101 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="concept-to-order-line-processor" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:concept-to-order-line-processor" />
+
+		<log loggingLevel="DEBUG" message="Start: route with id ${routeId}" />
+
+        <setProperty name="modelName">
+            <simple>product.product</simple>
+        </setProperty>
+        <setProperty name="externalId">
+            <simple>${exchangeProperty.orderLineConcept.get('uuid')}</simple>
+        </setProperty>
+
+        <to uri="direct:odoo-get-external-id-map" />
+
+        <when>
+            <simple>${body.length} == 0</simple>
+            <throwException exceptionType="org.openmrs.eip.EIPException" message="No product found in odoo mapped to uuid: ${exchangeProperty.externalId}" />
+        </when>
+
+        <when>
+            <simple>${body.length} > 1</simple>
+            <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} products in odoo mapped to uuid: ${exchangeProperty.externalId}" />
+        </when>
+
+        <setProperty name="odooProductId">
+            <simple>${body[0].get('res_id')}</simple>
+        </setProperty>
+
+        <log loggingLevel="DEBUG" message="Odoo product id: ${exchangeProperty.odooProductId}" />
+
+        <to uri="direct:odoo-get-draft-quotations" />
+
+        <log loggingLevel="DEBUG" message="Found ${body.length} existing draft quotation(s) for the patient in Odoo" />
+
+        <choice>
+            <when>
+                <simple>${body.length} > 1</simple>
+                <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} existing draft quotation(s) for the same patient in odoo" />
+            </when>
+            <when>
+                <simple>${body.length} == 0</simple>
+                <when>
+                    <simple>${exchangeProperty.createQuoteIfNotExist} == true</simple>
+                    <setProperty name="odoo-operation">
+                        <simple>create</simple>
+                    </setProperty>
+
+                    <log message="Creating new quotation" />
+
+                    <to uri="direct:odoo-manage-quotation" />
+
+                    <setProperty name="quotation-id">
+                        <simple>${body}</simple>
+                    </setProperty>
+                    <setProperty name="orderLineCount">
+                        <spel>#{T(java.lang.Integer).valueOf(0)}</spel>
+                    </setProperty>
+                </when>
+            </when>
+            <otherwise>
+                <log loggingLevel="DEBUG" message="Existing draft quotation id: ${body[0].get('id')}" />
+                <setProperty name="quotation-id">
+                    <spel>#{T(java.lang.Integer).valueOf(body[0].get('id'))}</spel>
+                </setProperty>
+                <setProperty name="orderLineCount">
+                    <spel>#{T(java.lang.Integer).valueOf(body[0].get('order_line').length)}</spel>
+                </setProperty>
+
+                <log loggingLevel="DEBUG" message="Item count on the existing draft quotation in odoo: ${exchangeProperty.orderLineCount}" />
+
+                <when>
+                    <simple>${exchangeProperty.orderLineCount} > 0</simple>
+                    <to uri="direct:odoo-get-order-line" />
+
+                    <choice>
+                        <when>
+                            <simple>${body.length} > 1</simple>
+                            <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} items for the same product added to the draft quotation in odoo" />
+                        </when>
+                        <when>
+                            <simple>${body.length} == 1</simple>
+                            <log message="Found existing item in odoo on the draft quotation" />
+
+                            <setProperty name="order-line">
+                                <simple>${body[0]}</simple>
+                            </setProperty>
+                        </when>
+                    </choice>
+                </when>
+
+                <when>
+                    <simple>${exchangeProperty.order-line} == null</simple>
+                    <log message="No item found on the existing draft quotation in odoo" />
+                </when>
+            </otherwise>
+        </choice>
+
+		<log loggingLevel="DEBUG" message="End: route with id ${routeId}" />
+    </route>
+</routes>

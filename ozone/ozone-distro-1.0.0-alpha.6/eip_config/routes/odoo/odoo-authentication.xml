@@ -1,0 +1,49 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="odoo-authentication" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:odoo-authentication" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+        <log message="Authenticating with odoo as {{odoo.username}} to database: {{odoo.database}}" />
+
+        <!-- TODO Register the client, config and odo user id in a custom spring bean so that we don't create them each time-->
+
+        <setProperty name="xmlrpc-client-config">
+            <spel>#{new org.apache.xmlrpc.client.XmlRpcClientConfigImpl()}</spel>
+        </setProperty>
+        <setProperty name="xmlrpc-client">
+            <spel>#{new org.apache.xmlrpc.client.XmlRpcClient()}</spel>
+        </setProperty>
+        <script>
+            <spel>
+                #{getProperty('xmlrpc-client-config').setServerURL(new java.net.URL('{{odoo.baseUrl}}/xmlrpc/2/common'))}
+            </spel>
+        </script>
+        <setProperty name="auth-params">
+            <spel>#{new java.util.ArrayList(4)}</spel>
+        </setProperty>
+        <script>
+            <spel>
+                #{getProperty('auth-params').add('{{odoo.database}}')}
+                #{getProperty('auth-params').add('{{odoo.username}}')}
+                #{getProperty('auth-params').add('{{odoo.password}}')}
+                #{getProperty('auth-params').add({})}
+            </spel>
+        </script>
+        <setBody>
+            <spel>
+                #{getProperty('xmlrpc-client').execute(getProperty('xmlrpc-client-config'), 'authenticate', getProperty('auth-params'))}
+            </spel>
+        </setBody>
+
+        <when>
+            <simple>${body} == false</simple>
+            <throwException exceptionType="org.openmrs.eip.EIPException" message="Invalid odoo username, password or database" />
+        </when>
+
+        <log message="Successfully authenticated with odoo!" />
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+    </route>
+
+</routes>

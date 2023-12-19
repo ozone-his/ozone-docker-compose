@@ -1,0 +1,123 @@
+<routes
+    xmlns="http://camel.apache.org/schema/spring">
+    <route id="cancel-order-to-senaite">
+        <from uri="direct:cancel-order-to-senaite"/>
+        <log message="Cancelling lab order:  '${body}'" />
+        
+        <setProperty name="order-to-cancel">
+            <simple>${body}</simple>
+        </setProperty>
+        
+        <to uri="direct:authenticate-to-senaite"/>
+        
+        <setHeader name="Content-Type">
+            <constant>application/json</constant>
+        </setHeader>
+        
+        <setHeader name="CamelHttpMethod">
+            <constant>GET</constant>
+        </setHeader>
+        
+        <!-- Fetching cancelled lab order if it exists from SENAITE-->
+        <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/search?getClientSampleID=${exchangeProperty.order-to-cancel}&amp;catalog=senaite_catalog_sample&amp;complete=true&amp;review_state=cancelled"/>
+        <unmarshal>
+            <json library="Jackson"/>
+        </unmarshal>
+        
+        <choice>
+            <!-- Check if lab order is not yet cancelled  -->
+            <when>
+                <jsonpath>$.[?(@.count==0)]</jsonpath>
+                
+                <!-- Proceed to cancel lab order -->
+                <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/search?getClientSampleID=${exchangeProperty.order-to-cancel}&amp;catalog=senaite_catalog_sample&amp;complete=true"/>
+                <unmarshal>
+                    <json library="Jackson"/>
+                </unmarshal>
+                
+                <choice>
+                    <when>
+                        <jsonpath>$.[?(@.count==1)]</jsonpath>
+                        
+                        <setProperty name="sample-uid">
+                            <jsonpath>$.items[0].uid</jsonpath>
+                        </setProperty>
+                        
+                        <setProperty name="client-uid">
+                            <jsonpath>$.items[0].getClientUID</jsonpath>
+                        </setProperty>
+                        
+                        <setHeader name="CamelHttpMethod">
+                            <constant>POST</constant>
+                        </setHeader>
+                        
+                        <choice>
+                            <when>
+                                <!-- First transition registered order to sample_due state on SENAITE -->
+                                <jsonpath>$.[?(@.items[0].review_state == 'sample_registered')]</jsonpath>
+                                
+                                <setBody>
+                                    <simple>{"uid": "${exchangeProperty.sample-uid}", "Client": "${exchangeProperty.client-uid}", "transition": "no_sampling_workflow"}</simple>
+                                </setBody>
+                                
+                                <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/update?throwExceptionOnFailure=false"/>
+                                <unmarshal>
+                                    <json library="Jackson"/>
+                                </unmarshal>
+                                
+                                <choice>
+                                    <!-- Add date sampled if persisting state fails -->
+                                    <when>
+                                        <jsonpath>$.[?(@.success == false &amp;&amp; @.message contains 'Date Sampled is required')] </jsonpath>
+                                        
+                                        <setProperty name="current-date">
+                                            <spel>#{new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new java.util.Date())}</spel>
+                                        </setProperty>
+                                        
+                                        <setBody>
+                                            <simple>{"uid": "${exchangeProperty.sample-uid}", "Client": "${exchangeProperty.client-uid}", "DateSampled": "${exchangeProperty.current-date}", "transition": "no_sampling_workflow"}</simple>
+                                        </setBody>
+                                        
+                                        <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/update?throwExceptionOnFailure=false"/>
+                                    </when>
+                                </choice>
+                            </when>
+                        </choice>
+                        
+                        <setBody>
+                            <simple>{"uid": "${exchangeProperty.sample-uid}", "Client": "${exchangeProperty.client-uid}", "transition": "cancel"}</simple>
+                        </setBody>
+                        
+                        <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/update?throwExceptionOnFailure=false"/>
+                        <unmarshal>
+                            <json library="Jackson"/>
+                        </unmarshal>
+                        
+                        <choice>
+                            <!-- Add date sampled if persisting state fails -->
+                            <when>
+                                <jsonpath>$.[?(@.success == false &amp;&amp; @.message contains 'Date Sampled is required')] </jsonpath>
+                                
+                                <setProperty name="current-date">
+                                    <spel>#{new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new java.util.Date())}</spel>
+                                </setProperty>
+                                
+                                <setBody>
+                                    <simple>{"uid": "${exchangeProperty.sample-uid}", "Client": "${exchangeProperty.client-uid}", "DateSampled": "${exchangeProperty.current-date}", "transition": "cancel"}</simple>
+                                </setBody>
+                                
+                                <toD cacheSize="-1" uri="{{senaite.baseUrl}}/@@API/senaite/v1/update"/>
+                            </when>
+                        </choice>
+                    </when>
+                    <when>
+                        <jsonpath>$.[?(@.count > 1)]</jsonpath>
+                        
+                        <log message="Could not cancel order identified by: '${exchangeProperty.order-to-cancel}' due to multiple orders existing with same identifier on SENAITE" />
+                        <!-- Maybe throw an error -->
+                    </when>
+                </choice>
+            </when>
+        </choice>
+    </route>
+</routes>

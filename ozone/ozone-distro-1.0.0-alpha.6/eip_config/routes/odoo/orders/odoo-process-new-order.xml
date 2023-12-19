@@ -1,0 +1,33 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-process-new-order" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-process-new-order" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+		<when>
+			<simple>${exchangeProperty.order-line} != null &amp;&amp; ${exchangeProperty.event.tableName} == 'orders'</simple>
+			<!-- TODO may be update the existing -->
+			<throwException exceptionType="org.openmrs.eip.EIPException" message="There is already an existing order line on the quotation for the same orderable in odoo" />
+		</when>
+
+        <choice>
+            <when>
+                <simple>${exchangeProperty.event.tableName} == 'orders'</simple>
+                <setProperty name="odoo-operation">
+                    <simple>create</simple>
+                </setProperty>
+
+                <log message="Adding new order line for the orderable to the quotation" />
+
+                <to uri="direct:odoo-manage-order-line" />
+            </when>
+            <otherwise>
+                <log message="Ignoring event for new order from subclass table: ${exchangeProperty.event.tableName}" />
+            </otherwise>
+        </choice>
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+
+</routes>

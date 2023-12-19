@@ -1,0 +1,194 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="odoo-event-listener" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:odoo-event-listener" />
+
+        <log message="Received DB event: ${exchangeProperty.event}" loggingLevel="DEBUG" />
+
+		<setProperty name="tables-resource-map">
+			<spel>#{new java.util.HashMap(6)}</spel>
+		</setProperty>
+
+		<script>
+			<spel>
+				#{getProperty('tables-resource-map').put('patient', 'patient')}
+				#{getProperty('tables-resource-map').put('person_name', 'name')}
+				#{getProperty('tables-resource-map').put('person_address', 'address')}
+                #{getProperty('tables-resource-map').put('patient_identifier', 'identifier')}
+			</spel>
+		</script>
+
+        <split parallelProcessing="false">
+            <simple>{{odoo.custom.table.resource.mappings}}</simple>
+            <script>
+                <spel>
+                    #{getProperty('tables-resource-map').put(body.split(":")[0].trim(), body.split(":")[1].trim())}
+                </spel>
+            </script>
+        </split>
+
+        <log loggingLevel="DEBUG" message="tables-resource-map -> ${exchangeProperty.tables-resource-map}"/>
+
+        <when>
+            <simple>${exchangeProperty.event.snapshot} == false &amp;&amp; ${exchangeProperty.tables-resource-map.containsKey(${exchangeProperty.event.tableName})} == true</simple>
+            <log message="Processing event..." />
+
+            <setProperty name="isSubResource">
+                <spel>#{getProperty('event').tableName == 'person_name' || getProperty('event').tableName == 'person_address' || getProperty('event').tableName == 'patient_identifier'}</spel>
+            </setProperty>
+            
+            <choice>
+                <when>
+                    <simple>${exchangeProperty.isSubResource} == true</simple>
+                    <log message="Fetching uuid for associated patient record" />
+
+                    <choice>
+                        <when>
+                            <simple>${exchangeProperty.event.tableName} == 'patient_identifier'</simple>
+                            <setProperty name="resourceName">
+                                <simple>patient</simple>
+                            </setProperty>
+                            <setProperty name="lookUpColumn">
+                                <simple>patient_id</simple>
+                            </setProperty>
+                        </when>
+                        <otherwise>
+                            <setProperty name="resourceName">
+                                <simple>person</simple>
+                            </setProperty>
+                            <setProperty name="lookUpColumn">
+                                <simple>person_id</simple>
+                            </setProperty>
+                        </otherwise>
+                    </choice>
+
+                    <toD uri="sql:SELECT uuid FROM person WHERE person_id = (SELECT t.${exchangeProperty.lookUpColumn} FROM ${exchangeProperty.event.tableName} t WHERE t.uuid = '${exchangeProperty.event.identifier}')?dataSource=openmrsDataSource" />
+
+                    <!-- TODO Check if no row was found -->
+
+                    <setProperty name="resourceId">
+                        <simple>${body[0].get('uuid')}</simple>
+                    </setProperty>
+                    <setProperty name="subResourceName">
+                        <spel>#{getProperty("tables-resource-map").get(getProperty('event').tableName)}</spel>
+                    </setProperty>
+                    <setProperty name="subResourceId">
+                        <simple>${exchangeProperty.event.identifier}</simple>
+                    </setProperty>
+                </when>
+                <otherwise>
+                    <setProperty name="resourceName">
+                        <spel>#{getProperty("tables-resource-map").get(getProperty('event').tableName)}</spel>
+                    </setProperty>
+                    <setProperty name="resourceId">
+                        <simple>${exchangeProperty.event.identifier}</simple>
+                    </setProperty>
+                </otherwise>
+            </choice>
+
+            <process ref="oauthProcessor" />
+
+            <log message="Fetching resource from OpenMRS..." loggingLevel="DEBUG" />
+            
+            <to uri="direct:get-entity-by-uuid-from-openmrs" />
+
+            <choice>
+                <when>
+                    <simple>${body} != null</simple>
+                    <setProperty name="entity-instance">
+                        <jsonpath>$</jsonpath>
+                    </setProperty>
+
+                    <log message="Fetched resource -> ${exchangeProperty.entity-instance}" loggingLevel="DEBUG" />
+
+                    <setProperty name="xmlRpcClientKey">
+                        <simple>${routeId}-xmlRpcClient</simple>
+                    </setProperty>
+                    <setProperty name="xmlRpcConfigKey">
+                        <simple>${routeId}-xmlRpcConfig</simple>
+                    </setProperty>
+                    <setProperty name="odooUserIdKey">
+                        <simple>${routeId}-odooUserId</simple>
+                    </setProperty>
+
+                    <when>
+                        <spel>#{T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')) == null}</spel>
+
+                        <to uri="direct:odoo-authentication" />
+
+                        <script>
+                            <spel>
+                                #{T(org.openmrs.eip.AppContext).add(getProperty('odooUserIdKey'), body)}
+                            </spel>
+                        </script>
+                    </when>
+
+                    <when>
+                        <spel>#{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')) == null}</spel>
+                        <script>
+                            <spel>
+                                #{T(org.openmrs.eip.AppContext).add(getProperty('xmlRpcClientKey'), new org.apache.xmlrpc.client.XmlRpcClient())}
+                                #{T(org.openmrs.eip.AppContext).add(getProperty('xmlRpcConfigKey'), new org.apache.xmlrpc.client.XmlRpcClientConfigImpl())}
+                                #{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')).setServerURL(new java.net.URL('{{odoo.baseUrl}}/xmlrpc/2/object'))}
+                            </spel>
+                        </script>
+
+                    </when>
+
+                    <choice>
+                        <when>
+                            <simple>${exchangeProperty.event.tableName} != 'patient' &amp;&amp; ${exchangeProperty.event.tableName} != 'person_name' &amp;&amp; ${exchangeProperty.event.tableName} != 'person_address' &amp;&amp; ${exchangeProperty.event.tableName} != 'patient_identifier'</simple>
+                            <log message="Invoking handler route -> {{odoo.handler.route}}" />
+
+                            <to uri="direct:{{odoo.handler.route}}" />
+                        </when>
+                        <when>
+                            <simple>${exchangeProperty.event.tableName} == 'patient'</simple>
+                            <setProperty name="patient">
+                                <simple>${exchangeProperty.entity-instance}</simple>
+                            </setProperty>
+                            
+                            <log message="Processing Patient" loggingLevel="DEBUG" />
+
+                            <to uri="direct:odoo-patient-handler" />
+                        </when>
+                        <when>
+                            <simple>${exchangeProperty.isSubResource} == true</simple>
+                            <choice>
+                                <when>
+                                    <simple>${exchangeProperty.event.tableName} == 'person_name'</simple>
+                                    <setProperty name="patientAssociationName">
+                                        <simple>Person Name</simple>
+                                    </setProperty>
+                                </when>
+                                <when>
+                                    <simple>${exchangeProperty.event.tableName} == 'person_address'</simple>
+                                    <setProperty name="patientAssociationName">
+                                        <simple>Person Address</simple>
+                                    </setProperty>
+                                </when>
+                                <otherwise>
+                                    <setProperty name="patientAssociationName">
+                                        <simple>Patient Identifier</simple>
+                                    </setProperty>
+                                </otherwise>
+                            </choice>
+
+                            <log message="Processing ${exchangeProperty.patientAssociationName}" loggingLevel="DEBUG" />
+
+                            <to uri="direct:odoo-patient-association-handler" />
+                        </when>
+                    </choice>
+
+                    <log message="Done processing event!" />
+                </when>
+                <otherwise>
+                    <!-- TODO entity was most likely deleted, why?-->
+                    <log message="No entity found with uuid: ${exchangeProperty.event.identifier}" loggingLevel="WARN" />
+                </otherwise>
+            </choice>
+        </when>
+        
+    </route>
+
+</routes>

@@ -1,0 +1,36 @@
+<routes
+    xmlns="http://camel.apache.org/schema/spring">
+    <route id="process-servicerequest-task-state">
+        <from uri="direct:process-servicerequest-task-state"/>
+        
+        <log message="Processing FHIR Task state for order." />
+
+        <choice>
+            <when>
+                <jsonpath>$.[?(@.items[0].review_state=='sample_due')]</jsonpath>
+                <setProperty name="service-request-transitioned-status">
+                    <simple>requested</simple>
+                </setProperty> 
+            </when>
+            <when>
+                <jsonpath>$.[?(@.items[0].review_state=='sample_received')]</jsonpath>
+                <setProperty name="service-request-transitioned-status">
+                    <simple>accepted</simple>
+                </setProperty>
+            </when>
+            <when>
+                <jsonpath>$.[?(@.items[0].review_state=='published')]</jsonpath>
+                <setProperty name="service-request-transitioned-status">
+                    <simple>completed</simple>
+                </setProperty>
+            </when>
+            <when>
+                <jsonpath>$.[?(@.items[0].review_state=='cancelled')]</jsonpath>
+                <setProperty name="service-request-transitioned-status">
+                    <simple>rejected</simple>
+                </setProperty>
+            </when>
+        </choice>
+        
+    </route>
+</routes>

@@ -1,0 +1,97 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="odoo-process-person-address" errorHandlerRef="watcherErrorHandler">
+        <from uri="direct:odoo-process-person-address" />
+
+        <log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+        <setProperty name="isSubResource">
+            <simple>true</simple>
+        </setProperty>
+        <setProperty name="resourceName">
+            <simple>person</simple>
+        </setProperty>
+        <setProperty name="resourceId">
+            <simple>${exchangeProperty.patient.get('uuid')}</simple>
+        </setProperty>
+        <setProperty name="subResourceName">
+            <simple>address</simple>
+        </setProperty>
+        <setProperty name="subResourceId">
+            <simple>${exchangeProperty.preferredAddress.get('uuid')}</simple>
+        </setProperty>
+
+        <log message="Fetching patient address from OpenMRS" />
+
+        <to uri="direct:get-entity-by-uuid-from-openmrs" />
+
+        <!-- TODO check if no record was found -->
+        <setProperty name="personAddress">
+            <jsonpath>$</jsonpath>
+        </setProperty>
+
+        <log loggingLevel="DEBUG" message="Fetched address: ${exchangeProperty.personAddress}" />
+
+        <when>
+            <simple>${exchangeProperty.personAddress.get('stateProvince')} != null</simple>
+            <setProperty name="stateName">
+                <simple>${exchangeProperty.personAddress.get('stateProvince')}</simple>
+            </setProperty>
+
+            <log message="Fetching state details from Odoo" />
+
+            <to uri="direct:odoo-get-state" />
+
+            <when>
+                <simple>${body.length} > 1</simple>
+                <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} states in odoo matching name: ${exchangeProperty.stateName}" />
+            </when>
+
+            <choice>
+                <when>
+                    <simple>${body.length} == 0</simple>
+                    <log message="No state found in odoo matching name: ${exchangeProperty.stateName}" loggingLevel="WARN" />
+                </when>
+                <otherwise>
+                    <setProperty name="odooStateId">
+                        <simple>${body[0]}</simple>
+                    </setProperty>
+
+                    <log message="Odoo state id: ${exchangeProperty.odooStateId}" loggingLevel="DEBUG" />
+                </otherwise>
+            </choice>
+        </when>
+        <when>
+            <simple>${exchangeProperty.personAddress.get('country')} != null</simple>
+            <setProperty name="countryName">
+                <simple>${exchangeProperty.personAddress.get('country')}</simple>
+            </setProperty>
+
+            <log message="Fetching country details from Odoo" />
+
+            <to uri="direct:odoo-get-country" />
+
+            <when>
+                <simple>${body.length} > 1</simple>
+                <throwException exceptionType="org.openmrs.eip.EIPException" message="Found ${body.length} countries in odoo matching name: ${exchangeProperty.countryName}" />
+            </when>
+
+            <choice>
+                <when>
+                    <simple>${body.length} == 0</simple>
+                    <log message="No country found in odoo matching name: ${exchangeProperty.countryName}" loggingLevel="WARN" />
+                </when>
+                <otherwise>
+                    <setProperty name="odooCountryId">
+                        <simple>${body[0]}</simple>
+                    </setProperty>
+
+                    <log message="Odoo country id: ${exchangeProperty.odooCountryId}" loggingLevel="DEBUG" />
+                </otherwise>
+            </choice>
+        </when>
+
+        <log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+    </route>
+
+</routes>

@@ -1,0 +1,36 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+	<route id="odoo-get-quotations" errorHandlerRef="watcherErrorHandler">
+		<from uri="direct:odoo-get-quotations" />
+
+		<log message="Start: route with id ${routeId}" loggingLevel="DEBUG" />
+
+		<setProperty name="partnerIdCriterion">
+			<spel>#{new Object[]{'partner_id', '=', getProperty('patient-odoo-id')}}</spel>
+		</setProperty>
+		<setProperty name="searchQuery">
+			<spel>#{new Object[]{new Object[]{getProperty('partnerIdCriterion')}}}</spel>
+		</setProperty>
+		<setProperty name="getQuotationParams">
+			<spel>#{new java.util.ArrayList(6)}</spel>
+		</setProperty>
+		<script>
+			<spel>
+				#{getProperty('getQuotationParams').add('{{odoo.database}}')}
+				#{getProperty('getQuotationParams').add(T(org.openmrs.eip.AppContext).get(getProperty('odooUserIdKey')))}
+				#{getProperty('getQuotationParams').add('{{odoo.password}}')}
+				#{getProperty('getQuotationParams').add('sale.order')}
+				#{getProperty('getQuotationParams').add('search')}
+				#{getProperty('getQuotationParams').add(getProperty('searchQuery'))}
+			</spel>
+		</script>
+		<setBody>
+			<spel>
+				#{T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcClientKey')).execute(T(org.openmrs.eip.AppContext).get(getProperty('xmlRpcConfigKey')), 'execute_kw', getProperty('getQuotationParams'))}
+			</spel>
+		</setBody>
+
+		<log message="End: route with id ${routeId}" loggingLevel="DEBUG" />
+	</route>
+
+</routes>
