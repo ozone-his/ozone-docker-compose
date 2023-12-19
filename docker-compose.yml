@@ -454,7 +454,13 @@ services:
      interval: 30s
      timeout: 30s
      retries: 3
-
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.openhim-core.rule=Host(`${OPENHIM_HOSTNAME}`)"
+      - "traefik.http.routers.openhim-core.entrypoints=websecure"
+      - "traefik.http.routers.openhim-core.tls=true"
+      - "traefik.http.services.openhim-core.loadbalancer.server.port=8080"
+    
   openhim-console:
     container_name: openhim-console
     image: jembi/openhim-console:latest
@@ -470,6 +476,12 @@ services:
      interval: 30s
      timeout: 30s
      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.openhim-console.rule=Host(`${OPENHIM_HOSTNAME}`)"
+      - "traefik.http.routers.openhim-console.entrypoints=websecure"
+      - "traefik.http.routers.openhim-console.tls=true"
+      - "traefik.http.services.openhim-console.loadbalancer.server.port=80"
 
   ####
   # OpenELIS
@@ -538,7 +550,15 @@ services:
     secrets:
         - source: datasource.password
         - source: common.properties
-            
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.openelis.rule=Host(`${OPENELIS_HOSTNAME}`)"
+      - "traefik.http.routers.openelis.entrypoints=websecure"
+      - "traefik.http.routers.openelis.tls=true"
+      - "traefik.http.services.openelis.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.openelis-stripprefix.stripprefix.prefixes=/OpenELIS-Global"
+      - "traefik.http.routers.openelis.middlewares=openelis-stripprefix@docker"
+
   fhir.openelis.org:
     container_name: external-fhir-api
     image: hapiproject/hapi:v5.5.1

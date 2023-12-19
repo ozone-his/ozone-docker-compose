@@ -27,8 +27,8 @@ mkdir -p $EIP_PATH/config/demo
 
 cp ./demo/eip/routes/generate-demo-data-route.xml $EIP_PATH/routes/demo/
 cp ./demo/eip/config/application.properties $EIP_PATH/config/demo/
-cp ./openmrs/custom_modules/event-2.10.0.omod $OPENMRS_MODULES_PATH/
-cp ./openmrs/custom_modules/labonfhir-1.2.1.omod $OPENMRS_MODULES_PATH/
+rm $OPENMRS_MODULES_PATH/addresshierarchy*.omod
+cp ./openmrs/custom_modules/*.omod $OPENMRS_MODULES_PATH/
 cp -R -f ./openmrs/openmrs_config $DISTRO_PATH/
 cp -R -f ./openmrs/frontend $OZONE_CONFIG_PATH/
 

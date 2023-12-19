@@ -118,23 +118,23 @@
     "externalRefLinks": [
       {
         "title": "OpenELIS",
-        "redirect": "https://localhost:8443/OpenELIS-Global"
+        "redirect": "https://openelis.clinicplusurgentcare.com"
       },
       {
         "title": "OpenHIM",
-        "redirect": "http://openhim.clinicplusurgentcare.com.localhost/"
+        "redirect": "https://openhim.clinicplusurgentcare.com"
       },
       {
         "title": "senaite",
-        "redirect": "http://senaite.clinicplusurgentcare.com.localhost/"
+        "redirect": "https://senaite.clinicplusurgentcare.com"
       },
       {
         "title": "odoo",
-        "redirect": "http://odoo.clinicplusurgentcare.com.localhost/"
+        "redirect": "https://odoo.clinicplusurgentcare.com"
       },
       {
         "title": "Superset",
-        "redirect": "http://superset.clinicplusurgentcare.com.localhost"
+        "redirect": "https://superset.clinicplusurgentcare.com"
       }
     ]
 
