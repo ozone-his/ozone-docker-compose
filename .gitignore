@@ -16,3 +16,6 @@ target/
 
 # IDE
 .vscode
+
+## IntelliJ IDEA
+.idea/
