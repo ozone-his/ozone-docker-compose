@@ -17,7 +17,7 @@ When ready Gitpod will launch the tab for OpenMRS 3.
 Clone the repo
 ```bash
 git clone https://github.com/ozone-his/ozone-docker
-cd ozone-docker
+cd ozone-desh-docker
 ```
 
 Build
