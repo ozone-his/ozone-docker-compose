@@ -1,10 +1,10 @@
-name: Build and Publish
+name: Build
 
 on:
   push:
 jobs:
   build-and-publish:
-    uses: mekomsolutions/mekom-github-workflow-maven/.github/workflows/build-publish-workflow.yml@main
+    uses: ./.github/actions/desh-build-workflow.yml
     with:
       webhook-url: https://openmrs-cd.mekomsolutions.net/generic-webhook-trigger/invoke
     secrets:

@@ -1,0 +1,105 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      maven-args:
+        required: false
+        type: string
+      webhook-url:
+        required: true
+        type: string
+      ref:
+        required: false
+        type: string
+      java-version:
+        required: false
+        type: string
+        default: '8'
+      notify-ocd3:
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      NEXUS_USERNAME:
+        required: true
+      NEXUS_PASSWORD:
+        required: true
+      OCD3_USERNAME:
+        required: true
+      OCD3_PASSWORD:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK ${{ inputs.java-version }}
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '${{ inputs.java-version }}'
+          cache: "maven"
+      - name: Build
+        run: "mvn --batch-mode clean package ${{ inputs.maven-args }}"
+
+  # publish:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   if: ${{ github.ref == 'refs/heads/main' }}
+  #   steps:
+  #     - uses: actions/checkout@v3
+
+  #     - name: Set up JDK ${{ inputs.java-version }}
+  #       uses: actions/setup-java@v2
+  #       with:
+  #         distribution: 'temurin'
+  #         java-version: '${{ inputs.java-version }}'
+  #         cache: "maven"
+
+  #     - name: Set settings.xml
+  #       uses: s4u/maven-settings-action@v2.8.0
+  #       with:
+  #         servers: |
+  #           [{
+  #             "id": "mks-private-repo",
+  #             "username": "${{ secrets.NEXUS_USERNAME }}",
+  #             "password": "${{ secrets.NEXUS_PASSWORD }}"
+  #           },
+  #           {
+  #             "id": "mks-nexus-public-snapshots",
+  #             "username": "${{ secrets.NEXUS_USERNAME }}",
+  #             "password": "${{ secrets.NEXUS_PASSWORD }}"
+  #           },
+  #           {
+  #             "id": "mks-nexus-public-releases",
+  #             "username": "${{ secrets.NEXUS_USERNAME }}",
+  #             "password": "${{ secrets.NEXUS_PASSWORD }}"
+  #           },
+  #           {
+  #             "id": "mks-nexus-private-snapshots",
+  #             "username": "${{ secrets.NEXUS_USERNAME }}",
+  #             "password": "${{ secrets.NEXUS_PASSWORD }}"
+  #           },
+  #           {
+  #             "id": "mks-nexus-private-releases",
+  #             "username": "${{ secrets.NEXUS_USERNAME }}",
+  #             "password": "${{ secrets.NEXUS_PASSWORD }}"
+  #           }]
+
+  #     - name: Publish
+  #       run: "mvn --batch-mode clean deploy ${{ inputs.maven-args }}"
+
+  #     - name: Notify OCD3
+  #       if: ${{ inputs.notify-ocd3 }}
+  #       uses: distributhor/workflow-webhook@v3
+  #       env:
+  #         webhook_type: 'json-extended'
+  #         webhook_url: ${{ inputs.webhook-url }}
+  #         webhook_auth: ${{ secrets.OCD3_USERNAME }}:${{ secrets.OCD3_PASSWORD }}
+  #         data: "{ \"ref\": \"${{ github.event_name == 'schedule' && github.default_branch || github.ref }}\" }"
+  #         verbose: true
+  
