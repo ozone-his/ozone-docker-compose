@@ -67,10 +67,10 @@ services:
         condition: service_started
     env_file: eip.env
     environment:
-      - DB_EVENT_DESTINATIONS=${DB_EVENT_DESTINATIONS_ODOO}
-      - EIP_DB_NAME=${EIP_DB_NAME_ODOO}
-      - EIP_DB_USER=${EIP_DB_USER_ODOO}
-      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD_ODOO}
+      - DB_EVENT_DESTINATIONS_ODOO=${DB_EVENT_DESTINATIONS_ODOO}
+      - EIP_DB_NAME_ODOO=${EIP_DB_NAME_ODOO}
+      - EIP_DB_USER_ODOO=${EIP_DB_USER_ODOO}
+      - EIP_DB_PASSWORD_ODOO=${EIP_DB_PASSWORD_ODOO}
       - ODOO_DATABASE=${ODOO_DATABASE}
       - ODOO_USER=${ODOO_USER}
       - ODOO_PASSWORD=${ODOO_PASSWORD}
@@ -79,10 +79,14 @@ services:
       - ODOO_CUSTOMER_DOB_FIELD=${ODOO_CUSTOMER_DOB_FIELD}
       - ODOO_CUSTOMER_WEIGHT_FIELD=${ODOO_CUSTOMER_WEIGHT_FIELD}
       - EMR_WEIGHT_CONCEPT=${EMR_WEIGHT_CONCEPT}
+      - OPENMRS_IDENTIFIER_TYPE_UUID=${OPENMRS_IDENTIFIER_TYPE_UUID}
       - ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE=${ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE}
       - ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE=${ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE}
       - ODOO_URL=http://odoo:8069
-    image: mekomsolutions/eip-client
+      - OPENMRS_URL=http://openmrs:8080/openmrs
+      - EIP_PROFILE=prod
+      - EIP_WATCHED_TABLES=patient,person_name,person_address,patient_identifier,orders,test_order,drug_order
+    image: mekomsolutions/eip-client:2.0.0
     networks:
       ozone:
         aliases:
@@ -90,8 +94,7 @@ services:
           - eip-odoo-openmrs
     restart: unless-stopped
     volumes:
-      - "${EIP_ODOO_OPENMRS_PROPERTIES_PATH}:/config"
-      - "${EIP_ODOO_OPENMRS_ROUTES_PATH}:/routes"
+      - "${EIP_ODOO_OPENMRS_ROUTES_PATH}:/eip-client/routes"
       - eip-home-odoo:/eip-home
     
   postgresql:

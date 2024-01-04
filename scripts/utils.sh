@@ -28,10 +28,8 @@ function exportPaths () {
     export ODOO_EXTRA_ADDONS=$DISTRO_PATH/binaries/odoo/addons
     export ODOO_CONFIG_PATH=$DISTRO_PATH/configs/odoo/initializer_config/
     export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/configs/odoo/config/odoo.conf
-    export EIP_ODOO_OPENMRS_ROUTES_PATH=$DISTRO_PATH/binaries/eip-odoo-openmrs/routes
-    export EIP_ODOO_OPENMRS_PROPERTIES_PATH=$DISTRO_PATH/configs/eip-odoo-openmrs/properties
-    export EIP_OPENMRS_SENAITE_ROUTES_PATH=$DISTRO_PATH/binaries/eip-openmrs-senaite/routes
-    export EIP_OPENMRS_SENAITE_PROPERTIES_PATH=$DISTRO_PATH/configs/eip-openmrs-senaite/properties
+    export EIP_ODOO_OPENMRS_ROUTES_PATH=$DISTRO_PATH/binaries/eip-odoo-openmrs
+    export EIP_OPENMRS_SENAITE_ROUTES_PATH=$DISTRO_PATH/binaries/eip-openmrs-senaite
     export OPENMRS_FRONTEND_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/frontend_config/
     export SQL_SCRIPTS_PATH=$DISTRO_PATH/data/
     export SUPERSET_CONFIG_PATH=$DISTRO_PATH/configs/superset/
@@ -45,9 +43,7 @@ function exportPaths () {
     echo "→ ODOO_CONFIG_PATH=$ODOO_CONFIG_PATH"
     echo "→ ODOO_CONFIG_FILE_PATH=$ODOO_CONFIG_FILE_PATH"
     echo "→ EIP_ODOO_OPENMRS_ROUTES_PATH=$EIP_ODOO_OPENMRS_ROUTES_PATH"
-    echo "→ EIP_ODOO_OPENMRS_PROPERTIES_PATH=$EIP_ODOO_OPENMRS_PROPERTIES_PATH"
     echo "→ EIP_OPENMRS_SENAITE_ROUTES_PATH=$EIP_OPENMRS_SENAITE_ROUTES_PATH"
-    echo "→ EIP_OPENMRS_SENAITE_PROPERTIES_PATH=$EIP_OPENMRS_SENAITE_PROPERTIES_PATH"
     echo "→ OPENMRS_FRONTEND_CONFIG_PATH=$OPENMRS_FRONTEND_CONFIG_PATH"
     echo "→ SQL_SCRIPTS_PATH=$SQL_SCRIPTS_PATH"
     echo "→ SUPERSET_CONFIG_PATH=$SUPERSET_CONFIG_PATH"
