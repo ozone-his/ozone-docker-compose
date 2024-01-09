@@ -35,8 +35,6 @@ services:
     networks:
       - ozone
       - web
-    ports:
-      - "8080:8080"
     restart: unless-stopped
     volumes:
       - "openmrs-data:/openmrs/data"

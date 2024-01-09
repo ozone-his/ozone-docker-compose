@@ -1,8 +1,6 @@
-FROM httpd:2.4-alpine
+FROM nginx:1.25-alpine
 
-RUN apk add curl iproute2 iputils less nano tree ca-certificates lsof --no-cache
+ENV FRAME_ANCESTORS ""
 
-COPY resources/httpd.conf /usr/local/apache2/conf/httpd.conf
-COPY resources/proxy-rules /usr/local/apache2/conf/proxy-rules
-COPY resources/tls/cert.pem resources/tls/privkey.pem resources/tls/chain.pem /etc/tls/
-EXPOSE 8069/tcp
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY default.conf.template /etc/nginx/templates/
