@@ -1,6 +1,6 @@
 services:
 
-  # Apache HTTPD - Entry point for the application.
+  # Nginx - Entry point for the application.
   proxy:
     restart: unless-stopped
     build:

@@ -110,7 +110,7 @@ function setTraefikHostnames {
 }
 
 function setNginxHostnames {
-    echo "$INFO Exporting  Nginx hostnames..."
+    echo "$INFO Exporting Nginx hostnames..."
 
     export O3_HOSTNAME="localhost"
     export ODOO_HOSTNAME="localhost:8069"
