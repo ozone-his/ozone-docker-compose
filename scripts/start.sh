@@ -18,8 +18,8 @@ if [ "$TRAEFIK" == "true" ]; then
     setTraefikIP
     setTraefikHostnames
 else
-    echo "$INFO \$TRAEFIK!=true, setting Apache 2 hostnames..."
-    setApache2Hostnames
+    echo "$INFO \$TRAEFIK!=true, setting Nginx hostnames..."
+    setNginxHostnames
 fi
 
 # Set the demo patients props
@@ -62,7 +62,7 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
         echo ""
         ($dockerComposeProxyCommand)
     else
-        echo "$INFO Skipping running Apache 2 proxy... (\$TRAEFIK=true)"
+        echo "$INFO Skipping running Nginx proxy... (\$TRAEFIK=true)"
     fi
 
     # Run the Demo service
