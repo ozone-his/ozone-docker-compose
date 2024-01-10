@@ -28,23 +28,6 @@ upstream backend {
   server openmrs:8080 max_fails=0;
 }
 
-upstream odoo {
-  server odoo:8069 max_fails=0;
-}
-upstream odoochat {
-  server odoo:8072  max_fails=0;
-}
-
-
-
-upstream senaite {
-  server senaite:8080 max_fails=0;
-}
-
-upstream superset {
-  server superset:8088 max_fails=0;
-}
-
 server {
   listen       80;
 
@@ -139,18 +122,22 @@ server {
         proxy_cache_valid 200 60m;
         proxy_buffering on;
         expires 864000;
-        proxy_pass http://odoo;
+        set $odoo odoo:8069;
+        proxy_pass http://$odoo;
     }
 
     location / {
-            proxy_pass http://odoo;
-            # The following makes the timeout broader
-            proxy_read_timeout 30000;
-            proxy_redirect off;
+
+        set $odoo odoo:8069;
+        proxy_pass http://$odoo;
+        # The following makes the timeout broader
+        proxy_read_timeout 30000;
+        proxy_redirect off;
     }
 
     location /longpolling {
-            proxy_pass http://odoochat;
+        set $odoo odoo:8072;
+        proxy_pass http://$odoo;
     }
 }
 
@@ -159,7 +146,8 @@ server {
     location / {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://superset;
+        set $superset superset:8088;
+        proxy_pass http://$superset;
     }
 }
 
@@ -170,6 +158,7 @@ server {
         proxy_set_header        X-Real-IP       $remote_addr;
         proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
         rewrite                 ^(.*)$ /VirtualHostBase/$scheme/$host/senaite/VirtualHostRoot/$1 break;
-        proxy_pass              http://senaite;
+        set $senaite senaite:8080;
+        proxy_pass http://$senaite;
     }
 }
