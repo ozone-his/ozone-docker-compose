@@ -12,7 +12,7 @@ services:
       - ADDONS=sale_management,stock,account_account,purchase,mrp,odoo_initializer,ozone_settings,mrp_product_expiry,product_expiry,l10n_generic_coa
       - INITIALIZER_DATA_FILES_PATH=/mnt/odoo_config
       - INITIALIZER_CONFIG_FILE_PATH=/mnt/odoo_config/initializer_config.json
-    image: mekomsolutions/odoo
+    image: mekomsolutions/odoo:2c1706f
     labels:
       traefik.enable: true
       # https
@@ -82,7 +82,7 @@ services:
       - ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE=${ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE}
       - ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE=${ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE}
       - ODOO_URL=http://odoo:8069
-    image: mekomsolutions/eip-client
+    image: mekomsolutions/eip-client:sha-90f12ce
     networks:
       ozone:
         aliases:
