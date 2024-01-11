@@ -28,7 +28,7 @@ scripts/mvnw clean package
 Run
 ```bash
 source target/go-to-scripts-dir.sh
-./fetch-ozone-distro.sh 1.0.0-SNAPSHOT # Replace by the version of your choice
+./fetch-ozone-distro.sh 1.0.0-alpha.9 # Replace by the version of your choice
 ./start-demo.sh
 ```
 
@@ -49,7 +49,7 @@ scripts/mvnw clean package
 Run
 ```bash
 source target/go-to-scripts-dir.sh
-./fetch-ozone-distro.sh 1.0.0-SNAPSHOT # Replace by the version of your choice
+./fetch-ozone-distro.sh 1.0.0-alpha.9 # Replace by the version of your choice
 export TRAEFIK="true"
 ./start-demo.sh
 ```

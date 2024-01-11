@@ -6,7 +6,7 @@ networks:
 services:
 
   env-substitution:
-    image: mekomsolutions/env-substitution
+    image: mekomsolutions/env-substitution:1e6fa02
     networks:
       - ozone
     restart: on-failure
