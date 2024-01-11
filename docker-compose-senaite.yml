@@ -9,7 +9,7 @@ services:
       - SITE=${SITE}
       - ADMIN_USER=${SENAITE_ADMIN_USER}
       - ADMIN_PASSWORD=${SENAITE_ADMIN_PASSWORD}
-    image: mekomsolutions/senaite:sha-272c0f5
+    image: mekomsolutions/senaite:latest
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.senaite.loadbalancer.server.port=8080"
@@ -46,7 +46,7 @@ services:
       - EIP_DB_PASSWORD=${EIP_DB_PASSWORD_SENAITE}
       - BAHMNI_TEST_ORDER_TYPE_UUID=${BAHMNI_TEST_ORDER_TYPE_UUID}
       - SENAITE_URL=http://senaite:8080
-    image: mekomsolutions/eip-client:sha-90f12ce
+    image: mekomsolutions/eip-client
     networks:
       ozone:
         aliases:
