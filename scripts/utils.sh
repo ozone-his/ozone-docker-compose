@@ -62,19 +62,22 @@ function setDockerComposeCLIOptions () {
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../$file"
     done
 
-    # Use the concatenated.env file if one is provided
+    # Set the default env file
+    export dockerComposeEnvFilePath="../.env"
+    
+    # Override the default with the concatenated.env file if it is provided
     concatenatedEnvFilePath="../concatenated.env"
     if [ -f "$concatenatedEnvFilePath" ]; then
-        export dockerComposeEnvFileCLIOption="--env-file $concatenatedEnvFilePath"
+        export dockerComposeEnvFilePath="$concatenatedEnvFilePath"
     fi
 
-    export dockerComposeOzoneCLIOptions="$dockerComposeEnvFileCLIOption $dockerComposeFilesCLIOptions"
+    export dockerComposeOzoneCLIOptions="--env-file $dockerComposeEnvFilePath $dockerComposeFilesCLIOptions"
 
     # Set args for the proxy service
-    export dockerComposeProxyCLIOptions="$dockerComposeEnvFileCLIOption -f ../proxy/docker-compose.yml"
+    export dockerComposeProxyCLIOptions="--env-file $dockerComposeEnvFilePath -f ../proxy/docker-compose.yml"
 
     # Set args for the demo service
-    export dockerComposeDemoCLIOptions="$dockerComposeEnvFileCLIOption -f ../demo/docker-compose.yml"
+    export dockerComposeDemoCLIOptions="--env-file $dockerComposeEnvFilePath -f ../demo/docker-compose.yml"
 }
 
 function setTraefikIP {

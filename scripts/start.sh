@@ -53,10 +53,10 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
     # Run Ozone
     ($dockerComposeOzoneCommand)
 
-    # Run the Apache2 Proxy service, if $TRAEFIK!=true
+    # Run the Nginx Proxy service, if $TRAEFIK!=true
     if [ "$TRAEFIK" != "true" ]; then
         dockerComposeProxyCommand="docker compose -p ozone $dockerComposeProxyCLIOptions up -d --build"
-        echo "$INFO Running Apache2 proxy service (\$TRAEFIK!=true)..."
+        echo "$INFO Running Nginx proxy service (\$TRAEFIK!=true)..."
         echo ""
         echo "$dockerComposeProxyCommand"
         echo ""
