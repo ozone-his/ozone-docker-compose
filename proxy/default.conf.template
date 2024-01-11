@@ -157,7 +157,19 @@ server {
         proxy_set_header        Host            $http_host;
         proxy_set_header        X-Real-IP       $remote_addr;
         proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-        rewrite                 ^(.*)$ /VirtualHostBase/$scheme/$host/senaite/VirtualHostRoot/$1 break;
+        rewrite                 ^(.*)$ /VirtualHostBase/https/$host/senaite/VirtualHostRoot/$1 break;
+        set $senaite senaite:8080;
+        proxy_pass http://$senaite;
+    }
+}
+
+server {
+    listen 8081;
+    location / {
+        proxy_set_header        Host            $http_host;
+        proxy_set_header        X-Real-IP       $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        rewrite                 ^(.*)$ /VirtualHostBase/http/$host/senaite/VirtualHostRoot/$1 break;
         set $senaite senaite:8080;
         proxy_pass http://$senaite;
     }
