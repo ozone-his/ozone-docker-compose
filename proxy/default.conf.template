@@ -171,3 +171,4 @@ server {
         rewrite                 ^(.*)$ /VirtualHostBase/http/$host/senaite/VirtualHostRoot/$1 break;
         proxy_pass              http://senaite:8080;
     }
+}
