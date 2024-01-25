@@ -86,7 +86,7 @@ services:
       - OPENMRS_URL=http://openmrs:8080/openmrs
       - EIP_PROFILE=prod
       - EIP_WATCHED_TABLES=patient,person_name,person_address,patient_identifier,orders,test_order,drug_order
-    image: mekomsolutions/eip-client:2.0.0
+    image: mekomsolutions/eip-client
     networks:
       ozone:
         aliases:

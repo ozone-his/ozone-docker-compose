@@ -54,7 +54,7 @@ services:
       - EIP_DB_USER_SENAITE=${EIP_DB_USER_SENAITE}
       - EIP_DB_PASSWORD_SENAITE=${EIP_DB_PASSWORD_SENAITE}
       - DB_EVENT_DESTINATIONS_SENAITE=${DB_EVENT_DESTINATIONS_SENAITE}
-    image: mekomsolutions/eip-client:2.0.0
+    image: mekomsolutions/eip-client
     networks:
       ozone:
         aliases:
