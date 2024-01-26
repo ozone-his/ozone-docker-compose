@@ -38,14 +38,22 @@ services:
         condition: service_started
     env_file: eip.env
     environment:
-      - DB_EVENT_DESTINATIONS=${DB_EVENT_DESTINATIONS_SENAITE}
-      - SENAITE_USERNAME=${SENAITE_ADMIN_USER}
-      - SENAITE_PASSWORD=${SENAITE_ADMIN_PASSWORD}
-      - EIP_DB_NAME=${EIP_DB_NAME_SENAITE}
-      - EIP_DB_USER=${EIP_DB_USER_SENAITE}
-      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD_SENAITE}
+      - SENAITE_SERVER_URL=https://${SENAITE_HOSTNAME}/senaite
+      - SENAITE_SERVER_USER=${SENAITE_ADMIN_USER}
+      - SENAITE_SERVER_PASSWORD=${SENAITE_ADMIN_PASSWORD}
+      - OPENMRS_SERVER_URL=http://openmrs:8080/openmrs
+      - OPENMRS_SERVER_USER=${OPENMRS_USER}
+      - OPENMRS_SERVER_PASSWORD=${OPENMRS_PASSWORD}
+      - OPENMRS_RESULTS_ENCOUNTER_TYPE_UUID=${RESULTS_ENCOUNTER_TYPE_UUID}
+      - OPENMRS_IDENTIFIER_TYPE_UUID=${OPENMRS_IDENTIFIER_TYPE_UUID}
+      - OPENMRS_CONCEPT_COMPLEX_UUID=${CONCEPT_COMPLEX_UUID}
       - BAHMNI_TEST_ORDER_TYPE_UUID=${BAHMNI_TEST_ORDER_TYPE_UUID}
-      - SENAITE_URL=http://senaite:8080
+      - EIP_PROFILE=prod
+      - EIP_WATCHED_TABLES=patient,person_name,person_address,patient_identifier,orders,test_order
+      - EIP_DB_NAME_SENAITE=${EIP_DB_NAME_SENAITE}
+      - EIP_DB_USER_SENAITE=${EIP_DB_USER_SENAITE}
+      - EIP_DB_PASSWORD_SENAITE=${EIP_DB_PASSWORD_SENAITE}
+      - DB_EVENT_DESTINATIONS_SENAITE=${DB_EVENT_DESTINATIONS_SENAITE}
     image: mekomsolutions/eip-client
     networks:
       ozone:
@@ -53,8 +61,7 @@ services:
           - eip-client-senaite
     restart: unless-stopped
     volumes:
-      - "${EIP_OPENMRS_SENAITE_PROPERTIES_PATH}:/config"
-      - "${EIP_OPENMRS_SENAITE_ROUTES_PATH}:/routes"
+      - "${EIP_OPENMRS_SENAITE_ROUTES_PATH}:/eip-client/routes"
       - eip-home-senaite:/eip-home
 
   mysql:
