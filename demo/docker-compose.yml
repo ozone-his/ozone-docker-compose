@@ -10,8 +10,8 @@ services:
       - EIP_DB_USER=${EIP_DB_USER_DEMO}
       - EIP_DB_PASSWORD=${EIP_DB_PASSWORD_DEMO}
     volumes:
-      - "./eip/config:/config"
-      - "./eip/routes:/routes"
+      - "./eip/config:/eip-client/config"
+      - "./eip/routes:/eip-client/routes"
     networks:
       ozone:
 
