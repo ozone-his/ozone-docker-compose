@@ -38,7 +38,7 @@ services:
         condition: service_started
     env_file: eip.env
     environment:
-      - SENAITE_SERVER_URL=https://${SENAITE_HOSTNAME}/senaite
+      - SENAITE_SERVER_URL=http://senaite:8080/senaite
       - SENAITE_SERVER_USER=${SENAITE_ADMIN_USER}
       - SENAITE_SERVER_PASSWORD=${SENAITE_ADMIN_PASSWORD}
       - OPENMRS_SERVER_URL=http://openmrs:8080/openmrs
