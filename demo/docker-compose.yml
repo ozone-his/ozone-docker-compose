@@ -6,6 +6,8 @@ services:
     env_file: ../eip.env
     environment:
       - NUMBER_OF_DEMO_PATIENTS=${NUMBER_OF_DEMO_PATIENTS}
+      - EIP_PROFILE=prod
+      - OPENMRS_URL=http://openmrs:8080/openmrs
     volumes:
       - "./eip/config:/eip-client/config"
       - "./eip/routes:/eip-client/routes"
