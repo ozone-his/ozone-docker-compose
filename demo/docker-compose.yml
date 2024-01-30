@@ -6,12 +6,11 @@ services:
     env_file: ../eip.env
     environment:
       - NUMBER_OF_DEMO_PATIENTS=${NUMBER_OF_DEMO_PATIENTS}
-      - EIP_DB_NAME=${EIP_DB_NAME_DEMO}
-      - EIP_DB_USER=${EIP_DB_USER_DEMO}
-      - EIP_DB_PASSWORD=${EIP_DB_PASSWORD_DEMO}
+      - EIP_PROFILE=prod
+      - OPENMRS_URL=http://openmrs:8080/openmrs
     volumes:
-      - "./eip/config:/config"
-      - "./eip/routes:/routes"
+      - "./eip/config:/eip-client/config"
+      - "./eip/routes:/eip-client/routes"
     networks:
       ozone:
 
