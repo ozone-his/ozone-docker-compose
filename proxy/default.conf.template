@@ -19,7 +19,7 @@ map $forwarded_proto $var_proxy_cookie_flags {
   default "off";
 }
 
-map $SENAITE_GITPOD_HTTPS_REWRITE $senaite_rewrite {
+map $GITPOD_ENV $senaite_rewrite {
     "true" /VirtualHostBase/https/$host/senaite/VirtualHostRoot/;
     default /VirtualHostBase/http/$host/senaite/VirtualHostRoot/;
 }

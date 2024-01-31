@@ -3,7 +3,7 @@ services:
   # Nginx - Entry point for the application.
   proxy:
     environment:
-      - SENAITE_GITPOD_HTTPS_REWRITE=${SENAITE_GITPOD_HTTPS_REWRITE}
+      - GITPOD_ENV=${GITPOD_ENV}
 
     restart: unless-stopped
     build:
