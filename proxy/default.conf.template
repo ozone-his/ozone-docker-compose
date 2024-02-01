@@ -19,6 +19,11 @@ map $forwarded_proto $var_proxy_cookie_flags {
   default "off";
 }
 
+map $GITPOD_ENV $senaite_rewrite {
+    "true" /VirtualHostBase/https/$host/senaite/VirtualHostRoot/;
+    default /VirtualHostBase/http/$host/senaite/VirtualHostRoot/;
+}
+
 upstream frontend {
   # always assume the frontend will be available
   server frontend max_fails=0;
@@ -159,18 +164,7 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         set $senaite senaite:8080;
         proxy_pass http://$senaite;
-        rewrite ^(.*)$ /VirtualHostBase/https/$host/senaite/VirtualHostRoot/$1 break;
-    }
-}
 
-server {
-    listen 8081;
-    location / {
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        set $senaite senaite:8080;
-        proxy_pass http://$senaite;
-        rewrite ^(.*)$ /VirtualHostBase/http/$host/senaite/VirtualHostRoot/$1 break;
+        rewrite ^(.*)$ $senaite_rewrite/$1 break;
     }
 }

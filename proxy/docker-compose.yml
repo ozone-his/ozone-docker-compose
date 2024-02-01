@@ -2,6 +2,9 @@ services:
 
   # Nginx - Entry point for the application.
   proxy:
+    environment:
+      - GITPOD_ENV=${GITPOD_ENV}
+
     restart: unless-stopped
     build:
       context: ./
