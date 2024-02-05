@@ -17,13 +17,12 @@ services:
       OMRS_CONFIG_CONNECTION_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
       HOST_URL: https://${O3_HOSTNAME}
     healthcheck:
-      test:
-        - CMD
-        - curl
-        - "-f"
-        - "http://localhost:8080/openmrs/"
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/health/started" ]
+      interval: 10s
       timeout: 5s
-    image: openmrs/openmrs-reference-application-3-backend:3.0.0-beta.16
+      retries: 48
+      start_period: 120s
+    image: openmrs/openmrs-reference-application-3-backend:${O3_DOCKER_IMAGE_TAG:-nightly}
     labels:
       traefik.enable: "true"
       traefik.http.routers.openmrs.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs`)"
@@ -55,7 +54,7 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
       timeout: 5s
-    image: openmrs/openmrs-reference-application-3-frontend:3.0.0-beta.16
+    image: openmrs/openmrs-reference-application-3-frontend:${O3_DOCKER_IMAGE_TAG:-nightly}
     labels:
       traefik.enable: "true"
       traefik.http.routers.frontend.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs/spa/`)"
@@ -104,4 +103,3 @@ volumes:
   openmrs-data: ~
   openmrs-modules: ~
   openmrs-owas: ~
-  
