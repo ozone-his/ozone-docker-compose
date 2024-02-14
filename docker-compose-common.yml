@@ -19,7 +19,7 @@ services:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
     healthcheck:
       test: "exit 0"
-    image: mariadb:10.2
+    image: mariadb:10.8
     networks:
       - ozone
     ports:
