@@ -102,10 +102,12 @@ function setTraefikHostnames {
     export ODOO_HOSTNAME=erp-"${IP_WITH_DASHES}.traefik.me"
     export SENAITE_HOSTNAME=lims-"${IP_WITH_DASHES}.traefik.me"
     export SUPERSET_HOSTNAME=analytics-"${IP_WITH_DASHES}.traefik.me"
+    export ERP_NEXT_HOSTNAME=erpnext-"${IP_WITH_DASHES}.traefik.me"  
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ SUPERSET_HOSTNAME=$SUPERSET_HOSTNAME"
+    echo "→ ERP_NEXT_HOSTNAME=$ERP_NEXT_HOSTNAME"
 
 }
 
@@ -116,9 +118,45 @@ function setNginxHostnames {
     export ODOO_HOSTNAME="localhost:8069"
     export SENAITE_HOSTNAME="localhost:8081"
     export SUPERSET_HOSTNAME="localhost:8088"
+    export ERP_NEXT_HOSTNAME="localhost:8082"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ SUPERSET_HOSTNAME=$SUPERSET_HOSTNAME"
+    echo "→ ERP_NEXT_HOSTNAME=$ERP_NEXT_HOSTNAME"
 
+}
+
+function displayAccesURLsWithCredentials() {
+    services=()
+    is_defined=()
+    
+    while read -r line; do
+        serviceWithoutExtension=${line%.yml}
+        service=${serviceWithoutExtension#docker-compose-}
+        
+        services+=("$service")
+        is_defined+=(1)
+    done < docker-compose-files.txt
+
+    echo "HIS Component,URL,Username,Password" > .urls_1.txt
+    echo "-,-,-,-" >> .urls_1.txt
+    tail -n +2 ozone-urls-template.csv | while IFS=',' read -r component url username password service ; do
+        for i in "${!services[@]}"; do
+            if [[ "${services[$i]}" == "$service" && "${is_defined[$i]}" == 1 ]]; then
+                echo "$component,$url,$username,$password" >> .urls_1.txt
+                break
+            fi
+        done
+    done
+
+    envsubst < .urls_1.txt > .urls_1.txt
+    echo ""
+    echo "$INFO 🔗 Access each ${OZONE_LABEL:-Ozone FOSS} components at the following URL:"
+    echo ""
+
+    set +e
+    column -t -s ',' .urls_1.txt > .urls_2.txt 2> /dev/null
+    set -e
+    cat .urls_2.txt
 }

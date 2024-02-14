@@ -1,0 +1,212 @@
+version: "3"
+
+services:
+  erpnext-backend:
+    deploy:
+      restart_policy:
+        condition: on-failure
+    image: frappe/erpnext:v15.12.2
+    platform: linux/amd64
+    networks:
+      - ozone
+    volumes:
+      - erpnext-sites:/home/frappe/frappe-bench/sites
+      - erpnext-logs:/home/frappe/frappe-bench/logs
+
+  erpnext-configurator:
+    command:
+      - >
+        ls -1 apps > sites/apps.txt;
+        bench set-config -g db_host $$DB_HOST;
+        bench set-config -gp db_port $$DB_PORT;
+        bench set-config -g redis_cache "redis://$$REDIS_CACHE";
+        bench set-config -g redis_queue "redis://$$REDIS_QUEUE";
+        bench set-config -g redis_socketio "redis://$$REDIS_QUEUE";
+        bench set-config -gp socketio_port $$SOCKETIO_PORT;
+    deploy:
+      restart_policy:
+        condition: none
+    entrypoint:
+      - bash
+      - -c
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      REDIS_CACHE: erpnext-redis-cache:6379
+      REDIS_QUEUE: erpnext-redis-queue:6379
+      SOCKETIO_PORT: "9000"
+    image: frappe/erpnext:v15.12.2
+    platform: linux/amd64
+    networks:
+      - ozone
+    volumes:
+      - erpnext-sites:/home/frappe/frappe-bench/sites
+      - erpnext-logs:/home/frappe/frappe-bench/logs
+
+  erpnext-init:
+    command:
+      - >
+        wait-for-it -t 120 mysql:3306;
+        wait-for-it -t 120 erpnext-redis-cache:6379;
+        wait-for-it -t 120 erpnext-redis-queue:6379;
+        export start=`date +%s`;
+        until [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".db_host // empty"` ]] && \
+          [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_cache // empty"` ]] && \
+          [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_queue // empty"` ]];
+        do
+          echo "Waiting for sites/common_site_config.json to be created";
+          sleep 5;
+          if (( `date +%s`-start > 120 )); then
+            echo "could not find sites/common_site_config.json with required keys";
+            exit 1
+          fi
+        done;
+        echo "sites/common_site_config.json found";
+        bench new-site --no-mariadb-socket --admin-password=$$ERPNEXT_ADMIN_PASSWORD --db-root-password=$$MYSQL_ADMIN_PASSWORD --install-app erpnext --set-default frontend;
+
+    depends_on:
+      erpnext-configurator:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_started
+      erpnext-redis-cache:
+        condition: service_started
+      erpnext-redis-queue:
+        condition: service_started
+    deploy:
+      restart_policy:
+        condition: none
+    entrypoint:
+      - bash
+      - -c
+    environment:
+      ERPNEXT_ADMIN_PASSWORD: ${ERPNEXT_ADMIN_PASSWORD}
+      MYSQL_ADMIN_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    image: frappe/erpnext:v15.12.2
+    platform: linux/amd64
+    volumes:
+      - erpnext-sites:/home/frappe/frappe-bench/sites
+      - erpnext-logs:/home/frappe/frappe-bench/logs
+    networks:
+      - ozone
+
+  erpnext:
+    command:
+      - nginx-entrypoint.sh
+    depends_on:
+      erpnext-websocket:
+        condition: service_started
+      mysql:
+        condition: service_started
+      env-substitution:
+        condition: service_completed_successfully
+    deploy:
+      restart_policy:
+        condition: on-failure
+    environment:
+      BACKEND: erpnext-backend:8000
+      FRAPPE_SITE_NAME_HEADER: frontend
+      SOCKETIO: erpnext-websocket:9000
+      UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
+      UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
+      UPSTREAM_REAL_IP_RECURSIVE: "off"
+      PROXY_READ_TIMEOUT: 120
+      CLIENT_MAX_BODY_SIZE: 50m
+    image: frappe/erpnext:v15.12.2
+    platform: linux/amd64
+    networks:
+      - ozone
+      - web
+    volumes:
+      - erpnext-sites:/home/frappe/frappe-bench/sites
+      - erpnext-logs:/home/frappe/frappe-bench/logs
+
+  erpnext-queue-long:
+    command:
+      - bench
+      - worker
+      - --queue
+      - long,default,short
+    deploy:
+      restart_policy:
+        condition: on-failure
+    image: frappe/erpnext:v15.12.2
+    platform: linux/amd64
+    networks:
+      - ozone
+    volumes:
+      - erpnext-sites:/home/frappe/frappe-bench/sites
+      - erpnext-logs:/home/frappe/frappe-bench/logs
+
+  erpnext-queue-short:
+    command:
+      - bench
+      - worker
+      - --queue
+      - short,default
+    deploy:
+      restart_policy:
+        condition: on-failure
+    image: frappe/erpnext:v15.12.2
+    platform: linux/amd64
+    networks:
+      - ozone
+    volumes:
+      - erpnext-sites:/home/frappe/frappe-bench/sites
+      - erpnext-logs:/home/frappe/frappe-bench/logs
+
+  erpnext-redis-queue:
+    deploy:
+      restart_policy:
+        condition: on-failure
+    image: redis:6.2-alpine
+    networks:
+      - ozone
+    volumes:
+      - erpnext-redis-queue-data:/data
+
+  erpnext-redis-cache:
+    deploy:
+      restart_policy:
+        condition: on-failure
+    image: redis:6.2-alpine
+    networks:
+      - ozone
+    volumes:
+      - erpnext-redis-cache-data:/data
+
+  erpnext-scheduler:
+    command:
+      - bench
+      - schedule
+    deploy:
+      restart_policy:
+        condition: on-failure
+    image: frappe/erpnext:v15.12.2
+    platform: linux/amd64
+    networks:
+      - ozone
+    volumes:
+      - erpnext-sites:/home/frappe/frappe-bench/sites
+      - erpnext-logs:/home/frappe/frappe-bench/logs
+
+  erpnext-websocket:
+    command:
+      - node
+      - /home/frappe/frappe-bench/apps/frappe/socketio.js
+    deploy:
+      restart_policy:
+        condition: on-failure
+    image: frappe/erpnext:v15.12.2
+    platform: linux/amd64
+    networks:
+      - ozone
+    volumes:
+      - erpnext-sites:/home/frappe/frappe-bench/sites
+      - erpnext-logs:/home/frappe/frappe-bench/logs
+
+volumes:
+  erpnext-redis-queue-data: ~
+  erpnext-redis-cache-data: ~
+  erpnext-sites: ~
+  erpnext-logs: ~
