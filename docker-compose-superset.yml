@@ -44,6 +44,8 @@ services:
     networks:
       - ozone
     restart: unless-stopped
+    volumes:
+      - ${SUPERSET_CONFIG_PATH}/:/etc/superset/
     
     
   superset-init:
