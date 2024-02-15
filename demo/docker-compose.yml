@@ -3,11 +3,12 @@ services:
   eip-demo:
     image: mekomsolutions/eip-client
     restart: "no"
-    env_file: ../eip.env
     environment:
       - NUMBER_OF_DEMO_PATIENTS=${NUMBER_OF_DEMO_PATIENTS}
       - EIP_PROFILE=prod
       - OPENMRS_URL=http://openmrs:8080/openmrs
+      - OPENMRS_USER=${OPENMRS_USER}
+      - OPENMRS_PASSWORD=${OPENMRS_PASSWORD}
     volumes:
       - "./eip/config:/eip-client/config"
       - "./eip/routes:/eip-client/routes"
