@@ -31,7 +31,7 @@ services:
       - ${SUPERSET_CONFIG_PATH}/:/etc/superset/
     
   superset-worker:
-    command: "celery worker --app=superset.tasks.celery_app:app"
+    command: "celery --app=superset.tasks.celery_app:app worker --pool=gevent -Ofair -n worker1@%h --loglevel=INFO"
     depends_on:
       redis:
         condition: service_started
@@ -44,6 +44,8 @@ services:
     networks:
       - ozone
     restart: unless-stopped
+    volumes:
+      - ${SUPERSET_CONFIG_PATH}/:/etc/superset/
     
     
   superset-init:
