@@ -102,7 +102,7 @@ function setTraefikHostnames {
     export ODOO_HOSTNAME=erp-"${IP_WITH_DASHES}.traefik.me"
     export SENAITE_HOSTNAME=lims-"${IP_WITH_DASHES}.traefik.me"
     export SUPERSET_HOSTNAME=analytics-"${IP_WITH_DASHES}.traefik.me"
-    export ERP_NEXT_HOSTNAME=erpnext-"${IP_WITH_DASHES}.traefik.me"  
+    export ERPNEXT_HOSTNAME=erpnext-"${IP_WITH_DASHES}.traefik.me"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"

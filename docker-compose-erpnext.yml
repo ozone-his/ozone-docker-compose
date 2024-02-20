@@ -23,7 +23,6 @@ services:
         bench set-config -g redis_queue "redis://$$REDIS_QUEUE";
         bench set-config -g redis_socketio "redis://$$REDIS_QUEUE";
         bench set-config -gp socketio_port $$SOCKETIO_PORT;
-        bench set-config -g skip_setup_wizard 1;
     deploy:
       restart_policy:
         condition: none
