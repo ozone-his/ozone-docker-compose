@@ -23,6 +23,7 @@ services:
         bench set-config -g redis_queue "redis://$$REDIS_QUEUE";
         bench set-config -g redis_socketio "redis://$$REDIS_QUEUE";
         bench set-config -gp socketio_port $$SOCKETIO_PORT;
+        bench set-config -g skip_setup_wizard 1;
     deploy:
       restart_policy:
         condition: none
@@ -113,6 +114,11 @@ services:
       PROXY_READ_TIMEOUT: 120
       CLIENT_MAX_BODY_SIZE: 50m
     image: frappe/erpnext:v15.12.2
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.erpnext.rule: "Host(`${ERPNEXT_HOSTNAME}`)"
+      traefik.http.routers.erpnext.entrypoints: "websecure"
+      traefik.http.services.erpnext.loadbalancer.server.port: 8082
     platform: linux/amd64
     networks:
       - ozone

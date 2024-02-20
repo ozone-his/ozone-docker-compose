@@ -107,7 +107,7 @@ function setTraefikHostnames {
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ SUPERSET_HOSTNAME=$SUPERSET_HOSTNAME"
-    echo "→ ERP_NEXT_HOSTNAME=$ERP_NEXT_HOSTNAME"
+    echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
 
 }
 
@@ -118,19 +118,20 @@ function setNginxHostnames {
     export ODOO_HOSTNAME="localhost:8069"
     export SENAITE_HOSTNAME="localhost:8081"
     export SUPERSET_HOSTNAME="localhost:8088"
-    export ERP_NEXT_HOSTNAME="localhost:8082"
+    export ERPNEXT_HOSTNAME="localhost:8082"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ SUPERSET_HOSTNAME=$SUPERSET_HOSTNAME"
-    echo "→ ERP_NEXT_HOSTNAME=$ERP_NEXT_HOSTNAME"
+    echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
 
 }
 
-function displayAccesURLsWithCredentials() {
+function displayAccessURLsWithCredentials {
     services=()
     is_defined=()
-    
+
+    # Read docker-compose-files.txt and extract the list of services run
     while read -r line; do
         serviceWithoutExtension=${line%.yml}
         service=${serviceWithoutExtension#docker-compose-}
@@ -150,13 +151,13 @@ function displayAccesURLsWithCredentials() {
         done
     done
 
-    envsubst < .urls_1.txt > .urls_1.txt
+    envsubst < .urls_1.txt > .urls_2.txt
     echo ""
     echo "$INFO 🔗 Access each ${OZONE_LABEL:-Ozone FOSS} components at the following URL:"
     echo ""
 
     set +e
-    column -t -s ',' .urls_1.txt > .urls_2.txt 2> /dev/null
+    column -t -s ',' .urls_2.txt > .urls_3.txt 2> /dev/null
     set -e
-    cat .urls_2.txt
+    cat .urls_3.txt
 }

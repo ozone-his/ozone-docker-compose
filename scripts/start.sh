@@ -81,4 +81,4 @@ else
     echo "$ERROR Docker versions < 20.10.13 are not supported"
 fi
 
-displayAccesURLsWithCredentials
+displayAccessURLsWithCredentials
