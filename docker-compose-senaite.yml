@@ -36,7 +36,6 @@ services:
         condition: service_started
       senaite:
         condition: service_started
-    env_file: eip.env
     environment:
       - SENAITE_SERVER_URL=http://senaite:8080/senaite
       - SENAITE_SERVER_USER=${SENAITE_ADMIN_USER}
@@ -54,6 +53,15 @@ services:
       - EIP_DB_USER_SENAITE=${EIP_DB_USER_SENAITE}
       - EIP_DB_PASSWORD_SENAITE=${EIP_DB_PASSWORD_SENAITE}
       - DB_EVENT_DESTINATIONS_SENAITE=${DB_EVENT_DESTINATIONS_SENAITE}
+      - MYSQL_ADMIN_USER=root
+      - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - OPENMRS_DB_HOST=${OPENMRS_DB_HOST}
+      - OPENMRS_DB_PORT=${OPENMRS_DB_PORT}
+      - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
+      - OPENMRS_DB_USER=${OPENMRS_DB_USER}
+      - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
+      - OPENMRS_USER=${OPENMRS_USER}
+      - OPENMRS_PASSWORD=${OPENMRS_PASSWORD}
     image: mekomsolutions/eip-client
     networks:
       ozone:

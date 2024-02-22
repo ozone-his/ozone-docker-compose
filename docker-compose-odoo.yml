@@ -65,7 +65,6 @@ services:
         condition: service_started
       odoo:
         condition: service_started
-    env_file: eip.env
     environment:
       - DB_EVENT_DESTINATIONS_ODOO=${DB_EVENT_DESTINATIONS_ODOO}
       - EIP_DB_NAME_ODOO=${EIP_DB_NAME_ODOO}
@@ -86,6 +85,15 @@ services:
       - OPENMRS_URL=http://openmrs:8080/openmrs
       - EIP_PROFILE=prod
       - EIP_WATCHED_TABLES=patient,person_name,person_address,patient_identifier,orders,test_order,drug_order
+      - MYSQL_ADMIN_USER=root
+      - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - OPENMRS_DB_HOST=${OPENMRS_DB_HOST}
+      - OPENMRS_DB_PORT=${OPENMRS_DB_PORT}
+      - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
+      - OPENMRS_DB_USER=${OPENMRS_DB_USER}
+      - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
+      - OPENMRS_USER=${OPENMRS_USER}
+      - OPENMRS_PASSWORD=${OPENMRS_PASSWORD}
     image: mekomsolutions/eip-client
     networks:
       ozone:
