@@ -62,7 +62,23 @@ services:
           fi
         done;
         echo "sites/common_site_config.json found";
-        bench new-site --no-mariadb-socket --admin-password=$$ERPNEXT_ADMIN_PASSWORD --db-root-password=$$MYSQL_ADMIN_PASSWORD --install-app erpnext --set-default frontend;
+        echo "Creating new site";
+        bench new-site --no-mariadb-socket --admin-password=$$ERPNEXT_ADMIN_PASSWORD --db-root-password=$$MYSQL_ADMIN_PASSWORD --db-name=$$ERPNEXT_DB_NAME --source_sql=/opt/erpnext/configs/sql/erpnext-v15.12.2-init-db.sql.gz --install-app erpnext --set-default ozone-erpnext;
+        echo "==============================================================";
+        export startTime=`date +%s`;
+        until [[ -f sites/ozone-erpnext/site_config.json ]];
+        do
+          echo "Waiting for sites/ozone-erpnext/site_config.json to be created";
+          sleep 5;
+          if (( `date +%s`-startTime > 480 )); then
+            echo "could not find sites/ozone-erpnext/site_config.json";
+            exit 1
+          fi
+        done;
+        echo "Site fully initialized";
+        echo "Running data-import.sh script to import data into the new site";
+        source /opt/erpnext/scripts/data-import.sh;
+        echo "==============================================================";
 
     depends_on:
       erpnext-configurator:
@@ -82,11 +98,14 @@ services:
     environment:
       ERPNEXT_ADMIN_PASSWORD: ${ERPNEXT_ADMIN_PASSWORD}
       MYSQL_ADMIN_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      ERPNEXT_DB_NAME: ${ERPNEXT_DB_NAME}
     image: frappe/erpnext:v15.12.2
     platform: linux/amd64
     volumes:
       - erpnext-sites:/home/frappe/frappe-bench/sites
       - erpnext-logs:/home/frappe/frappe-bench/logs
+      - "${ERPNEXT_CONFIG_PATH}:/opt/erpnext/configs"
+      - "${ERPNEXT_SCRIPTS_PATH}:/opt/erpnext/scripts"
     networks:
       - ozone
 
@@ -96,6 +115,8 @@ services:
     depends_on:
       erpnext-websocket:
         condition: service_started
+      erpnext-init:
+        condition: service_completed_successfully
       mysql:
         condition: service_started
       env-substitution:
@@ -105,7 +126,7 @@ services:
         condition: on-failure
     environment:
       BACKEND: erpnext-backend:8000
-      FRAPPE_SITE_NAME_HEADER: frontend
+      FRAPPE_SITE_NAME_HEADER: ozone-erpnext
       SOCKETIO: erpnext-websocket:9000
       UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
       UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
