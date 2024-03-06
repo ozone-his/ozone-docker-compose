@@ -4,3 +4,4 @@ docker-compose-openmrs.yml
 docker-compose-senaite.yml
 docker-compose-superset.yml
 docker-compose-erpnext.yml
+docker-compose-erpnext.yml

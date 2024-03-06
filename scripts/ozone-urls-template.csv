@@ -4,4 +4,4 @@ OpenMRS 3,${O3_HOSTNAME}/openmrs/spa,admin,Admin123,openmrs
 SENAITE,${SENAITE_HOSTNAME},admin,password,senaite
 Odoo,${ODOO_HOSTNAME},admin,admin,odoo
 Superset,${SUPERSET_HOSTNAME},admin,password,superset
-ERPNEXT,${ERPNEXT_HOSTNAME},administrator,password,erpnext
+ERPNext,${ERPNEXT_HOSTNAME},administrator,password,erpnext
