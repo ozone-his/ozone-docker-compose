@@ -34,6 +34,8 @@ function exportPaths () {
     export OPENMRS_FRONTEND_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/frontend_config/
     export SQL_SCRIPTS_PATH=$DISTRO_PATH/data/
     export SUPERSET_CONFIG_PATH=$DISTRO_PATH/configs/superset/
+    export ERPNEXT_CONFIG_PATH=$DISTRO_PATH/configs/erpnext/initializer_config/
+    export ERPNEXT_SCRIPTS_PATH=$DISTRO_PATH/binaries/erpnext/scripts/
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
@@ -48,6 +50,8 @@ function exportPaths () {
     echo "→ OPENMRS_FRONTEND_CONFIG_PATH=$OPENMRS_FRONTEND_CONFIG_PATH"
     echo "→ SQL_SCRIPTS_PATH=$SQL_SCRIPTS_PATH"
     echo "→ SUPERSET_CONFIG_PATH=$SUPERSET_CONFIG_PATH"
+    echo "→ ERPNEXT_CONFIG_PATH=$ERPNEXT_CONFIG_PATH"
+    echo "→ ERPNEXT_SCRIPTS_PATH=$ERPNEXT_SCRIPTS_PATH"
     
 }
 
@@ -102,10 +106,12 @@ function setTraefikHostnames {
     export ODOO_HOSTNAME=erp-"${IP_WITH_DASHES}.traefik.me"
     export SENAITE_HOSTNAME=lims-"${IP_WITH_DASHES}.traefik.me"
     export SUPERSET_HOSTNAME=analytics-"${IP_WITH_DASHES}.traefik.me"
+    export ERPNEXT_HOSTNAME=erpnext-"${IP_WITH_DASHES}.traefik.me"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ SUPERSET_HOSTNAME=$SUPERSET_HOSTNAME"
+    echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
 
 }
 
@@ -116,9 +122,46 @@ function setNginxHostnames {
     export ODOO_HOSTNAME="localhost:8069"
     export SENAITE_HOSTNAME="localhost:8081"
     export SUPERSET_HOSTNAME="localhost:8088"
+    export ERPNEXT_HOSTNAME="localhost:8082"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ SUPERSET_HOSTNAME=$SUPERSET_HOSTNAME"
+    echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
 
+}
+
+function displayAccessURLsWithCredentials {
+    services=()
+    is_defined=()
+
+    # Read docker-compose-files.txt and extract the list of services run
+    while read -r line; do
+        serviceWithoutExtension=${line%.yml}
+        service=${serviceWithoutExtension#docker-compose-}
+        
+        services+=("$service")
+        is_defined+=(1)
+    done < docker-compose-files.txt
+
+    echo "HIS Component,URL,Username,Password" > .urls_1.txt
+    echo "-,-,-,-" >> .urls_1.txt
+    tail -n +2 ozone-urls-template.csv | while IFS=',' read -r component url username password service ; do
+        for i in "${!services[@]}"; do
+            if [[ "${services[$i]}" == "$service" && "${is_defined[$i]}" == 1 ]]; then
+                echo "$component,$url,$username,$password" >> .urls_1.txt
+                break
+            fi
+        done
+    done
+
+    envsubst < .urls_1.txt > .urls_2.txt
+    echo ""
+    echo "$INFO 🔗 Access each ${OZONE_LABEL:-Ozone FOSS} components at the following URL:"
+    echo ""
+
+    set +e
+    column -t -s ',' .urls_2.txt > .urls_3.txt 2> /dev/null
+    set -e
+    cat .urls_3.txt
 }
