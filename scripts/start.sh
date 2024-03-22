@@ -83,7 +83,7 @@ fi
 
 envsubst < ozone-urls-template.csv > .urls_1.txt
 echo ""
-echo "$INFO 🔗 Access each ${OZONE_LABEL:-Ozone FOSS} components at the following URL:"
+echo "$INFO 🔗 Access ${OZONE_LABEL:-Ozone FOSS} components at the following URLs:"
 echo ""
 
 set +e
