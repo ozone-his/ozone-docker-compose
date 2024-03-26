@@ -231,6 +231,14 @@ services:
       - erpnext-sites:/home/frappe/frappe-bench/sites
       - erpnext-logs:/home/frappe/frappe-bench/logs
 
+  mysql:
+    environment:
+      EIP_DB_NAME_ERPNEXT: ${EIP_DB_NAME_ERPNEXT}
+      EIP_DB_USER_ERPNEXT: ${EIP_DB_USER_ERPNEXT}
+      EIP_DB_PASSWORD_ERPNEXT: ${EIP_DB_PASSWORD_ERPNEXT}
+    volumes:
+      - "${SQL_SCRIPTS_PATH}/mysql/eip-erpnext-openmrs:/docker-entrypoint-initdb.d/db/eip-erpnext-openmrs"
+
 volumes:
   erpnext-redis-queue-data: ~
   erpnext-redis-cache-data: ~
