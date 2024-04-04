@@ -1,19 +1,31 @@
-version: "3"
+version: "3.7"
+
+x-erpnext-image: &erpnext-image
+  image: frappe/erpnext:v15.12.2
+  platform: linux/amd64
+
+x-redis-image: &redis-image
+  image: redis:6.2-alpine
+
+x-ozone-networks: &ozone-networks
+  networks:
+    - ozone
+    - web
+
+x-erpnext-volumes: &erpnext-volumes
+  volumes:
+    - erpnext-sites:/home/frappe/frappe-bench/sites
+    - erpnext-logs:/home/frappe/frappe-bench/logs
 
 services:
   erpnext-backend:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     deploy:
       restart_policy:
         condition: on-failure
-    image: frappe/erpnext:v15.12.2
-    platform: linux/amd64
-    networks:
-      - ozone
-    volumes:
-      - erpnext-sites:/home/frappe/frappe-bench/sites
-      - erpnext-logs:/home/frappe/frappe-bench/logs
 
   erpnext-configurator:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - >
         ls -1 apps > sites/apps.txt;
@@ -35,15 +47,9 @@ services:
       REDIS_CACHE: erpnext-redis-cache:6379
       REDIS_QUEUE: erpnext-redis-queue:6379
       SOCKETIO_PORT: "9000"
-    image: frappe/erpnext:v15.12.2
-    platform: linux/amd64
-    networks:
-      - ozone
-    volumes:
-      - erpnext-sites:/home/frappe/frappe-bench/sites
-      - erpnext-logs:/home/frappe/frappe-bench/logs
 
   erpnext-init:
+    <<: [ *erpnext-image, *ozone-networks ]
     command:
       - >
         wait-for-it -t 120 mysql:3306;
@@ -99,17 +105,14 @@ services:
       ERPNEXT_ADMIN_PASSWORD: ${ERPNEXT_ADMIN_PASSWORD}
       MYSQL_ADMIN_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       ERPNEXT_DB_NAME: ${ERPNEXT_DB_NAME}
-    image: frappe/erpnext:v15.12.2
-    platform: linux/amd64
     volumes:
       - erpnext-sites:/home/frappe/frappe-bench/sites
       - erpnext-logs:/home/frappe/frappe-bench/logs
       - "${ERPNEXT_CONFIG_PATH}:/opt/erpnext/configs"
       - "${ERPNEXT_SCRIPTS_PATH}:/opt/erpnext/scripts"
-    networks:
-      - ozone
 
   erpnext:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - nginx-entrypoint.sh
     depends_on:
@@ -133,21 +136,14 @@ services:
       UPSTREAM_REAL_IP_RECURSIVE: "off"
       PROXY_READ_TIMEOUT: 120
       CLIENT_MAX_BODY_SIZE: 50m
-    image: frappe/erpnext:v15.12.2
     labels:
       traefik.enable: "true"
       traefik.http.routers.erpnext.rule: "Host(`${ERPNEXT_HOSTNAME}`)"
       traefik.http.routers.erpnext.entrypoints: "websecure"
       traefik.http.services.erpnext.loadbalancer.server.port: 8082
-    platform: linux/amd64
-    networks:
-      - ozone
-      - web
-    volumes:
-      - erpnext-sites:/home/frappe/frappe-bench/sites
-      - erpnext-logs:/home/frappe/frappe-bench/logs
 
   erpnext-queue-long:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - bench
       - worker
@@ -156,15 +152,9 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-    image: frappe/erpnext:v15.12.2
-    platform: linux/amd64
-    networks:
-      - ozone
-    volumes:
-      - erpnext-sites:/home/frappe/frappe-bench/sites
-      - erpnext-logs:/home/frappe/frappe-bench/logs
 
   erpnext-queue-short:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - bench
       - worker
@@ -173,63 +163,40 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-    image: frappe/erpnext:v15.12.2
-    platform: linux/amd64
-    networks:
-      - ozone
-    volumes:
-      - erpnext-sites:/home/frappe/frappe-bench/sites
-      - erpnext-logs:/home/frappe/frappe-bench/logs
 
   erpnext-redis-queue:
+    <<: [ *redis-image, *ozone-networks ]
     deploy:
       restart_policy:
         condition: on-failure
-    image: redis:6.2-alpine
-    networks:
-      - ozone
     volumes:
       - erpnext-redis-queue-data:/data
 
   erpnext-redis-cache:
+    <<: [ *redis-image, *ozone-networks ]
     deploy:
       restart_policy:
         condition: on-failure
-    image: redis:6.2-alpine
-    networks:
-      - ozone
     volumes:
       - erpnext-redis-cache-data:/data
 
   erpnext-scheduler:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - bench
       - schedule
     deploy:
       restart_policy:
         condition: on-failure
-    image: frappe/erpnext:v15.12.2
-    platform: linux/amd64
-    networks:
-      - ozone
-    volumes:
-      - erpnext-sites:/home/frappe/frappe-bench/sites
-      - erpnext-logs:/home/frappe/frappe-bench/logs
 
   erpnext-websocket:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - node
       - /home/frappe/frappe-bench/apps/frappe/socketio.js
     deploy:
       restart_policy:
         condition: on-failure
-    image: frappe/erpnext:v15.12.2
-    platform: linux/amd64
-    networks:
-      - ozone
-    volumes:
-      - erpnext-sites:/home/frappe/frappe-bench/sites
-      - erpnext-logs:/home/frappe/frappe-bench/logs
 
   mysql:
     environment:
