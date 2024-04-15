@@ -81,12 +81,4 @@ else
     echo "$ERROR Docker versions < 20.10.13 are not supported"
 fi
 
-envsubst < ozone-urls-template.csv > .urls_1.txt
-echo ""
-echo "$INFO 🔗 Access ${OZONE_LABEL:-Ozone FOSS} components at the following URLs:"
-echo ""
-
-set +e
-column -t -s ',' .urls_1.txt > .urls_2.txt 2> /dev/null
-set -e
-cat .urls_2.txt
+displayAccessURLsWithCredentials

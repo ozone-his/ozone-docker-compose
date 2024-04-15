@@ -1,6 +1,7 @@
-HIS Component,URL,Username,Password
+HIS Component,URL,Username,Password,Service
 -,-,-,-
-OpenMRS 3,${O3_HOSTNAME}/openmrs/spa,admin,Admin123
-SENAITE,${SENAITE_HOSTNAME},admin,password
-Odoo,${ODOO_HOSTNAME},admin,admin
-Superset,${SUPERSET_HOSTNAME},admin,password
+OpenMRS 3,${O3_HOSTNAME}/openmrs/spa,admin,Admin123,openmrs
+SENAITE,${SENAITE_HOSTNAME},admin,password,senaite
+Odoo,${ODOO_HOSTNAME},admin,admin,odoo
+Superset,${SUPERSET_HOSTNAME},admin,password,superset
+ERPNext,${ERPNEXT_HOSTNAME},administrator,password,erpnext

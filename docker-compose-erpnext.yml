@@ -1,0 +1,213 @@
+version: "3.7"
+
+x-erpnext-image: &erpnext-image
+  image: frappe/erpnext:v15.12.2
+  platform: linux/amd64
+
+x-redis-image: &redis-image
+  image: redis:6.2-alpine
+
+x-ozone-networks: &ozone-networks
+  networks:
+    - ozone
+    - web
+
+x-erpnext-volumes: &erpnext-volumes
+  volumes:
+    - erpnext-sites:/home/frappe/frappe-bench/sites
+    - erpnext-logs:/home/frappe/frappe-bench/logs
+
+services:
+  erpnext-backend:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  erpnext-configurator:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
+    command:
+      - >
+        ls -1 apps > sites/apps.txt;
+        bench set-config -g db_host $$DB_HOST;
+        bench set-config -gp db_port $$DB_PORT;
+        bench set-config -g redis_cache "redis://$$REDIS_CACHE";
+        bench set-config -g redis_queue "redis://$$REDIS_QUEUE";
+        bench set-config -g redis_socketio "redis://$$REDIS_QUEUE";
+        bench set-config -gp socketio_port $$SOCKETIO_PORT;
+    deploy:
+      restart_policy:
+        condition: none
+    entrypoint:
+      - bash
+      - -c
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      REDIS_CACHE: erpnext-redis-cache:6379
+      REDIS_QUEUE: erpnext-redis-queue:6379
+      SOCKETIO_PORT: "9000"
+
+  erpnext-init:
+    <<: [ *erpnext-image, *ozone-networks ]
+    command:
+      - >
+        wait-for-it -t 120 mysql:3306;
+        wait-for-it -t 120 erpnext-redis-cache:6379;
+        wait-for-it -t 120 erpnext-redis-queue:6379;
+        export start=`date +%s`;
+        until [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".db_host // empty"` ]] && \
+          [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_cache // empty"` ]] && \
+          [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_queue // empty"` ]];
+        do
+          echo "Waiting for sites/common_site_config.json to be created";
+          sleep 5;
+          if (( `date +%s`-start > 120 )); then
+            echo "could not find sites/common_site_config.json with required keys";
+            exit 1
+          fi
+        done;
+        echo "sites/common_site_config.json found";
+        echo "Creating new site";
+        bench new-site --no-mariadb-socket --admin-password=$$ERPNEXT_ADMIN_PASSWORD --db-root-password=$$MYSQL_ADMIN_PASSWORD --db-name=$$ERPNEXT_DB_NAME --source_sql=/opt/erpnext/configs/sql/erpnext-v15.12.2-init-db.sql.gz --install-app erpnext --set-default ozone-erpnext;
+        echo "==============================================================";
+        export startTime=`date +%s`;
+        until [[ -f sites/ozone-erpnext/site_config.json ]];
+        do
+          echo "Waiting for sites/ozone-erpnext/site_config.json to be created";
+          sleep 5;
+          if (( `date +%s`-startTime > 480 )); then
+            echo "could not find sites/ozone-erpnext/site_config.json";
+            exit 1
+          fi
+        done;
+        echo "Site fully initialized";
+        echo "Running data-import.sh script to import data into the new site";
+        source /opt/erpnext/scripts/data-import.sh;
+        echo "==============================================================";
+
+    depends_on:
+      erpnext-configurator:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_started
+      erpnext-redis-cache:
+        condition: service_started
+      erpnext-redis-queue:
+        condition: service_started
+    deploy:
+      restart_policy:
+        condition: none
+    entrypoint:
+      - bash
+      - -c
+    environment:
+      ERPNEXT_ADMIN_PASSWORD: ${ERPNEXT_ADMIN_PASSWORD}
+      MYSQL_ADMIN_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      ERPNEXT_DB_NAME: ${ERPNEXT_DB_NAME}
+    volumes:
+      - erpnext-sites:/home/frappe/frappe-bench/sites
+      - erpnext-logs:/home/frappe/frappe-bench/logs
+      - "${ERPNEXT_CONFIG_PATH}:/opt/erpnext/configs"
+      - "${ERPNEXT_SCRIPTS_PATH}:/opt/erpnext/scripts"
+
+  erpnext:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
+    command:
+      - nginx-entrypoint.sh
+    depends_on:
+      erpnext-websocket:
+        condition: service_started
+      erpnext-init:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_started
+      env-substitution:
+        condition: service_completed_successfully
+    deploy:
+      restart_policy:
+        condition: on-failure
+    environment:
+      BACKEND: erpnext-backend:8000
+      FRAPPE_SITE_NAME_HEADER: ozone-erpnext
+      SOCKETIO: erpnext-websocket:9000
+      UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
+      UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
+      UPSTREAM_REAL_IP_RECURSIVE: "off"
+      PROXY_READ_TIMEOUT: 120
+      CLIENT_MAX_BODY_SIZE: 50m
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.erpnext.rule: "Host(`${ERPNEXT_HOSTNAME}`)"
+      traefik.http.routers.erpnext.entrypoints: "websecure"
+      traefik.http.services.erpnext.loadbalancer.server.port: 8082
+
+  erpnext-queue-long:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
+    command:
+      - bench
+      - worker
+      - --queue
+      - long,default,short
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  erpnext-queue-short:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
+    command:
+      - bench
+      - worker
+      - --queue
+      - short,default
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  erpnext-redis-queue:
+    <<: [ *redis-image, *ozone-networks ]
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - erpnext-redis-queue-data:/data
+
+  erpnext-redis-cache:
+    <<: [ *redis-image, *ozone-networks ]
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - erpnext-redis-cache-data:/data
+
+  erpnext-scheduler:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
+    command:
+      - bench
+      - schedule
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  erpnext-websocket:
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
+    command:
+      - node
+      - /home/frappe/frappe-bench/apps/frappe/socketio.js
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  mysql:
+    environment:
+      EIP_DB_NAME_ERPNEXT: ${EIP_DB_NAME_ERPNEXT}
+      EIP_DB_USER_ERPNEXT: ${EIP_DB_USER_ERPNEXT}
+      EIP_DB_PASSWORD_ERPNEXT: ${EIP_DB_PASSWORD_ERPNEXT}
+    volumes:
+      - "${SQL_SCRIPTS_PATH}/mysql/eip-erpnext-openmrs:/docker-entrypoint-initdb.d/db/eip-erpnext-openmrs"
+
+volumes:
+  erpnext-redis-queue-data: ~
+  erpnext-redis-cache-data: ~
+  erpnext-sites: ~
+  erpnext-logs: ~
