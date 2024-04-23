@@ -199,7 +199,7 @@ services:
         condition: on-failure
 
   eip-erpnext-openmrs:
-    <<: [ *erpnext-image, *ozone-networks ]
+    <<: [ *ozone-networks ]
     depends_on:
       env-substitution:
         condition: service_completed_successfully
@@ -225,7 +225,7 @@ services:
       - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
       - OPENMRS_DB_USER=${OPENMRS_DB_USER}
       - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
-      - EIP_FHIR_RESOURCES=Patient,Encouter,Observation,ServiceRequest,MedicationRequest
+      - EIP_FHIR_RESOURCES=Patient,ServiceRequest,MedicationRequest
       - EIP_FHIR_SERVER_URL=http://openmrs:8080/openmrs/ws/fhir2/R4
       - EIP_FHIR_USERNAME=${OPENMRS_USER}
       - EIP_FHIR_PASSWORD=${OPENMRS_PASSWORD}
