@@ -140,7 +140,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.erpnext.rule: "Host(`${ERPNEXT_HOSTNAME}`)"
       traefik.http.routers.erpnext.entrypoints: "websecure"
-      traefik.http.services.erpnext.loadbalancer.server.port: 8082
+      traefik.http.services.erpnext.loadbalancer.server.port: 8080
 
   erpnext-queue-long:
     <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
@@ -210,7 +210,7 @@ services:
       erpnext:
         condition: service_started
     environment:
-      - ERPNEXT_SERVER_URL=http://erpnext:8082/api
+      - ERPNEXT_SERVER_URL=http://erpnext:8080/api
       - ERPNEXT_USERNAME=${ERPNEXT_USER}
       - ERPNEXT_PASSWORD=${ERPNEXT_PASSWORD}
       - ERPNEXT_OPENMRS_ENABLE_PATIENT_SYNC=false
@@ -225,7 +225,7 @@ services:
       - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
       - OPENMRS_DB_USER=${OPENMRS_DB_USER}
       - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
-      - EIP_FHIR_RESOURCES=Patient,ServiceRequest,MedicationRequest
+      - EIP_FHIR_RESOURCES=Patient,ServiceRequest,MedicationRequest,Encounter
       - EIP_FHIR_SERVER_URL=http://openmrs:8080/openmrs/ws/fhir2/R4
       - EIP_FHIR_USERNAME=${OPENMRS_USER}
       - EIP_FHIR_PASSWORD=${OPENMRS_PASSWORD}
