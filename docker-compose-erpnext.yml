@@ -140,7 +140,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.erpnext.rule: "Host(`${ERPNEXT_HOSTNAME}`)"
       traefik.http.routers.erpnext.entrypoints: "websecure"
-      traefik.http.services.erpnext.loadbalancer.server.port: 8082
+      traefik.http.services.erpnext.loadbalancer.server.port: 8080
 
   erpnext-queue-long:
     <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
