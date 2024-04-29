@@ -104,6 +104,8 @@ services:
     volumes:
       - "${EIP_ODOO_OPENMRS_ROUTES_PATH}:/eip-client/routes"
       - eip-home-odoo:/eip-home
+    ports:
+      - "9080:8080"
     
   postgresql:
     environment:

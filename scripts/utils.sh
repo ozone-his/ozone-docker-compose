@@ -23,6 +23,7 @@ function exportPaths () {
     export OPENMRS_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/initializer_config
     export OPENMRS_PROPERTIES_PATH=$DISTRO_PATH/configs/openmrs/properties
     export OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/openmrs/modules
+    export OPENMRS_JMX_PATH=$DISTRO_PATH/binaries/monitoring
     export SPA_PATH=/openmrs/spa
     export SENAITE_CONFIG_PATH=$DISTRO_PATH/configs/senaite/initializer_config
     export ODOO_EXTRA_ADDONS=$DISTRO_PATH/binaries/odoo/addons
@@ -40,6 +41,7 @@ function exportPaths () {
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
     echo "→ OPENMRS_MODULES_PATH=$OPENMRS_MODULES_PATH"
+    echo "→ OPENMRS_JMX_PATH=$OPENMRS_JMX_PATH"
     echo "→ SPA_PATH=$SPA_PATH"
     echo "→ SENAITE_CONFIG_PATH=$SENAITE_CONFIG_PATH"
     echo "→ ODOO_EXTRA_ADDONS=$ODOO_EXTRA_ADDONS"
