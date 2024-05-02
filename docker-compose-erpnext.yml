@@ -20,9 +20,7 @@ x-erpnext-volumes: &erpnext-volumes
 services:
   erpnext-backend:
     <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: unless-stopped
 
   erpnext-configurator:
     <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
@@ -35,9 +33,6 @@ services:
         bench set-config -g redis_queue "redis://$$REDIS_QUEUE";
         bench set-config -g redis_socketio "redis://$$REDIS_QUEUE";
         bench set-config -gp socketio_port $$SOCKETIO_PORT;
-    deploy:
-      restart_policy:
-        condition: none
     entrypoint:
       - bash
       - -c
@@ -95,9 +90,6 @@ services:
         condition: service_started
       erpnext-redis-queue:
         condition: service_started
-    deploy:
-      restart_policy:
-        condition: none
     entrypoint:
       - bash
       - -c
@@ -124,9 +116,7 @@ services:
         condition: service_started
       env-substitution:
         condition: service_completed_successfully
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: on-failure
     environment:
       BACKEND: erpnext-backend:8000
       FRAPPE_SITE_NAME_HEADER: ozone-erpnext
@@ -149,9 +139,7 @@ services:
       - worker
       - --queue
       - long,default,short
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: on-failure
 
   erpnext-queue-short:
     <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
@@ -160,23 +148,17 @@ services:
       - worker
       - --queue
       - short,default
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: on-failure
 
   erpnext-redis-queue:
     <<: [ *redis-image, *ozone-networks ]
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: on-failure
     volumes:
       - erpnext-redis-queue-data:/data
 
   erpnext-redis-cache:
     <<: [ *redis-image, *ozone-networks ]
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: on-failure
     volumes:
       - erpnext-redis-cache-data:/data
 
@@ -185,18 +167,14 @@ services:
     command:
       - bench
       - schedule
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: on-failure
 
   erpnext-websocket:
     <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - node
       - /home/frappe/frappe-bench/apps/frappe/socketio.js
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: on-failure
 
   eip-erpnext-openmrs:
     <<: [ *ozone-networks ]
