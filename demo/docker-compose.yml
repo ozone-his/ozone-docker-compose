@@ -9,6 +9,7 @@ services:
       - OPENMRS_URL=http://openmrs:8080/openmrs
       - OPENMRS_USER=${OPENMRS_USER}
       - OPENMRS_PASSWORD=${OPENMRS_PASSWORD}
+      - ENABLE_LIQUIBASE=false
     volumes:
       - "${EIP_DEMO_DATA_CONFIG_PATH:-./eip/config}:/eip-client/config"
       - "${EIP_DEMO_DATA_ROUTES_PATH:-./eip/routes}:/eip-client/routes"
