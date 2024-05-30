@@ -23,5 +23,10 @@
         </setBody>
 
         <toD cacheSize="-1" uri="{{openmrs.baseUrl}}/ws/rest/v1/referencedemodata/generate"/>
+
+        <!-- On successful completion, run the shutdown method -->
+        <onCompletion>
+            <bean ref="shutdownHandler" method="shutdown"/>
+        </onCompletion>
     </route>
 </routes>
