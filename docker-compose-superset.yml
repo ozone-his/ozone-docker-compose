@@ -17,7 +17,7 @@ services:
       - ADMIN_USERNAME=${SUPERSET_ADMIN_USERNAME}
       - ADMIN_PASSWORD=${SUPERSET_ADMIN_PASSWORD}
       - ANALYTICS_DB_PASSWORD=${ANALYTICS_DB_PASSWORD}
-    image: &superset-image amancevice/superset:2.1.0
+    image: &superset-image amancevice/superset:4.0.0
     labels:
       traefik.enable: "true"
       traefik.http.routers.superset.rule: "Host(`${SUPERSET_HOSTNAME}`)"
@@ -60,6 +60,7 @@ services:
     restart: on-failure
     volumes:
       - ${SUPERSET_CONFIG_PATH}/:/etc/superset/
+      - ${SUPERSET_DASHBOARDS_PATH}/:/dashboards/
     
   redis:
     image: redis:7
