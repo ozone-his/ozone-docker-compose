@@ -35,6 +35,7 @@ function exportPaths () {
     export OPENMRS_FRONTEND_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/frontend_config/
     export SQL_SCRIPTS_PATH=$DISTRO_PATH/data/
     export SUPERSET_CONFIG_PATH=$DISTRO_PATH/configs/superset/
+    export SUPERSET_DASHBOARDS_PATH=$DISTRO_PATH/configs/superset/dashboard-assets/
     export ERPNEXT_CONFIG_PATH=$DISTRO_PATH/configs/erpnext/initializer_config/
     export ERPNEXT_SCRIPTS_PATH=$DISTRO_PATH/binaries/erpnext/scripts/
 
@@ -52,6 +53,7 @@ function exportPaths () {
     echo "→ OPENMRS_FRONTEND_CONFIG_PATH=$OPENMRS_FRONTEND_CONFIG_PATH"
     echo "→ SQL_SCRIPTS_PATH=$SQL_SCRIPTS_PATH"
     echo "→ SUPERSET_CONFIG_PATH=$SUPERSET_CONFIG_PATH"
+    echo "→ SUPERSET_DASHBOARDS_PATH=$SUPERSET_DASHBOARDS_PATH"
     echo "→ ERPNEXT_CONFIG_PATH=$ERPNEXT_CONFIG_PATH"
     echo "→ ERPNEXT_SCRIPTS_PATH=$ERPNEXT_SCRIPTS_PATH"
     
