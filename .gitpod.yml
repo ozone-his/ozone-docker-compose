@@ -10,6 +10,9 @@ ports:
   - name: Odoo
     description: Odoo
     port: 8069
+  - name: Superset
+    description: Superset
+    port: 8088
   - name: SENAITE
     description: SENAITE
     port: 8081
