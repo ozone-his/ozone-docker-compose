@@ -34,8 +34,6 @@ function exportPaths () {
     export OPENMRS_FRONTEND_BINARY_PATH=$DISTRO_PATH/binaries/openmrs/frontend
     export OPENMRS_FRONTEND_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/frontend_config/
     export SQL_SCRIPTS_PATH=$DISTRO_PATH/data/
-    export SUPERSET_CONFIG_PATH=$DISTRO_PATH/configs/superset/
-    export SUPERSET_DASHBOARDS_PATH=$DISTRO_PATH/configs/superset/dashboard-assets/
     export ERPNEXT_CONFIG_PATH=$DISTRO_PATH/configs/erpnext/initializer_config/
     export ERPNEXT_SCRIPTS_PATH=$DISTRO_PATH/binaries/erpnext/scripts/
 
@@ -52,8 +50,6 @@ function exportPaths () {
     echo "→ EIP_ERPNEXT_OPENMRS_ROUTES_PATH=$EIP_ERPNEXT_OPENMRS_ROUTES_PATH"
     echo "→ OPENMRS_FRONTEND_CONFIG_PATH=$OPENMRS_FRONTEND_CONFIG_PATH"
     echo "→ SQL_SCRIPTS_PATH=$SQL_SCRIPTS_PATH"
-    echo "→ SUPERSET_CONFIG_PATH=$SUPERSET_CONFIG_PATH"
-    echo "→ SUPERSET_DASHBOARDS_PATH=$SUPERSET_DASHBOARDS_PATH"
     echo "→ ERPNEXT_CONFIG_PATH=$ERPNEXT_CONFIG_PATH"
     echo "→ ERPNEXT_SCRIPTS_PATH=$ERPNEXT_SCRIPTS_PATH"
     
@@ -109,12 +105,10 @@ function setTraefikHostnames {
     export O3_HOSTNAME=emr-"${IP_WITH_DASHES}.traefik.me"
     export ODOO_HOSTNAME=erp-"${IP_WITH_DASHES}.traefik.me"
     export SENAITE_HOSTNAME=lims-"${IP_WITH_DASHES}.traefik.me"
-    export SUPERSET_HOSTNAME=analytics-"${IP_WITH_DASHES}.traefik.me"
     export ERPNEXT_HOSTNAME=erpnext-"${IP_WITH_DASHES}.traefik.me"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
-    echo "→ SUPERSET_HOSTNAME=$SUPERSET_HOSTNAME"
     echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
 
 }
@@ -125,12 +119,10 @@ function setNginxHostnames {
     export O3_HOSTNAME="localhost"
     export ODOO_HOSTNAME="localhost:8069"
     export SENAITE_HOSTNAME="localhost:8081"
-    export SUPERSET_HOSTNAME="localhost:8088"
     export ERPNEXT_HOSTNAME="localhost:8082"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
-    echo "→ SUPERSET_HOSTNAME=$SUPERSET_HOSTNAME"
     echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
 
 }
