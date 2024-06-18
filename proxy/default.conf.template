@@ -147,16 +147,6 @@ server {
 }
 
 server {
-    listen 8088;
-    location / {
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        set $superset superset:8088;
-        proxy_pass http://$superset;
-    }
-}
-
-server {
     listen 8081;
     location / {
         proxy_set_header Host $http_host;

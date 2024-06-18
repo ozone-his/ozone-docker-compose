@@ -2,4 +2,3 @@ docker-compose-common.yml
 docker-compose-odoo.yml
 docker-compose-openmrs.yml
 docker-compose-senaite.yml
-docker-compose-superset.yml
