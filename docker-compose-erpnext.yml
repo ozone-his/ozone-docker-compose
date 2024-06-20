@@ -1,5 +1,3 @@
-version: "3.7"
-
 x-erpnext-image: &erpnext-image
   image: frappe/erpnext:v15.12.2
   platform: linux/amd64
