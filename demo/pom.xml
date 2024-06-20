@@ -4,7 +4,7 @@
   <groupId>com.ozonehis</groupId>
   <artifactId>ozone-demo-data</artifactId>
   <name>Resources to create demo data for Ozone</name>
-  <version>1.0.0-alpha.11</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <organization>
