@@ -71,6 +71,8 @@ services:
     volumes:
       - "${EIP_OPENMRS_SENAITE_ROUTES_PATH}:/eip-client/routes"
       - eip-home-senaite:/eip-home
+    ports:
+      - "9081:8080"
 
   mysql:
     environment:

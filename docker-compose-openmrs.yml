@@ -15,6 +15,7 @@ services:
       OMRS_CONFIG_CONNECTION_DATABASE: openmrs
       OMRS_CONFIG_CONNECTION_USERNAME: ${OPENMRS_DB_USER:-openmrs}
       OMRS_CONFIG_CONNECTION_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
+      OMRS_JAVA_SERVER_OPTS: ${OMRS_JAVA_SERVER_OPTS}
       HOST_URL: https://${O3_HOSTNAME}
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/health/started" ]
@@ -43,6 +44,8 @@ services:
       - "${OPENMRS_CONFIG_PATH:-openmrs-config}:/openmrs/distribution/openmrs_config/"
       - "${OPENMRS_CONFIG_CHECKSUMS_PATH:-openmrs-config-checksums}:/openmrs/data/configuration_checksums"
       - "${OPENMRS_PROPERTIES_PATH}:/etc/properties/"
+    ports:
+      - "${JMX_EXPORTER_PORT:-8088}:8088"
 
   # OpenMRS 3 Frontend
   frontend:
