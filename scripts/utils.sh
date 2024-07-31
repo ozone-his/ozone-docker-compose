@@ -127,6 +127,16 @@ function setNginxHostnames {
 
 }
 
+function isOzoneRunning {
+    local projectName=$1
+    runningContainers=$(docker ps --filter "name=${projectName}" --format "{{.Names}}")
+    if [ -n "$runningContainers" ]; then
+        return 0  # true
+    else
+        return 1  # false
+    fi
+}
+
 function displayAccessURLsWithCredentials {
     services=()
     is_defined=()

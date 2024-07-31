@@ -29,6 +29,16 @@ if [ "$DEMO" == "true" ]; then
     echo "→ NUMBER_OF_DEMO_PATIENTS=$NUMBER_OF_DEMO_PATIENTS"
 fi
 
+projectName="ozone"
+suffix=0
+
+while isOzoneRunning "$projectName"; do
+    suffix=$((suffix + 1))
+    projectName="ozone_$suffix"
+done
+
+echo "$INFO Starting Ozone project with name: $projectName"
+
 INSTALLED_DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
 MINIMUM_REQUIRED_DOCKER_VERSION_REGEX="^((([2-9][1-9]|[3-9][0]|[0-9]{3,}).*)|(20\.([0-9]{3,}|[1-9][1-9]|[2-9][0]).*)|(20\.10\.([0-9]{3,}|[2-9][0-9]|[1][3-9])))"
 if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; then
@@ -40,10 +50,10 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
 
     # Pull Ozone Docker images
     echo "$INFO Pulling ${OZONE_LABEL:-Ozone FOSS} images..."
-    docker compose -p ozone $dockerComposeOzoneCLIOptions pull
+    docker compose -p $projectName $dockerComposeOzoneCLIOptions pull
     
     # Set the Docker Compose command for Ozone
-    dockerComposeOzoneCommand="docker compose -p ozone $dockerComposeOzoneCLIOptions up -d --build"
+    dockerComposeOzoneCommand="docker compose -p $projectName $dockerComposeOzoneCLIOptions up -d --build"
     echo "$INFO Running ${OZONE_LABEL:-Ozone FOSS}..."
     echo ""
     echo "$dockerComposeOzoneCommand"
@@ -57,7 +67,7 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
 
     # Run the Nginx Proxy service, if $TRAEFIK!=true
     if [ "$TRAEFIK" != "true" ]; then
-        dockerComposeProxyCommand="docker compose -p ozone $dockerComposeProxyCLIOptions up -d --build"
+        dockerComposeProxyCommand="docker compose -p $projectName $dockerComposeProxyCLIOptions up -d --build"
         echo "$INFO Running Nginx proxy service (\$TRAEFIK!=true)..."
         echo ""
         echo "$dockerComposeProxyCommand"
@@ -69,7 +79,7 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
 
     # Run the Demo service
     if [ "$DEMO" == "true" ]; then
-        dockerComposeDemoCommand="docker compose -p ozone $dockerComposeDemoCLIOptions up -d"
+        dockerComposeDemoCommand="docker compose -p $projectName $dockerComposeDemoCLIOptions up -d"
         echo "$INFO Running demo service..."
         echo ""
         echo "$dockerComposeDemoCommand"
