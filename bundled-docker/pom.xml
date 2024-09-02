@@ -76,7 +76,7 @@
                                         <include>postgresql/**</include>
                                         <include>proxy/**</include>
                                         <include>senaite/**</include>
-                                        <include>docker-compose-bundled.yaml.template</include>
+                                        <include>docker-compose-bundled.yml.template</include>
                                     </includes>
                                 </resource>
                             </resources>
