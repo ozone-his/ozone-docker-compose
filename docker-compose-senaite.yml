@@ -62,6 +62,11 @@ services:
       - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
       - OPENMRS_USER=${OPENMRS_USER}
       - OPENMRS_PASSWORD=${OPENMRS_PASSWORD}
+      - EIP_FHIR_RESOURCES=Patient,ServiceRequest
+      - EIP_FHIR_SERVER_URL=http://openmrs:8080/openmrs/ws/fhir2/R4
+      - EIP_FHIR_USERNAME=${OPENMRS_USER}
+      - EIP_FHIR_PASSWORD=${OPENMRS_PASSWORD}
+      - SENAITE_OPENMRS_ENABLE_PATIENT_SYNC=false
     image: mekomsolutions/eip-client
     networks:
       ozone:
