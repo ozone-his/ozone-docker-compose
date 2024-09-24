@@ -24,6 +24,7 @@ services:
       - "8081:8081"
       - "8088:8088"
       - "8082:8082"
+      - "8083:8083"
     volumes:
       - "./confs:/usr/local/apache2/conf/extra"
       - "${PROXY_TLS_CERTS_PATH:-proxy-tls-certs}:/etc/tls"
