@@ -43,6 +43,7 @@ services:
       - "${OPENMRS_CONFIG_PATH:-openmrs-config}:/openmrs/distribution/openmrs_config/"
       - "${OPENMRS_CONFIG_CHECKSUMS_PATH:-openmrs-config-checksums}:/openmrs/data/configuration_checksums"
       - "${OPENMRS_PROPERTIES_PATH}:/etc/properties/"
+      - "${OPENMRS_PROPERTIES_PATH}/fhir-proxy.properties:/openmrs/data/fhirproxy/config.properties"
 
   # OpenMRS 3 Frontend
   frontend:

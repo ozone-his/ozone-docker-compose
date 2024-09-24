@@ -98,7 +98,31 @@ services:
     volumes:
       - "${EIP_ODOO_OPENMRS_ROUTES_PATH}:/eip-client/routes"
       - eip-home-odoo:/eip-home
-    
+
+  fhir-odoo:
+    depends_on:
+      env-substitution:
+        condition: service_completed_successfully
+      odoo:
+        condition: service_started
+    environment:
+      - ODOO_HOST=odoo
+      - ODOO_PORT=8069
+      - ODOO_RPC_PROTOCOL=${ODOO_RPC_PROTOCOL}
+      - ODOO_DATABASE=${ODOO_DATABASE}
+    image: mekomsolutions/fhir-odoo
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.fhir-odoo.rule: "Host(`${FHIR_ODOO_HOSTNAME}`)"
+      traefik.http.routers.fhir-odoo.entrypoints: "websecure"
+      traefik.http.services.fhir-odoo.loadbalancer.server.port: 8080
+    networks:
+      ozone:
+        aliases:
+          - fhir-odoo
+          - odoo-fhir-facade
+    restart: unless-stopped
+
   postgresql:
     environment:
       ODOO_DB_NAME: ${ODOO_DATABASE}
@@ -118,6 +142,10 @@ services:
   env-substitution:
     environment:
       - ODOO_PUBLIC_URL=${SERVER_SCHEME}://${ODOO_HOSTNAME}
+      - ODOO_PUBLIC_URL=https://${ODOO_HOSTNAME}
+      - FHIR_ODOO_PUBLIC_URL=${ODOO_RPC_PROTOCOL}://${FHIR_ODOO_HOSTNAME}
+      - ODOO_USER=${ODOO_USER}
+      - ODOO_PASSWORD=${ODOO_PASSWORD}
 
 volumes:
   eip-home-odoo: ~
