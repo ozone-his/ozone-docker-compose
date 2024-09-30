@@ -29,12 +29,18 @@ if [ "$DEMO" == "true" ]; then
     echo "→ NUMBER_OF_DEMO_PATIENTS=$NUMBER_OF_DEMO_PATIENTS"
 fi
 
-projectName="ozone"
-suffix=0
+# Check if ozone-info.json exists and read project name
+ozoneInfo="../$DISTRO_PATH/ozone-info.json"
+if [ -f "$ozoneInfo" ]; then
+     projectName=$(grep -o '"name":\s*"[^\"]*"' "$ozoneInfo" | cut -d'"' -f4)
+else
+    projectName="ozone"
+fi
 
+suffix=0
 while isOzoneRunning "$projectName"; do
     suffix=$((suffix + 1))
-    projectName="ozone_$suffix"
+    projectName="$projectName-$suffix"
 done
 
 echo "$INFO Starting Ozone project with name: $projectName"
