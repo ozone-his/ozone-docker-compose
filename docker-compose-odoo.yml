@@ -106,9 +106,8 @@ services:
       odoo:
         condition: service_started
     environment:
-      - ODOO_HOST=odoo
+      - ODOO_HOST=http://odoo
       - ODOO_PORT=8069
-      - ODOO_RPC_PROTOCOL=${ODOO_RPC_PROTOCOL}
       - ODOO_DATABASE=${ODOO_DATABASE}
     image: mekomsolutions/fhir-odoo
     labels:
@@ -143,7 +142,7 @@ services:
     environment:
       - ODOO_PUBLIC_URL=${SERVER_SCHEME}://${ODOO_HOSTNAME}
       - ODOO_PUBLIC_URL=https://${ODOO_HOSTNAME}
-      - EXTERNAL_FHIR_API_URL=${ODOO_RPC_PROTOCOL}://${FHIR_ODOO_HOSTNAME}/odoo/fhir/R4
+      - EXTERNAL_FHIR_API_URL=http://fhir-odoo:8080/odoo/fhir/R4
       - EXTERNAL_FHIR_API_USERNAME=${ODOO_USER}
       - EXTERNAL_FHIR_API_PASSWORD=${ODOO_PASSWORD}
 
