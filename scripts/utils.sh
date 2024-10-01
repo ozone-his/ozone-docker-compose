@@ -2,10 +2,12 @@
 
 export TEXT_BLUE=`tput setaf 4`
 export TEXT_RED=`tput setaf 1`
+export TEXT_YELLOW=`tput setaf 3`
 export BOLD=`tput bold`
 export RESET_FORMATTING=`tput sgr0`
 INFO="$TEXT_BLUE$BOLD[INFO]$RESET_FORMATTING"
 ERROR="$TEXT_RED$BOLD[ERROR]$RESET_FORMATTING"
+WARN="$TEXT_YELLOW$BOLD[WARN]$RESET_FORMATTING"
 
 function setupDirs () {
     # Create the Ozone directory
