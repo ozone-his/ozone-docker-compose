@@ -108,10 +108,12 @@ function setTraefikHostnames {
     export ODOO_HOSTNAME=erp-"${IP_WITH_DASHES}.traefik.me"
     export SENAITE_HOSTNAME=lims-"${IP_WITH_DASHES}.traefik.me"
     export ERPNEXT_HOSTNAME=erpnext-"${IP_WITH_DASHES}.traefik.me"
+    export FHIR_ODOO_HOSTNAME=fhir-erp-"${IP_WITH_DASHES}.traefik.me"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
+    echo "→ FHIR_ODOO_HOSTNAME=$FHIR_ODOO_HOSTNAME"
 
 }
 
@@ -122,10 +124,12 @@ function setNginxHostnames {
     export ODOO_HOSTNAME="localhost:8069"
     export SENAITE_HOSTNAME="localhost:8081"
     export ERPNEXT_HOSTNAME="localhost:8082"
+    export FHIR_ODOO_HOSTNAME="localhost:8083"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
+    echo "→ FHIR_ODOO_HOSTNAME=$FHIR_ODOO_HOSTNAME"
 
 }
 
