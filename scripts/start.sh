@@ -36,6 +36,7 @@ if [ -f "$ozoneInfo" ]; then
 else
     export PROJECT_NAME="ozone"
 fi
+echo "$PROJECT_NAME" > /tmp/project_name.txt
 
 if ! isOzoneRunning "$PROJECT_NAME"; then
     echo "$INFO Starting Ozone project with name: $PROJECT_NAME"
@@ -48,6 +49,7 @@ while isOzoneRunning "$PROJECT_NAME"; do
     suffix=$((suffix + 1))
     export PROJECT_NAME="$PROJECT_NAME-$suffix"
     echo "$INFO Starting a new instance of Ozone with name: $PROJECT_NAME"
+    echo "$PROJECT_NAME" > /tmp/project_name.txt
 done
 
 INSTALLED_DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
