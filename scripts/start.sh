@@ -57,9 +57,13 @@ MINIMUM_REQUIRED_DOCKER_VERSION_REGEX="^((([2-9][1-9]|[3-9][0]|[0-9]{3,}).*)|(20
 if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; then
     if command -v gp version &> /dev/null; then
         export GITPOD_ENV="true"
+        export USE_HTTPS="true"
     else
         export GITPOD_ENV="false"
     fi
+
+    # Export the scheme
+    exportScheme
 
     # Pull Ozone Docker images
     echo "$INFO Pulling ${OZONE_LABEL:-Ozone FOSS} images..."
