@@ -81,7 +81,7 @@ services:
     
   env-substitution:
     environment:
-      - SENAITE_PUBLIC_URL=https://${SENAITE_HOSTNAME}
+      - SENAITE_PUBLIC_URL=${SERVER_SCHEME}://${SENAITE_HOSTNAME}
 
 volumes:
   eip-home-senaite: ~

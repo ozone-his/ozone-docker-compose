@@ -117,7 +117,7 @@ services:
 
   env-substitution:
     environment:
-      - ODOO_PUBLIC_URL=https://${ODOO_HOSTNAME}
+      - ODOO_PUBLIC_URL=${SERVER_SCHEME}://${ODOO_HOSTNAME}
 
 volumes:
   eip-home-odoo: ~
