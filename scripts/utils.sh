@@ -104,6 +104,7 @@ function setTraefikIP {
 function setTraefikHostnames {
     echo "$INFO Exporting Traefik hostnames..."
 
+    export USE_HTTPS="true"
     export O3_HOSTNAME=emr-"${IP_WITH_DASHES}.traefik.me"
     export ODOO_HOSTNAME=erp-"${IP_WITH_DASHES}.traefik.me"
     export SENAITE_HOSTNAME=lims-"${IP_WITH_DASHES}.traefik.me"
@@ -127,6 +128,15 @@ function setNginxHostnames {
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
 
+}
+
+function exportScheme() {
+    if [ "$USE_HTTPS" == "true" ]; then
+        export SERVER_SCHEME="https"
+    else
+        export SERVER_SCHEME="http"
+    fi
+    echo "$INFO Scheme set to: $SERVER_SCHEME"
 }
 
 function isOzoneRunning {

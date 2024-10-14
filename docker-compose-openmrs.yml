@@ -95,7 +95,7 @@ services:
 
   env-substitution:
     environment:
-      - OPENMRS_PUBLIC_URL=https://${O3_HOSTNAME}
+      - OPENMRS_PUBLIC_URL=${SERVER_SCHEME}://${O3_HOSTNAME}
 
 volumes:  
   openmrs-core: ~
