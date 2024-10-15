@@ -112,12 +112,13 @@ services:
     image: mekomsolutions/fhir-odoo
     labels:
       traefik.enable: "true"
-      traefik.http.routers.fhir-odoo.rule: "Host(`${FHIR_ODOO_HOSTNAME}`)"
-      traefik.http.routers.fhir-odoo.entrypoints: "websecure"
-      traefik.http.services.fhir-odoo.loadbalancer.server.port: 8080
+      traefik.http.routers.fhir-erp.rule: "Host(`${FHIR_ODOO_HOSTNAME}`)"
+      traefik.http.routers.fhir-erp.entrypoints: "websecure"
+      traefik.http.services.fhir-erp.loadbalancer.server.port: 8080
     networks:
       ozone:
         aliases:
+          - fhir-erp
           - fhir-odoo
           - odoo-fhir-facade
     restart: unless-stopped
@@ -141,7 +142,6 @@ services:
   env-substitution:
     environment:
       - ODOO_PUBLIC_URL=${SERVER_SCHEME}://${ODOO_HOSTNAME}
-      - ODOO_PUBLIC_URL=https://${ODOO_HOSTNAME}
       - EXTERNAL_FHIR_API_URL=http://fhir-odoo:8080/odoo/fhir/R4
       - EXTERNAL_FHIR_API_USERNAME=${ODOO_USER}
       - EXTERNAL_FHIR_API_PASSWORD=${ODOO_PASSWORD}
