@@ -61,6 +61,11 @@ services:
       - EIP_FHIR_SERVER_URL=http://openmrs:8080/openmrs/ws/fhir2/R4
       - EIP_FHIR_USERNAME=${OPENMRS_USER}
       - EIP_FHIR_PASSWORD=${OPENMRS_PASSWORD}
+      - EIP_WATCHED_TABLES=patient,person_name,person_address,patient_identifier,orders,test_order,drug_order
+      - DB_EVENT_DESTINATIONS_SENAITE=${DB_EVENT_DESTINATIONS_SENAITE}
+      - OPENMRS_IDENTIFIER_TYPE_UUID=${OPENMRS_IDENTIFIER_TYPE_UUID}
+      - OPENMRS_URL=http://openmrs:8080/openmrs
+      - BAHMNI_TEST_ORDER_TYPE_UUID=${BAHMNI_TEST_ORDER_TYPE_UUID}
     image: mekomsolutions/eip-client
     networks:
       ozone:
