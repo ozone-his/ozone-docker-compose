@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  orthanc:
+    command: /run/secrets/
+    secrets:
+      - orthanc.json
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - ORTHANC_NAME=${ORTHANC_NAME}
+      - ORTHANC_AUTHENTICATION=keycloak
+      - KEYCLOAK_REALM=orthanc
+      - KEYCLOAK_CLIENT_ID=orthanc
+    volumes:
+      - orthanc-db:/var/lib/orthanc/db
+    networks:
+      - ozone
+      - web
+    ports:
+    - "8888:8042"
+#    depends_on:
+#      env-substitution:
+#        condition: service_completed_successfully
+
+  # keycloak:
+  #   image: orthancteam/orthanc-keycloak:latest
+  #   restart: always
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - ORTHANC__USER__NAME=orthanc
+  #     - ORTHANC__USER__PASSWORD=orthanc
+  #     - KC_DB="postgresql"
+  #     - KC_DB_URL="jdbc:postgresql://postgres:5432/keycloak"
+  #     - KC_DB_USERNAME="orthanc"
+  #     - KC_DB_PASSWORD="orthanc"
+  #   networks:
+  #     - ozone
+  #     - web
+
+#  env-substitution:
+#    environment:
+#      - ORTHANC_PUBLIC_URL=http://${ORTHANC_HOSTNAME}
+
+secrets:
+  orthanc.json:
+    file: orthanc.json
+
+networks:
+  ozone:
+  web:
+
+volumes:
+  orthanc-db:
