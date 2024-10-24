@@ -84,7 +84,7 @@ services:
     restart: unless-stopped
     volumes:
       - "${OPENMRS_FRONTEND_BINARY_PATH}:/usr/share/nginx/html"
-      - "${OPENMRS_FRONTEND_CONFIG_PATH}:/usr/share/nginx/html/ozone"
+      - "${OPENMRS_FRONTEND_CONFIG_PATH}:/usr/share/nginx/html/configs"
 
   mysql:
     environment:
