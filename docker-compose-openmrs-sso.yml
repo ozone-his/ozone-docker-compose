@@ -1,0 +1,12 @@
+services:
+  openmrs:
+    environment:
+      KEYCLOAK_URL: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+    volumes:
+      - "${OPENMRS_PROPERTIES_PATH}/oauth2.properties:/openmrs/data/oauth2.properties"
+      - "./openmrs/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+  env-substitution:
+    environment:
+      - HOST_URL=${SERVER_SCHEME}://${O3_HOSTNAME}
+      - KEYCLOAK_AUTH_SERVER_URL=${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      - OPENMRS_CLIENT_SECRET=${OPENMRS_CLIENT_SECRET}

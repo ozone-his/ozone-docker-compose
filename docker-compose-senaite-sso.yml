@@ -1,0 +1,38 @@
+services:
+  env-substitution:
+    environment:
+      - SENAITE_CLIENT_SECRET=${SENAITE_CLIENT_SECRET}
+      - SENAITE_CLIENT_UUID=${SENAITE_CLIENT_UUID}
+
+  senaite:
+    image: mekomsolutions/senaite-ozonepro
+    restart: unless-stopped
+    environment:
+      - SITE=${SITE}
+      - PASSWORD=${SENAITE_ADMIN_PASSWORD}
+      - OAUTH_CONFIG_FILE=/data/oidc/client.json
+      - RELSTORAGE_ADAPTER_OPTIONS=type postgresql,dsn dbname='${SENAITE_DB_NAME}' user='${SENAITE_DB_USER}' password='${SENAITE_DB_PASSWORD}' host='${SENAITE_DB_HOST}', driver pg8000
+      - RELSTORAGE_KEEP_HISTORY=false
+      - RELSTORAGE_BLOB_DIR=/home/senaite/senaitelims/blobstorage
+    volumes:
+      - ${SENAITE_CONFIG_PATH}:/data/importdata/senaite
+      - ${SENAITE_OIDC_CONFIG_PATH}/:/data/oidc
+      - ${SENAITE_BLOBSTORAGE_PATH:-senaite-blobstorage}:/home/senaite/senaitelims/blobstorage
+    networks:
+      ozone:
+        aliases:
+          - senaite
+      web:
+    depends_on:
+      env-substitution:
+        condition: service_completed_successfully
+      postgresql:
+        condition: service_healthy
+
+  postgresql:
+    environment:
+      SENAITE_DB_NAME: ${SENAITE_DB_NAME}
+      SENAITE_DB_USER: ${SENAITE_DB_USER}
+      SENAITE_DB_PASSWORD: ${SENAITE_DB_PASSWORD}
+    volumes:
+      - "${SQL_SCRIPTS_PATH}/postgresql/senaite:/docker-entrypoint-initdb.d/db/senaite"

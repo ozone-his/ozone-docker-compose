@@ -24,9 +24,11 @@ function exportPaths () {
     echo "$INFO Exporting distro paths..."
     export OPENMRS_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/initializer_config
     export OPENMRS_PROPERTIES_PATH=$DISTRO_PATH/configs/openmrs/properties
+    export OPENMRS_TOMCAT_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/tomcat
     export OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/openmrs/modules
     export SPA_PATH=/openmrs/spa
     export SENAITE_CONFIG_PATH=$DISTRO_PATH/configs/senaite/initializer_config
+    export SENAITE_OIDC_CONFIG_PATH=$DISTRO_PATH/configs/senaite/oidc
     export ODOO_EXTRA_ADDONS=$DISTRO_PATH/binaries/odoo/addons
     export ODOO_CONFIG_PATH=$DISTRO_PATH/configs/odoo/initializer_config/
     export ODOO_CONFIG_FILE_PATH=$DISTRO_PATH/configs/odoo/config/odoo.conf
@@ -38,12 +40,15 @@ function exportPaths () {
     export SQL_SCRIPTS_PATH=$DISTRO_PATH/data/
     export ERPNEXT_CONFIG_PATH=$DISTRO_PATH/configs/erpnext/initializer_config/
     export ERPNEXT_SCRIPTS_PATH=$DISTRO_PATH/binaries/erpnext/scripts/
+    export KEYCLOAK_CONFIG_PATH=$DISTRO_PATH/configs/keycloak
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
     echo "→ OPENMRS_MODULES_PATH=$OPENMRS_MODULES_PATH"
+    echo "→ OPENMRS_TOMCAT_CONFIG_PATH=$OPENMRS_TOMCAT_CONFIG_PATH"
     echo "→ SPA_PATH=$SPA_PATH"
     echo "→ SENAITE_CONFIG_PATH=$SENAITE_CONFIG_PATH"
+    echo "→ SENAITE_OIDC_CONFIG_PATH=$SENAITE_OIDC_CONFIG_PATH"
     echo "→ ODOO_EXTRA_ADDONS=$ODOO_EXTRA_ADDONS"
     echo "→ ODOO_CONFIG_PATH=$ODOO_CONFIG_PATH"
     echo "→ ODOO_CONFIG_FILE_PATH=$ODOO_CONFIG_FILE_PATH"
@@ -54,7 +59,8 @@ function exportPaths () {
     echo "→ SQL_SCRIPTS_PATH=$SQL_SCRIPTS_PATH"
     echo "→ ERPNEXT_CONFIG_PATH=$ERPNEXT_CONFIG_PATH"
     echo "→ ERPNEXT_SCRIPTS_PATH=$ERPNEXT_SCRIPTS_PATH"
-    
+    echo "→ KEYCLOAK_CONFIG_PATH=$KEYCLOAK_CONFIG_PATH"
+
 }
 
 function setDockerComposeCLIOptions () {
@@ -65,12 +71,18 @@ function setDockerComposeCLIOptions () {
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../$file"
     done
 
-    # Add restore file if restore env is set
+    if [ "$ENABLE_SSO" == "true" ]; then
+        ssoFiles=$(cat docker-compose-sso-files.txt)
+        for ssoFile in ${ssoFiles}; do
+            export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../$ssoFile"
+        done
+    fi
 
+    # Add restore file if restore env is set
     if [ "$RESTORE" == "true" ]; then
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../docker-compose-restore.yml"
     fi
-    
+
     # Set the default env file
     export dockerComposeEnvFilePath="../.env"
     
@@ -115,11 +127,13 @@ function setTraefikHostnames {
     export ODOO_HOSTNAME=erp-"${IP_WITH_DASHES}.traefik.me"
     export SENAITE_HOSTNAME=lims-"${IP_WITH_DASHES}.traefik.me"
     export ERPNEXT_HOSTNAME=erpnext-"${IP_WITH_DASHES}.traefik.me"
+    export KEYCLOAK_HOSTNAME=auth-"${IP_WITH_DASHES}.traefik.me"
     export FHIR_ODOO_HOSTNAME=fhir-erp-"${IP_WITH_DASHES}.traefik.me"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
+    echo "→ KEYCLOAK_HOSTNAME=$KEYCLOAK_HOSTNAME"
     echo "→ FHIR_ODOO_HOSTNAME=$FHIR_ODOO_HOSTNAME"
 
 }
@@ -132,11 +146,13 @@ function setNginxHostnames {
     export SENAITE_HOSTNAME="localhost:8081"
     export ERPNEXT_HOSTNAME="localhost:8082"
     export FHIR_ODOO_HOSTNAME="localhost:8083"
+    export KEYCLOAK_HOSTNAME="localhost:8084"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
     echo "→ FHIR_ODOO_HOSTNAME=$FHIR_ODOO_HOSTNAME"
+    echo "→ KEYCLOAK_HOSTNAME=$KEYCLOAK_HOSTNAME"
 
 }
 
@@ -163,14 +179,26 @@ function displayAccessURLsWithCredentials {
     services=()
     is_defined=()
 
-    # Read docker-compose-files.txt and extract the list of services run
+    # Read docker-compose-files.txt and docker-compose-sso-files.txt, and extract the list of services run
     while read -r line; do
-        serviceWithoutExtension=${line%.yml}
-        service=${serviceWithoutExtension#docker-compose-}
-        
-        services+=("$service")
-        is_defined+=(1)
+        if [[ $line != *-sso.yml ]]; then
+            serviceWithoutExtension=${line%.yml}
+            service=${serviceWithoutExtension#docker-compose-}
+
+            services+=("$service")
+            is_defined+=(1)
+        fi
     done < docker-compose-files.txt
+
+    while read -r line; do
+        if [[ $line != *-sso.yml ]]; then
+            serviceWithoutExtension=${line%.yml}
+            service=${serviceWithoutExtension#docker-compose-}
+
+            services+=("$service")
+            is_defined+=(1)
+        fi
+    done < docker-compose-sso-files.txt
 
     echo "HIS Component,URL,Username,Password" > .urls_1.txt
     echo "-,-,-,-" >> .urls_1.txt

@@ -79,6 +79,7 @@
                   <directory>${project.basedir}</directory>
                   <includes>
                     <include>proxy/</include>
+                    <include>openmrs/</include>
                     <include>*docker-compose*</include>
                     <include>*env</include>
                     <include>scripts/</include>
