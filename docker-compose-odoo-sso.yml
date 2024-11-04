@@ -5,6 +5,5 @@ services:
 
   env-substitution:
     environment:
-      - ODOO_PUBLIC_URL=${SERVER_SCHEME}://${ODOO_HOSTNAME}
       - ODOO_CLIENT_SECRET=${ODOO_CLIENT_SECRET}
       - ODOO_CLIENT_UUID=${ODOO_CLIENT_UUID}
