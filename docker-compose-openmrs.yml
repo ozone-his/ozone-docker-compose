@@ -22,7 +22,7 @@ services:
       timeout: 5s
       retries: 48
       start_period: 120s
-    image: openmrs/openmrs-reference-application-3-backend:${O3_DOCKER_IMAGE_TAG:-nightly}
+    image: openmrs/openmrs-reference-application-3-backend:3.1.1
     labels:
       traefik.enable: "true"
       traefik.http.routers.openmrs.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs`)"
