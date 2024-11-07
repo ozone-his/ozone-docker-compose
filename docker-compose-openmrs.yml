@@ -31,6 +31,9 @@ services:
       traefik.http.routers.openmrs.middlewares: openmrs-spa-redirectregex
       traefik.http.middlewares.openmrs-spa-redirectregex.redirectregex.regex: https://${O3_HOSTNAME}/openmrs/spa
       traefik.http.middlewares.openmrs-spa-redirectregex.redirectregex.replacement: https://${O3_HOSTNAME}/openmrs/spa/home
+      #=====================================================backup================================================================
+      restic-compose-backup.volumes: true
+      restic-compose-backup.volumes.include: "${OPENMRS_CONFIG_CHECKSUMS_PATH:-openmrs-config-checksums}"
     networks:
       - ozone
       - web

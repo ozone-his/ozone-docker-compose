@@ -1,0 +1,32 @@
+services:
+  openmrs:
+    depends_on:
+      restore:
+        condition: service_completed_successfully
+    profiles:
+      - openmrs-restore
+  odoo:
+    depends_on:
+      restore:
+        condition: service_completed_successfully
+    profiles:
+      - odoo-restore
+  backup:
+    depends_on:
+      restore:
+        condition: service_completed_successfully
+  restore:
+    image: mekomsolutions/restic-compose-backup-restore
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      # Map local restic repository
+      - ${RESTIC_LOCAL_BACKUP_PATH:-./restic_data}:/restic_data
+    environment:
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+      LOG_LEVEL: ${LOG_LEVEL}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    networks:
+      - ozone
