@@ -26,6 +26,9 @@ function exportPaths () {
     export OPENMRS_PROPERTIES_PATH=$DISTRO_PATH/configs/openmrs/properties
     export OPENMRS_TOMCAT_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/tomcat
     export OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/openmrs/modules
+    export OPENMRS_SSO_MODULES_PATH=$DISTRO_PATH/binaries/openmrs_sso/modules
+    export OPENMRS_SSO_CONFIG_PATH=$DISTRO_PATH/configs/openmrs_sso/initializer_config
+    export OPENMRS_SSO_PROPERTIES_PATH=$DISTRO_PATH/configs/openmrs_sso/properties
     export SPA_PATH=/openmrs/spa
     export SENAITE_CONFIG_PATH=$DISTRO_PATH/configs/senaite/initializer_config
     export SENAITE_OIDC_CONFIG_PATH=$DISTRO_PATH/configs/senaite/oidc
@@ -37,6 +40,7 @@ function exportPaths () {
     export EIP_ERPNEXT_OPENMRS_ROUTES_PATH=$DISTRO_PATH/binaries/eip-erpnext-openmrs
     export OPENMRS_FRONTEND_BINARY_PATH=$DISTRO_PATH/binaries/openmrs/frontend
     export OPENMRS_FRONTEND_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/frontend_config/
+    export OPENMRS_SSO_FRONTEND_CONFIG_PATH=$DISTRO_PATH/configs/openmrs_sso/frontend_config/
     export SQL_SCRIPTS_PATH=$DISTRO_PATH/data/
     export ERPNEXT_CONFIG_PATH=$DISTRO_PATH/configs/erpnext/initializer_config/
     export ERPNEXT_SCRIPTS_PATH=$DISTRO_PATH/binaries/erpnext/scripts/
@@ -101,6 +105,20 @@ function setDockerComposeCLIOptions () {
     export dockerComposeDemoCLIOptions="--env-file $dockerComposeEnvFilePath -f ../demo/docker-compose.yml"
 }
 
+function exportHostIP() {
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # Linux
+        export HOST_MACHINE_IP=$(hostname -I | awk '{print $1}')
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        # Mac OSX
+        export HOST_MACHINE_IP=$(ipconfig getifaddr en0)
+    else
+        echo "$ERROR Unsupported OS type: $OSTYPE"
+        return 1
+    fi
+    echo "$INFO IP address set to: $HOST_MACHINE_IP"
+}
+
 function setTraefikIP {
 
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -141,12 +159,13 @@ function setTraefikHostnames {
 function setNginxHostnames {
     echo "$INFO Exporting Nginx hostnames..."
 
-    export O3_HOSTNAME="localhost"
-    export ODOO_HOSTNAME="localhost:8069"
-    export SENAITE_HOSTNAME="localhost:8081"
-    export ERPNEXT_HOSTNAME="localhost:8082"
-    export FHIR_ODOO_HOSTNAME="localhost:8083"
-    export KEYCLOAK_HOSTNAME="localhost:8084"
+    export O3_HOSTNAME="${HOST_MACHINE_IP:-localhost}"
+    export ODOO_HOSTNAME="${HOST_MACHINE_IP:-localhost}:8069"
+    export SENAITE_HOSTNAME="${HOST_MACHINE_IP:-localhost}:8081"
+    export ERPNEXT_HOSTNAME="${HOST_MACHINE_IP:-localhost}:8082"
+    export FHIR_ODOO_HOSTNAME="${HOST_MACHINE_IP:-localhost}:8083"
+    export KEYCLOAK_HOSTNAME="${HOST_MACHINE_IP:-localhost}:8084"
+
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
@@ -205,6 +224,9 @@ function displayAccessURLsWithCredentials {
     tail -n +2 ozone-urls-template.csv | while IFS=',' read -r component url username password service ; do
         for i in "${!services[@]}"; do
             if [[ "${services[$i]}" == "$service" && "${is_defined[$i]}" == 1 ]]; then
+                if [[ "$service" == "keycloak" && "$ENABLE_SSO" == "false" ]]; then
+                  continue
+                fi
                 echo "$component,$url,$username,$password" >> .urls_1.txt
                 break
             fi
