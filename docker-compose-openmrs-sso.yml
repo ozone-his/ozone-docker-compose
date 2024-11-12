@@ -10,7 +10,7 @@ services:
 
   frontend:
     environment:
-      - SPA_CONFIG_URLS=${SPA_SSO_CONFIG_URLS}
+      - SPA_CONFIG_URLS=${SPA_CONFIG_URLS},/openmrs/spa/configs/ozone-sso-frontend-config.json
     volumes:
       - "${OPENMRS_SSO_FRONTEND_CONFIG_PATH}/ozone-sso-frontend-config.json:/usr/share/nginx/html/configs/ozone-sso-frontend-config.json"
 

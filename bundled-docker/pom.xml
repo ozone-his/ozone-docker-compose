@@ -76,7 +76,9 @@
                                         <include>postgresql/**</include>
                                         <include>proxy/**</include>
                                         <include>senaite/**</include>
+                                        <include>keycloak/**</include>
                                         <include>docker-compose-bundled.yml.template</include>
+                                        <include>docker-compose-bundled-sso.yml.template</include>
                                     </includes>
                                 </resource>
                             </resources>
