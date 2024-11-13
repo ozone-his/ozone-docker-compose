@@ -108,15 +108,15 @@ function setDockerComposeCLIOptions () {
 function exportHostIP() {
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux
-        export HOST_MACHINE_IP=$(hostname -I | awk '{print $1}')
+        export HOST_IP_ADDRESS=$(hostname -I | awk '{print $1}')
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
-        export HOST_MACHINE_IP=$(ipconfig getifaddr en0)
+        export HOST_IP_ADDRESS=$(ipconfig getifaddr en0)
     else
         echo "$ERROR Unsupported OS type: $OSTYPE"
         return 1
     fi
-    echo "$INFO IP address set to: $HOST_MACHINE_IP"
+    echo "$INFO IP address set to: $HOST_IP_ADDRESS"
 }
 
 function setTraefikIP {
@@ -159,12 +159,12 @@ function setTraefikHostnames {
 function setNginxHostnames {
     echo "$INFO Exporting Nginx hostnames..."
 
-    export O3_HOSTNAME="${HOST_MACHINE_IP:-localhost}"
-    export ODOO_HOSTNAME="${HOST_MACHINE_IP:-localhost}:8069"
-    export SENAITE_HOSTNAME="${HOST_MACHINE_IP:-localhost}:8081"
-    export ERPNEXT_HOSTNAME="${HOST_MACHINE_IP:-localhost}:8082"
-    export FHIR_ODOO_HOSTNAME="${HOST_MACHINE_IP:-localhost}:8083"
-    export KEYCLOAK_HOSTNAME="${HOST_MACHINE_IP:-localhost}:8084"
+    export O3_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
+    export ODOO_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8069"
+    export SENAITE_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8081"
+    export ERPNEXT_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8082"
+    export FHIR_ODOO_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8083"
+    export KEYCLOAK_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8084"
 
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
@@ -234,12 +234,16 @@ function displayAccessURLsWithCredentials {
     done
 
     envsubst < .urls_1.txt > .urls_2.txt
-    echo ""
-    echo "$INFO 🔗 Access each ${OZONE_LABEL:-Ozone FOSS} components at the following URL:"
-    echo ""
 
-    set +e
-    column -t -s ',' .urls_2.txt > .urls_3.txt 2> /dev/null
-    set -e
-    cat .urls_3.txt
+    if [ "$ENABLE_SSO" == "true" ]; then
+        echo ""
+        echo "$INFO 🔗 Access each ${OZONE_LABEL:-Ozone FOSS} components at the following URL:"
+        echo ""
+        awk -F, 'NR==1 {printf "%-15s %-40s\n", $1, $2} NR>2 && $1 != "Keycloak" {printf "%-15s %-40s\n", $1, $2} END {print "-\nusername: jdoe\npassword: password\n-\nIDP Access URL\nHIS Component\tURL\tUsername\tPassword\nKeycloak", $2, $3, $4}' .urls_2.txt
+    else
+        echo ""
+        echo "$INFO 🔗 Access each ${OZONE_LABEL:-Ozone FOSS} components at the following URL:"
+        echo ""
+        awk -F, 'NR==1 {printf "%-15s %-40s %-15s %-15s\n", $1, $2, $3, $4} NR>2' .urls_2.txt
+    fi
 }
