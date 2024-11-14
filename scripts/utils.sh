@@ -239,7 +239,7 @@ function displayAccessURLsWithCredentials {
         echo ""
         echo "$INFO 🔗 Access each ${OZONE_LABEL:-Ozone FOSS} components at the following URL:"
         echo ""
-        awk -F, 'NR==1 {printf "%-15s %-40s\n", $1, $2} NR>2 && $1 != "Keycloak" {printf "%-15s %-40s\n", $1, $2} END {print "-\nusername: jdoe\npassword: password\n-\nIDP Access URL\nHIS Component\tURL\tUsername\tPassword\nKeycloak", $2, $3, $4}' .urls_2.txt
+        awk -F, 'NR==1 {printf "%-15s %-40s\n", $1, $2} NR>2 && $1 != "Keycloak" {printf "%-15s %-40s\n", $1, $2} END {print "-\nUsername: jdoe\nPassword: password\n-\nIdentity Provider(IDP)\nKeycloak -", $2, " Username:", $3, " Password:", $4}' .urls_2.txt
     else
         echo ""
         echo "$INFO 🔗 Access each ${OZONE_LABEL:-Ozone FOSS} components at the following URL:"
