@@ -33,7 +33,7 @@ services:
       traefik.http.middlewares.openmrs-spa-redirectregex.redirectregex.replacement: https://${O3_HOSTNAME}/openmrs/spa/home
       #=====================================================backup================================================================
       restic-compose-backup.volumes: true
-      restic-compose-backup.volumes.include: "${OPENMRS_CONFIG_CHECKSUMS_PATH:-openmrs-config-checksums}"
+      restic-compose-backup.volumes.include: "${OPENMRS_CONFIG_CHECKSUMS_PATH:-openmrs-config-checksums},${OPENMRS_PERSON_IMAGES_PATH:-openmrs-person-images}:/openmrs/data/person_images,${OPENMRS_COMPLEX_OBS_PATH:-openmrs-complex-obs}:/openmrs/data/complex_obs"
     networks:
       - ozone
       - web
@@ -47,6 +47,8 @@ services:
       - "${OPENMRS_CONFIG_CHECKSUMS_PATH:-openmrs-config-checksums}:/openmrs/data/configuration_checksums"
       - "${OPENMRS_PROPERTIES_PATH}:/etc/properties/"
       - "${OPENMRS_PROPERTIES_PATH}/fhirproxy.properties:/openmrs/data/fhirproxy/config.properties"
+      - "${OPENMRS_PERSON_IMAGES_PATH:-openmrs-person-images}:/openmrs/data/person_images"
+      - "${OPENMRS_COMPLEX_OBS_PATH:-openmrs-complex-obs}:/openmrs/data/complex_obs"
 
   # OpenMRS 3 Frontend
   frontend:
@@ -108,3 +110,5 @@ volumes:
   openmrs-data: ~
   openmrs-modules: ~
   openmrs-owas: ~
+  openmrs-person-images: ~
+  openmrs-complex-obs: ~
