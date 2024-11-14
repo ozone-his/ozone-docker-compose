@@ -5,15 +5,15 @@ services:
     volumes:
       - "${OPENMRS_SSO_PROPERTIES_PATH}/oauth2.properties:/openmrs/data/oauth2.properties"
       - "${OPENMRS_SSO_MODULES_PATH:-openmrs-modules}/${oauth2loginArtifactId}-${oauth2loginVersion}.omod:/openmrs/distribution/openmrs_modules/${oauth2loginArtifactId}-${oauth2loginVersion}.omod"
-      - "${OPENMRS_SSO_CONFIG_PATH:-openmrs-config}/globalproperties/oauth2-login-props.xml:/openmrs/distribution/openmrs_config/globalproperties/oauth2-login-props.xml"
       - "${OPENMRS_SSO_CONFIG_PATH:-openmrs-config}/liquibase/liquibase.xml:/openmrs/distribution/openmrs_config/liquibase/liquibase.xml"
+      - "${OPENMRS_SSO_CONFIG_PATH:-openmrs-config}/globalproperties/oauth2-login-props.xml:/openmrs/distribution/openmrs_config/globalproperties/oauth2-login-props.xml"
       - "./openmrs/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 
   frontend:
     environment:
       - SPA_CONFIG_URLS=${SPA_CONFIG_URLS},/openmrs/spa/configs/ozone-sso-frontend-config.json
     volumes:
-      - "${OPENMRS_SSO_FRONTEND_CONFIG_PATH}/ozone-sso-frontend-config.json:/usr/share/nginx/html/configs/ozone-sso-frontend-config.json"
+      - "${OPENMRS_SSO_FRONTEND_CONFIG_PATH}/*:/usr/share/nginx/html/configs/"
 
   env-substitution:
     environment:
