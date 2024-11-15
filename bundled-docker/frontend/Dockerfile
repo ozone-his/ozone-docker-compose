@@ -6,7 +6,7 @@ ADD distro/binaries/openmrs/frontend /usr/share/nginx/html
 ADD distro/configs/openmrs/frontend_config /usr/share/nginx/html/configs
 
 # Copy SSO configuration file to a temporary location
-COPY distro/configs/openmrs_sso/frontend_config/ozone-sso-frontend-config.json /tmp/ozone-sso-frontend-config.json
+COPY distro/configs/openmrs/frontend_config_sso/ozone-sso-frontend-config.json /tmp/ozone-sso-frontend-config.json
 
 # Add SSO configurations if SSO is enabled
 RUN if [ "$ENABLE_SSO" = "true" ]; then \
