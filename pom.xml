@@ -86,6 +86,8 @@
                   </includes>
                   <excludes>
                     <exclude>scripts/distro/</exclude>
+                    <excude>docker-compose-bundled.yml.template</excude>
+                    <excude>docker-compose-bundled-sso.yml.template</excude>
                   </excludes>
                 </resource>
               </resources>

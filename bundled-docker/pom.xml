@@ -77,6 +77,11 @@
                                         <include>proxy/**</include>
                                         <include>senaite/**</include>
                                         <include>keycloak/**</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>../</directory>
+                                    <includes>
                                         <include>docker-compose-bundled.yml.template</include>
                                         <include>docker-compose-bundled-sso.yml.template</include>
                                     </includes>
