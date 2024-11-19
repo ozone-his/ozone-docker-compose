@@ -26,9 +26,9 @@ function exportPaths () {
     export OPENMRS_PROPERTIES_PATH=$DISTRO_PATH/configs/openmrs/properties
     export OPENMRS_TOMCAT_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/tomcat
     export OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/openmrs/modules
-    export OPENMRS_SSO_MODULES_PATH=$DISTRO_PATH/binaries/openmrs/modules_sso
-    export OPENMRS_SSO_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/initializer_config_sso
-    export OPENMRS_SSO_PROPERTIES_PATH=$DISTRO_PATH/configs/openmrs/properties_sso
+    export OPENMRS_MODULES_SSO_PATH=$DISTRO_PATH/binaries/openmrs/modules_sso
+    export OPENMRS_CONFIG_SSO_PATH=$DISTRO_PATH/configs/openmrs/initializer_config_sso
+    export OPENMRS_PROPERTIES_SSO_PATH=$DISTRO_PATH/configs/openmrs/properties_sso
     export SPA_PATH=/openmrs/spa
     export SENAITE_CONFIG_PATH=$DISTRO_PATH/configs/senaite/initializer_config
     export SENAITE_OIDC_CONFIG_PATH=$DISTRO_PATH/configs/senaite/oidc
@@ -40,7 +40,7 @@ function exportPaths () {
     export EIP_ERPNEXT_OPENMRS_ROUTES_PATH=$DISTRO_PATH/binaries/eip-erpnext-openmrs
     export OPENMRS_FRONTEND_BINARY_PATH=$DISTRO_PATH/binaries/openmrs/frontend
     export OPENMRS_FRONTEND_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/frontend_config/
-    export OPENMRS_SSO_FRONTEND_CONFIG_PATH=$DISTRO_PATH/configs/openmrs/frontend_config_sso/
+    export OPENMRS_FRONTEND_CONFIG_SSO_PATH=$DISTRO_PATH/configs/openmrs/frontend_config_sso/
     export SQL_SCRIPTS_PATH=$DISTRO_PATH/data/
     export ERPNEXT_CONFIG_PATH=$DISTRO_PATH/configs/erpnext/initializer_config/
     export ERPNEXT_SCRIPTS_PATH=$DISTRO_PATH/binaries/erpnext/scripts/
@@ -50,9 +50,9 @@ function exportPaths () {
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
     echo "→ OPENMRS_MODULES_PATH=$OPENMRS_MODULES_PATH"
     echo "→ OPENMRS_TOMCAT_CONFIG_PATH=$OPENMRS_TOMCAT_CONFIG_PATH"
-    echo "→ OPENMRS_SSO_MODULES_PATH=$OPENMRS_SSO_MODULES_PATH"
-    echo "→ OPENMRS_SSO_CONFIG_PATH=$OPENMRS_SSO_CONFIG_PATH"
-    echo "→ OPENMRS_SSO_PROPERTIES_PATH=$OPENMRS_SSO_PROPERTIES_PATH"
+    echo "→ OPENMRS_MODULES_SSO_PATH=$OPENMRS_MODULES_SSO_PATH"
+    echo "→ OPENMRS_CONFIG_SSO_PATH=$OPENMRS_CONFIG_SSO_PATH"
+    echo "→ OPENMRS_PROPERTIES_SSO_PATH=$OPENMRS_PROPERTIES_SSO_PATH"
     echo "→ SPA_PATH=$SPA_PATH"
     echo "→ SENAITE_CONFIG_PATH=$SENAITE_CONFIG_PATH"
     echo "→ SENAITE_OIDC_CONFIG_PATH=$SENAITE_OIDC_CONFIG_PATH"
@@ -63,7 +63,7 @@ function exportPaths () {
     echo "→ EIP_OPENMRS_SENAITE_ROUTES_PATH=$EIP_OPENMRS_SENAITE_ROUTES_PATH"
     echo "→ EIP_ERPNEXT_OPENMRS_ROUTES_PATH=$EIP_ERPNEXT_OPENMRS_ROUTES_PATH"
     echo "→ OPENMRS_FRONTEND_CONFIG_PATH=$OPENMRS_FRONTEND_CONFIG_PATH"
-    echo "→ OPENMRS_SSO_FRONTEND_CONFIG_PATH=$OPENMRS_SSO_FRONTEND_CONFIG_PATH"
+    echo "→ OPENMRS_FRONTEND_CONFIG_SSO_PATH=$OPENMRS_FRONTEND_CONFIG_SSO_PATH"
     echo "→ SQL_SCRIPTS_PATH=$SQL_SCRIPTS_PATH"
     echo "→ ERPNEXT_CONFIG_PATH=$ERPNEXT_CONFIG_PATH"
     echo "→ ERPNEXT_SCRIPTS_PATH=$ERPNEXT_SCRIPTS_PATH"
@@ -76,15 +76,13 @@ function setDockerComposeCLIOptions () {
     dockerComposeFiles=$(cat docker-compose-files.txt)
     for file in ${dockerComposeFiles}
     do
+        if [ "$ENABLE_SSO" != "true" ]; then
+            if [[ "$file" == *"-sso.yml" || "$file" == "docker-compose-keycloak.yml" ]]; then
+                continue
+            fi
+        fi
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../$file"
     done
-
-    if [ "$ENABLE_SSO" == "true" ]; then
-        ssoFiles=$(cat docker-compose-sso-files.txt)
-        for ssoFile in ${ssoFiles}; do
-            export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../$ssoFile"
-        done
-    fi
 
     # Add restore file if restore env is set
     if [ "$RESTORE" == "true" ]; then
@@ -93,7 +91,7 @@ function setDockerComposeCLIOptions () {
 
     # Set the default env file
     export dockerComposeEnvFilePath="../.env"
-    
+
     # Override the default with the concatenated.env file if it is provided
     concatenatedEnvFilePath="../concatenated.env"
     if [ -f "$concatenatedEnvFilePath" ]; then
@@ -212,16 +210,6 @@ function displayAccessURLsWithCredentials {
             is_defined+=(1)
         fi
     done < docker-compose-files.txt
-
-    while read -r line; do
-        if [[ $line != *-sso.yml ]]; then
-            serviceWithoutExtension=${line%.yml}
-            service=${serviceWithoutExtension#docker-compose-}
-
-            services+=("$service")
-            is_defined+=(1)
-        fi
-    done < docker-compose-sso-files.txt
 
     echo "HIS Component,URL,Username,Password" > .urls_1.txt
     echo "-,-,-,-" >> .urls_1.txt

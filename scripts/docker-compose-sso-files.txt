@@ -1,4 +1,0 @@
-docker-compose-keycloak.yml
-docker-compose-openmrs-sso.yml
-docker-compose-senaite-sso.yml
-docker-compose-odoo-sso.yml
