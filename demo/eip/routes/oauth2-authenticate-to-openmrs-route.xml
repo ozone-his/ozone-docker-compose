@@ -1,8 +1,8 @@
 <routes
         xmlns="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://camel.apache.org/schema/spring ">
-    <route id="authenticate-to-openmrs">
-        <from uri="direct:authenticate-to-openmrs"/>
+    <route id="oauth2-authenticate-to-openmrs">
+        <from uri="direct:oauth2-authenticate-to-openmrs"/>
         <log message="Authenticating application to OpenMRS"/>
         <setHeader name="oauth2.url">
             <simple>{{oauth.access.token.url}}</simple>
