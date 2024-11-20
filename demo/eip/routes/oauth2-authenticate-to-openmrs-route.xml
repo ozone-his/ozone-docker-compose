@@ -1,0 +1,21 @@
+<routes
+        xmlns="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://camel.apache.org/schema/spring ">
+    <route id="authenticate-to-openmrs">
+        <from uri="direct:authenticate-to-openmrs"/>
+        <log message="Authenticating application to OpenMRS"/>
+        <setHeader name="oauth2.url">
+            <simple>{{oauth.access.token.url}}</simple>
+        </setHeader>
+        <setHeader name="oauth2.client.id">
+            <simple>{{oauth.client.id}}</simple>
+        </setHeader>
+        <setHeader name="oauth2.client.secret">
+            <simple>{{oauth.client.secret}}</simple>
+        </setHeader>
+        <setHeader name="oauth2.client.scope">
+            <simple>{{oauth.client.scope}}</simple>
+        </setHeader>
+        <process ref="eip.oauthProcessor"/>
+    </route>
+</routes>

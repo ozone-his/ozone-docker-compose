@@ -104,7 +104,11 @@ function setDockerComposeCLIOptions () {
     export dockerComposeProxyCLIOptions="--env-file $dockerComposeEnvFilePath -f ../proxy/docker-compose.yml"
 
     # Set args for the demo service
-    export dockerComposeDemoCLIOptions="--env-file $dockerComposeEnvFilePath -f ../demo/docker-compose.yml"
+    if [ "$ENABLE_SSO" == "true" ]; then
+        export dockerComposeDemoCLIOptions="--env-file $dockerComposeEnvFilePath -f ../demo/docker-compose.yml -f ../demo/docker-compose-sso.yml"
+    else
+        export dockerComposeDemoCLIOptions="--env-file $dockerComposeEnvFilePath -f ../demo/docker-compose.yml"
+    fi
 }
 
 function exportHostIP() {

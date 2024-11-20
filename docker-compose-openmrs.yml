@@ -37,7 +37,7 @@ services:
     networks:
       - ozone
       - web
-    restart: on-failure
+    restart: unless-stopped
     volumes:
       - "openmrs-data:/openmrs/data"
       - "${OPENMRS_OWAS_PATH:-openmrs-owas}:/openmrs/distribution/openmrs_owas/"
