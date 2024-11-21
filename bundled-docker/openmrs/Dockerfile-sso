@@ -1,7 +1,0 @@
-FROM openmrs/openmrs-reference-application-3-backend:3.1.1
-ADD binaries/openmrs/modules /openmrs/distribution/openmrs_modules
-ADD configs/openmrs/initializer_config /openmrs/distribution/openmrs_config
-ADD configs/openmrs/properties/fhirproxy.properties /openmrs/data/fhirproxy/config.properties
-ADD configs/openmrs/properties_sso/oauth2.properties /openmrs/data/oauth2.properties
-ADD configs/openmrs/initializer_config_sso/globalproperties/oauth2-login-props.xml /openmrs/distribution/openmrs_config/globalproperties/oauth2-login-props.xml
-ADD binaries/openmrs/modules_sso/* /openmrs/distribution/openmrs_modules
