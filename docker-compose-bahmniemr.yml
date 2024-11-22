@@ -8,33 +8,19 @@ x-log-config: &log-config
 
 services:
 
-  proxy:
-    image: 'bahmni/proxy:${PROXY_IMAGE_TAG:?}'
-    #volumes:
-      # - ${CERTIFICATE_PATH}:/etc/tls
-    ports:
-      - '80:80'
-      - '443:443'
-    logging: *log-config
-    restart: ${RESTART_POLICY}
-    environment:
-      TZ: ${TZ}
-    networks:
-      - ozone
-
   bahmni-config:
     image: 'bahmni/standard-config:${CONFIG_IMAGE_TAG:?}'
     volumes:
       - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
     logging: *log-config
-    restart: ${RESTART_POLICY}
+    restart: unless-stopped
     networks:
       - ozone
 
   openmrs:
     image: bahmni/openmrs:${OPENMRS_IMAGE_TAG:?}
     environment:
-      TZ: ${TZ}
+      TZ: ${TIMEZONE}
       OMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
       OMRS_DB_HOSTNAME: ${OPENMRS_DB_HOST:?}
       OMRS_DB_USERNAME: ${OPENMRS_DB_USER:?}
@@ -45,10 +31,6 @@ services:
       # OMRS_DEV_DEBUG_PORT: ${OMRS_DEV_DEBUG_PORT}
       OMRS_JAVA_SERVER_OPTS: ${OMRS_JAVA_SERVER_OPTS}
       OMRS_JAVA_MEMORY_OPTS: ${OMRS_JAVA_MEMORY_OPTS}
-      OPENELIS_HOST: ${OPENELIS_HOST:?}
-      OPENELIS_PORT: ${OPENELIS_PORT:?}
-      OPENELIS_ATOMFEED_USER: ${OPENELIS_ATOMFEED_USER:?}
-      OPENELIS_ATOMFEED_PASSWORD: ${OPENELIS_ATOMFEED_PASSWORD:?}
       SEND_MAIL: ${SEND_MAIL}
       MAIL_TRANSPORT_PROTOCOL: ${MAIL_TRANSPORT_PROTOCOL}
       MAIL_SMTP_HOST: ${MAIL_SMTP_HOST}
@@ -82,7 +64,7 @@ services:
     depends_on:
       - mysql
     logging: *log-config
-    restart: ${RESTART_POLICY}
+    restart: unless-stopped
     networks:
       - ozone
 
@@ -105,7 +87,7 @@ services:
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
     #   - "${BAHMNI_APPS_PATH:?}/ui/node_modules/@bower_components/:/usr/local/apache2/htdocs/bahmni/components"
     logging: *log-config
-    restart: ${RESTART_POLICY}
+    restart: unless-stopped
     networks:
       - ozone
 
@@ -117,27 +99,26 @@ services:
     depends_on:
       - openmrs
     logging: *log-config
-    restart: ${RESTART_POLICY}
+    restart: unless-stopped
     networks:
       - ozone
 
   reports:
     image: bahmni/reports:${REPORTS_IMAGE_TAG:?}
     environment:
-      TZ: ${TZ}
+      TZ: ${TIMEZONE}
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
       OPENMRS_DB_USERNAME: ${OPENMRS_DB_USER:?}
       OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
       OPENMRS_HOST: ${OPENMRS_HOST:?}
       OPENMRS_PORT: ${OPENMRS_PORT:?}
-      OPENELIS_DB_SERVER: ${OPENELIS_DB_SERVER}
       REPORTS_DB_SERVER: reportsdb
       REPORTS_DB_NAME: ${REPORTS_DB_NAME:?}
       REPORTS_DB_USERNAME: ${REPORTS_DB_USERNAME:?}
       REPORTS_DB_PASSWORD: ${REPORTS_DB_PASSWORD:?}
-      ODOO_DB_SERVER: ${ODOO_DB_HOST:?}
-      ODOO_DB_NAME: ${ODOO_DB_NAME:?}
+      ODOO_DB_SERVER: ${POSTGRES_DB_HOST:?}
+      ODOO_DB_NAME: ${ODOO_DATABASE:?}
       ODOO_DB_USERNAME: ${ODOO_DB_USER:?}
       ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD:?}
       ICD10_LITE_INDICATOR: ${ICD10_LITE_INDICATOR}
@@ -150,7 +131,7 @@ services:
       - mysql
       - bahmni-web
     logging: *log-config
-    restart: ${RESTART_POLICY}
+    restart: unless-stopped
     networks:
       - ozone
 
@@ -158,7 +139,7 @@ services:
     platform: linux/amd64
     image: ${REPORTS_DB_IMAGE_NAME:?}
     environment:
-      TZ: ${TZ}
+      TZ: ${TIMEZONE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${REPORTS_DB_NAME:?}
       MYSQL_USER: ${REPORTS_DB_USERNAME:?}
@@ -166,7 +147,7 @@ services:
     volumes:
       - 'reportsdbdata:/var/lib/mysql'
     logging: *log-config
-    restart: ${RESTART_POLICY}
+    restart: unless-stopped
     networks:
       - ozone
 
@@ -178,18 +159,18 @@ services:
       - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
       - "bahmni-uploaded-files:/usr/share/nginx/html/uploaded-files"
     environment:
-      TZ: ${TZ}
+      TZ: ${TIMEZONE}
       OPENMRS_HOST: ${OPENMRS_HOST:?}
     depends_on:
       - openmrs
     logging: *log-config
-    restart: ${RESTART_POLICY}
+    restart: unless-stopped
     networks:
       - ozone
 
   appointments:
     image: bahmni/appointments:${APPOINTMENTS_IMAGE_TAG:?}
-    restart: ${RESTART_POLICY}
+    restart: unless-stopped
     # volumes:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
     networks:
@@ -198,9 +179,9 @@ services:
   sms-service:
     image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
     profiles: ["sms"]
-    restart: ${RESTART_POLICY}
+    restart: unless-stopped
     environment:
-      TZ: ${TZ}
+      TZ: ${TIMEZONE}
       SMS_TOKEN: ${SMS_TOKEN}
       SMS_ORIGINATOR: ${SMS_ORIGINATOR}
       SMS_PROVIDER_API: ${SMS_PROVIDER_API}
@@ -215,7 +196,7 @@ services:
   ipd:
     image: bahmni/microfrontend-ipd:${IPD_TAG:?}
     container_name: ipd
-    restart: ${RESTART_POLICY}
+    restart: unless-stopped
     # volumes:
     #   - "${IPD_PATH:?}/dist/federation/:/usr/local/apache2/htdocs/ipd"
     logging: *log-config
