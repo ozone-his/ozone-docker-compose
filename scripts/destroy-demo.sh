@@ -13,8 +13,8 @@ exportPaths
 
 # Read PROJECT_NAME from the temporary file
 PROJECT_NAME=$(cat /tmp/project_name.txt)
-# Unset the BACKUP_RESTORE variable if it is set, as the restore Docker Compose files introduces restore specific profiles that will make the  Docker Compose file invalid
-unset BACKUP_RESTORE
+# Unset the RESTORE variable if it is set, as the restore Docker Compose files introduces restore specific profiles that will make the  Docker Compose file invalid
+unset RESTORE
 
 echo "$INFO Destroying $PROJECT_NAME project..."
 

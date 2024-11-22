@@ -67,7 +67,7 @@ function setDockerComposeCLIOptions () {
 
     # Add restore file if restore env is set
 
-    if [ "$BACKUP_RESTORE" == "true" ]; then
+    if [ "$RESTORE" == "true" ]; then
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../docker-compose-restore.yml"
     fi
     
