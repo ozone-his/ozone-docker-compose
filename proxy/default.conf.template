@@ -24,15 +24,6 @@ map $GITPOD_ENV $senaite_rewrite {
     default /VirtualHostBase/http/$host/senaite/VirtualHostRoot/;
 }
 
-upstream frontend {
-  # always assume the frontend will be available
-  server frontend max_fails=0;
-}
-
-upstream backend {
-  server openmrs:8080 max_fails=0;
-}
-
 server {
   listen       80;
 
@@ -85,16 +76,88 @@ server {
   }
 
   location /openmrs/spa/ {
-    proxy_pass http://frontend/;
+    set $frontend frontend;
+    proxy_pass http://$frontend/;
     proxy_redirect http://$host/ /openmrs/spa/;
   }
 
   location /openmrs {
-    proxy_pass http://backend;
+    set $openmrs openmrs:8080;
+    proxy_pass http://$openmrs;
   }
 
   location = / {
     return 301 /openmrs/spa/;
+  }
+
+  # Permanent redirect for /home
+  rewrite ^/home$ /bahmni/home/ permanent;
+
+  # Uploaded Files
+  location /uploaded-files {
+    set $patient_documents patient-documents:80;
+    proxy_pass http://$patient_documents/uploaded-files;
+  }
+
+  # Patient Documents
+  location /document_images {
+    set $patient_documents patient-documents:80;
+    proxy_pass http://$patient_documents/document_images;
+  }
+
+  # Lab Results
+  location /uploaded_results {
+    set $patient_documents patient-documents:80;
+    proxy_pass http://$patient_documents/uploaded_results;
+  }
+
+  # OpenMRS Authentication
+  location /openmrs/auth {
+    set $patient_documents patient-documents:80;
+    proxy_pass http://$patient_documents/openmrs/auth;
+  }
+
+  # appointments:80
+  location /appointments:80 {
+    set $appointments appointments:80;
+    proxy_pass http://$appointments/appointments;
+  }
+
+  # ipd:80
+  location /ipd:80 {
+    set $ipd ipd:80;
+    proxy_pass http://$ipd/ipd;
+  }
+
+  # Bahmni Web
+  location /bahmni {
+    set $bahmni_web bahmni-web:8091;
+    proxy_pass http://$bahmni_web/bahmni;
+    add_header X-Robots-Tag "noindex, nofollow";
+  }
+
+  # Bahmni Person Management
+  location /person-management {
+    set $bahmni_web bahmni-web:8091;
+    proxy_pass http://$bahmni_web/person-management;
+  }
+
+  # Bahmni Config OpenMRS Apps
+  location /bahmni_config/openmrs/apps {
+    set $bahmni_web bahmni-web:8091;
+    proxy_pass http://$bahmni_web/bahmni_config/openmrs/apps;
+  }
+
+  # Bahmni Config OpenMRS I18n
+  location /bahmni_config/openmrs/i18n {
+    set $bahmni_web bahmni-web:8091;
+    proxy_pass http://$bahmni_web/bahmni_config/openmrs/i18n;
+  }
+
+  # Implementer Interface
+  location /implementer-interface:80 {
+    set $implementer_interface implementer-interface:80;
+    proxy_pass http://$implementer_interface/implementer-interface;
   }
 }
 
@@ -105,7 +168,7 @@ server {
     # Increase proxy buffer size
     proxy_buffers 16 64k;
     proxy_buffer_size 128k;
-    # Force timeouts if the backend dies
+    # Force timeouts if the openmrs:8080 dies
     proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
     # Enable data compression
     gzip on;
