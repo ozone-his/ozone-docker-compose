@@ -196,7 +196,7 @@ function displayAccessURLsWithCredentials {
     services=()
     is_defined=()
 
-    # Read docker-compose-files.txt and docker-compose-sso-files.txt, and extract the list of services run
+    # Read docker-compose-files.txt and extract the list of services run
     while read -r line; do
         if [[ $line != *-sso.yml ]]; then
             serviceWithoutExtension=${line%.yml}

@@ -25,12 +25,15 @@ services:
       ODOO_PUBLIC_URL: \${SERVER_SCHEME}://\${ODOO_HOSTNAME}
       OPENMRS_PUBLIC_URL: \${SERVER_SCHEME}://\${O3_HOSTNAME}
       SENAITE_PUBLIC_URL: \${SERVER_SCHEME}://\${SENAITE_HOSTNAME}
+      SUPERSET_PUBLIC_URL: \${SERVER_SCHEME}://\${SUPERSET_HOSTNAME}
       ODOO_CLIENT_SECRET: \${ODOO_CLIENT_SECRET}
       ODOO_CLIENT_UUID: \${ODOO_CLIENT_UUID}
       OPENMRS_CLIENT_SECRET: \${OPENMRS_CLIENT_SECRET}
       OPENMRS_CLIENT_UUID: \${OPENMRS_CLIENT_UUID}
       SENAITE_CLIENT_SECRET: \${SENAITE_CLIENT_SECRET}
       SENAITE_CLIENT_UUID: \${SENAITE_CLIENT_UUID}
+      SUPERSET_CLIENT_SECRET: \${SUPERSET_CLIENT_SECRET}
+      SUPERSET_CLIENT_UUID: \${SUPERSET_CLIENT_UUID}
       KEYCLOAK_ADMIN_SA_CLIENT_SECRET: \${KEYCLOAK_ADMIN_SA_CLIENT_SECRET}
       EIP_CLIENT_SECRET: \${EIP_CLIENT_SECRET}
       KEYCLOAK_EXTRA_ARGS_PREPENDED: "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true"
@@ -70,6 +73,9 @@ services:
   # Odoo
   odoo:
     environment:
+     - KEYCLOAK_URL=\${SERVER_SCHEME}://\${KEYCLOAK_HOSTNAME}
+     - ODOO_CLIENT_UUID=\${ODOO_CLIENT_UUID}
+     - ODOO_CLIENT_SECRET=\${ODOO_CLIENT_SECRET}
      - ADDONS=sale_management,stock,account_account,purchase,mrp,mrp_product_expiry,product_expiry,l10n_generic_coa,odoo_initializer,ozone_settings,server_environment,auth_oidc_environment,auth_oidc
   # EIP Odoo OpenMRS Integration Service
   eip-odoo-openmrs:
@@ -84,6 +90,8 @@ services:
   openmrs:
     environment:
       KEYCLOAK_URL: \${SERVER_SCHEME}://\${KEYCLOAK_HOSTNAME}
+      OPENMRS_CLIENT_UUID: \${OPENMRS_CLIENT_UUID}
+      OPENMRS_CLIENT_SECRET: \${OPENMRS_CLIENT_SECRET}
 
   frontend:
     environment:
@@ -94,6 +102,9 @@ services:
     environment:
       OAUTH_CONFIG_FILE: /data/oidc/client.json
       OAUTH_CONFIG_PATH: /data/oidc
+      KEYCLOAK_URL: \${SERVER_SCHEME}://\${KEYCLOAK_HOSTNAME}
+      SENAITE_CLIENT_UUID: \${SENAITE_CLIENT_UUID}
+      SENAITE_CLIENT_SECRET: \${SENAITE_CLIENT_SECRET}
   # OpenMRS - SENAITE integration service
   eip-openmrs-senaite:
     environment:

@@ -1,9 +1,9 @@
-# Enable sso
+#!/usr/bin/env bash
+set -e
+
+# Enable SSO
 export ENABLE_SSO=true
-export OAUTH_ENABLED=true
 echo "$INFO Setting ENABLE_SSO=true..."
 echo "→ ENABLE_SSO=$ENABLE_SSO"
-echo "$INFO Setting OAUTH_ENABLED=true..."
-echo "→ OAUTH_ENABLED=$OAUTH_ENABLED"
 
 source start-demo.sh

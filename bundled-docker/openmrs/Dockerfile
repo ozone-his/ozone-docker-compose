@@ -1,4 +1,4 @@
-FROM openmrs/openmrs-reference-application-3-backend:nightly
+FROM openmrs/openmrs-reference-application-3-backend:3.1.1
 ADD distro/binaries/openmrs/modules /openmrs/distribution/openmrs_modules
 ADD distro/configs/openmrs/initializer_config /openmrs/distribution/openmrs_config
 ADD distro/configs/openmrs/properties/fhirproxy.properties /openmrs/data/fhirproxy/config.properties
