@@ -65,6 +65,12 @@ services:
       - mysql
     logging: *log-config
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 48
+      start_period: 600s
     networks:
       - ozone
 
