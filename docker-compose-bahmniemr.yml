@@ -1,5 +1,3 @@
-version: '3.7'
-
 x-default-logging: &default
   {}
 
@@ -87,7 +85,6 @@ services:
 
   bahmni-web:
     image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
-    profiles: ["emr","bahmni-standard","bahmni-mart"]
     volumes:
       - "${CONFIG_VOLUME:?}:/usr/local/apache2/htdocs/bahmni_config/:ro"
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
@@ -99,7 +96,6 @@ services:
 
   implementer-interface:
     image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}
-    profiles: ["implementer-interface","emr","bahmni-standard"]
     #volumes:
     #  - "${IMPLEMENTER_INTERFACE_CODE_PATH:?}/dist:/usr/local/apache2/htdocs/implementer_interface"
     depends_on:
@@ -159,7 +155,6 @@ services:
 
   patient-documents:
     image: 'bahmni/patient-documents:${PATIENT_DOCUMENTS_TAG:?}'
-    profiles: ["emr","bahmni-standard"]
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
       - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
@@ -184,7 +179,6 @@ services:
 
   sms-service:
     image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
-    profiles: ["sms"]
     restart: unless-stopped
     environment:
       TZ: ${TIMEZONE}
