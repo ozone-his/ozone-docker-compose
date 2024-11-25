@@ -44,7 +44,7 @@ function exportPaths () {
     export KEYCLOAK_BINARIES_PATH=$DISTRO_PATH/binaries/keycloak
     export EIP_OPENMRS_ORTHANC_ROUTES_PATH=$DISTRO_PATH/binaries/eip-openmrs-orthanc
     export ORTHANC_CONFIG_PATH=$DISTRO_PATH/configs/orthanc/initializer_config
-
+    export BAHMNI_OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/bahmniemr/modules
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
@@ -67,6 +67,7 @@ function exportPaths () {
     echo "→ KEYCLOAK_BINARIES_PATH=$KEYCLOAK_BINARIES_PATH"
     echo "→ EIP_OPENMRS_ORTHANC_ROUTES_PATH=$EIP_OPENMRS_ORTHANC_ROUTES_PATH"
     echo "→ ORTHANC_CONFIG_PATH=$ORTHANC_CONFIG_PATH"
+    echo "→ BAHMNI_OPENMRS_MODULES_PATH=$BAHMNI_OPENMRS_MODULES_PATH"
 
 }
 
