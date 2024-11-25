@@ -20,7 +20,7 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       # Map local restic repository
-      - ${RESTIC_LOCAL_BACKUP_PATH:-./restic_data}:/restic_data
+      - ${BACKUP_PATH:-./restic_data}:/restic_data
     environment:
       RESTIC_REPOSITORY: ${RESTIC_REPOSITORY}
       RESTIC_PASSWORD: ${RESTIC_PASSWORD}
