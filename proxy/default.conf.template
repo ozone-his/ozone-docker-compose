@@ -90,9 +90,6 @@ server {
     return 301 /openmrs/spa/;
   }
 
-  # Permanent redirect for /home
-  rewrite ^/home$ /bahmni/home/ permanent;
-
   # Uploaded Files
   location /uploaded-files {
     set $patient_documents patient-documents:80;
@@ -117,23 +114,28 @@ server {
     proxy_pass http://$patient_documents/openmrs/auth;
   }
 
-  # appointments:80
-  location /appointments:80 {
+  # appointments
+  location /appointments {
     set $appointments appointments:80;
     proxy_pass http://$appointments/appointments;
   }
 
-  # ipd:80
-  location /ipd:80 {
+  # ipd
+  location /ipd {
     set $ipd ipd:80;
     proxy_pass http://$ipd/ipd;
   }
 
   # Bahmni Web
+  location = /bahmni {
+    return 301 /bahmni/;
+  }
+
   location /bahmni {
     set $bahmni_web bahmni-web:8091;
-    proxy_pass http://$bahmni_web/bahmni;
     add_header X-Robots-Tag "noindex, nofollow";
+    proxy_pass http://$bahmni_web;
+    proxy_redirect http://$host/ /;
   }
 
   # Bahmni Person Management
@@ -155,7 +157,7 @@ server {
   }
 
   # Implementer Interface
-  location /implementer-interface:80 {
+  location /implementer-interface {
     set $implementer_interface implementer-interface:80;
     proxy_pass http://$implementer_interface/implementer-interface;
   }
