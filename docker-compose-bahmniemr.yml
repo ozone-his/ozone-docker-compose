@@ -64,11 +64,11 @@ services:
     logging: *log-config
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/index.htm" ]
       interval: 10s
       timeout: 5s
-      retries: 48
-      start_period: 600s
+      retries: 192
+      start_period: 180s
     networks:
       - ozone
 
