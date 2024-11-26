@@ -67,7 +67,7 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/index.htm" ]
       interval: 10s
       timeout: 5s
-      retries: 192
+      retries: 360
       start_period: 180s
     networks:
       - ozone
