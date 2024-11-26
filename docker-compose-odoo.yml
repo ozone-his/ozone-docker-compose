@@ -43,6 +43,10 @@ services:
       traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto: https
       traefik.http.middlewares.limit.buffering.memRequestBodyBytes: 20971520
       traefik.http.middlewares.limit.buffering.maxRequestBodyBytes: 20971520
+
+      #=====================================================backup================================================================
+      restic-compose-backup.volumes: true
+      restic-compose-backup.volumes.include: "${ODOO_FILESTORE:-odoo-filestore},${ODOO_CONFIG_CHECKSUMS_PATH:-odoo-checksums}"
     networks:
       - ozone
       - web
