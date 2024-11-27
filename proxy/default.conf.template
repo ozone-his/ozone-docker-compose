@@ -24,11 +24,6 @@ map $GITPOD_ENV $senaite_rewrite {
     default /VirtualHostBase/http/$host/senaite/VirtualHostRoot/;
 }
 
-map $GITPOD_ENV $bahmni_config_rewrite {
-    "true" /VirtualHostBase/https/$host/bahmni_config/VirtualHostRoot/;
-    default /VirtualHostBase/http/$host/bahmni_config/VirtualHostRoot/;
-}
-
 server {
   listen       80;
 
@@ -166,7 +161,7 @@ server {
     return 301 /bahmni/;
   }
 
-  location /bahmni {
+  location /bahmni/ {
     set $bahmni_web bahmni-web:8091;
     add_header X-Robots-Tag "noindex, nofollow";
     proxy_pass http://$bahmni_web;
