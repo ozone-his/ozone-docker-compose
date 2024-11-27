@@ -211,6 +211,11 @@ server {
     proxy_pass http://$implementer_interface;
     proxy_redirect http://$host/ /;
   }
+
+  # Bahmni's CGI script location
+  location /cgi-bin/ {
+    root /usr/local/bahmni;
+  }
 }
 
 server {
