@@ -1,8 +1,4 @@
-FROM openmrs/openmrs-reference-application-3-backend:nightly
-
-# Remove modules & configurations from OpenMRS Reference Application
-RUN find /openmrs/distribution/openmrs_modules -mindepth 1 -delete || true
-RUN find /openmrs/distribution/openmrs_config -mindepth 1 -delete || true
+FROM openmrs/openmrs-core:2.6.7
 
 # Add modules & configurations for the ozone distribution
 ADD distro/binaries/openmrs/modules /openmrs/distribution/openmrs_modules
