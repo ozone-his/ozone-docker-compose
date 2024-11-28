@@ -9,6 +9,9 @@ services:
       - SITE=${SITE}
       - ADMIN_USER=${SENAITE_ADMIN_USER}
       - ADMIN_PASSWORD=${SENAITE_ADMIN_PASSWORD}
+      - RELSTORAGE_ADAPTER_OPTIONS=type postgresql,dsn dbname='${SENAITE_DB_NAME}' user='${SENAITE_DB_USER}' password='${SENAITE_DB_PASSWORD}' host='${SENAITE_DB_HOST}', driver pg8000
+      - RELSTORAGE_KEEP_HISTORY=false
+      - RELSTORAGE_BLOB_DIR=/home/senaite/senaitelims/blobstorage
     image: mekomsolutions/senaite:latest
     labels:
       - "traefik.enable=true"
@@ -22,8 +25,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${SENAITE_CONFIG_PATH}:/data/importdata/senaite
-      - senaite-filestorage:/data/filestorage
-      - senaite-blobstorage:/data/blobstorage
+      - ${SENAITE_BLOBSTORAGE_PATH:-senaite-blobstorage}:/home/senaite/senaitelims/blobstorage
 
   # OpenMRS - SENAITE integration service
   eip-openmrs-senaite:
