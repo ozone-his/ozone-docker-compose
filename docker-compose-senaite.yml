@@ -85,6 +85,14 @@ services:
     environment:
       - SENAITE_PUBLIC_URL=${SERVER_SCHEME}://${SENAITE_HOSTNAME}
 
+  postgresql:
+    environment:
+      SENAITE_DB_NAME: ${SENAITE_DB_NAME}
+      SENAITE_DB_USER: ${SENAITE_DB_USER}
+      SENAITE_DB_PASSWORD: ${SENAITE_DB_PASSWORD}
+    volumes:
+      - "${SQL_SCRIPTS_PATH}/postgresql/senaite:/docker-entrypoint-initdb.d/db/senaite"
+
 volumes:
   eip-home-senaite: ~
   senaite-blobstorage: ~
