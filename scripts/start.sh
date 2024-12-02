@@ -40,17 +40,10 @@ echo "$PROJECT_NAME" > /tmp/project_name.txt
 
 if ! isOzoneRunning "$PROJECT_NAME"; then
     echo "$INFO Starting Ozone project with name: $PROJECT_NAME"
+else
+  echo "$WARN Ozone project with name: $PROJECT_NAME is already running"
+  echo "$INFO Re-applying Docker Compose up command to ensure all services are up-to-date..."
 fi
-
-# Check if an instance of Ozone is already running
-suffix=0
-while isOzoneRunning "$PROJECT_NAME"; do
-    echo "$WARN An instance of Ozone is already running with the name: $PROJECT_NAME"
-    suffix=$((suffix + 1))
-    export PROJECT_NAME="$PROJECT_NAME-$suffix"
-    echo "$INFO Starting a new instance of Ozone with name: $PROJECT_NAME"
-    echo "$PROJECT_NAME" > /tmp/project_name.txt
-done
 
 INSTALLED_DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
 MINIMUM_REQUIRED_DOCKER_VERSION_REGEX="^((([2-9][1-9]|[3-9][0]|[0-9]{3,}).*)|(20\.([0-9]{3,}|[1-9][1-9]|[2-9][0]).*)|(20\.10\.([0-9]{3,}|[2-9][0-9]|[1][3-9])))"

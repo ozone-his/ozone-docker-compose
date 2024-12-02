@@ -1,0 +1,25 @@
+services:
+  backup:
+    image: mekomsolutions/restic-compose-backup
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      # Map local restic repository
+      - ${BACKUP_PATH:-./restic_data}:/restic_data
+      # Map restic cache
+      - restic_cache:/cache
+    environment:
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+      RESTIC_KEEP_DAILY: ${RESTIC_KEEP_DAILY}
+      RESTIC_KEEP_WEEKLY: ${RESTIC_KEEP_WEEKLY}
+      RESTIC_KEEP_MONTHLY: ${RESTIC_KEEP_MONTHLY}
+      RESTIC_KEEP_YEARLY: ${RESTIC_KEEP_YEARLY}
+      LOG_LEVEL: ${LOG_LEVEL}
+      CRON_SCHEDULE: ${CRON_SCHEDULE}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    networks:
+      - ozone
+volumes:
+  restic_cache: ~

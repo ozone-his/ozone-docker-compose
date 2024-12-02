@@ -66,6 +66,12 @@ function setDockerComposeCLIOptions () {
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../$file"
     done
 
+    # Add restore file if restore env is set
+
+    if [ "$RESTORE" == "true" ]; then
+        export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../docker-compose-restore.yml"
+    fi
+    
     # Set the default env file
     export dockerComposeEnvFilePath="../.env"
     
