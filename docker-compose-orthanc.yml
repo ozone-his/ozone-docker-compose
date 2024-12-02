@@ -5,9 +5,8 @@ services:
     command: /run/secrets/
     secrets:
       - orthanc.json
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: sidvaish97/orthanc_test:v1.0
+    platform: linux/amd64
     restart: always
     environment:
       - ORTHANC_NAME=Orthanc
@@ -87,9 +86,9 @@ services:
 
   mysql:
     environment:
-      EIP_DB_NAME_ODOO: ${EIP_DB_NAME_ODOO}
-      EIP_DB_USER_ODOO: ${EIP_DB_USER_ODOO}
-      EIP_DB_PASSWORD_ODOO: ${EIP_DB_PASSWORD_ODOO}
+      EIP_DB_NAME_ORTHANC: ${EIP_DB_NAME_ORTHANC}
+      EIP_DB_USER_ORTHANC: ${EIP_DB_USER_ORTHANC}
+      EIP_DB_PASSWORD_ORTHANC: ${EIP_DB_PASSWORD_ORTHANC}
     volumes:
       - "${SQL_SCRIPTS_PATH}/mysql/eip-openmrs-orthanc:/docker-entrypoint-initdb.d/db/eip-openmrs-orthanc"
 
