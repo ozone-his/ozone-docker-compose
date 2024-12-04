@@ -12,6 +12,11 @@ setupDirs
 # Export the paths variables to point to distro artifacts
 exportPaths
 
+# Export IP address of the host machine
+if [ "$ENABLE_SSO" == "true" ]; then
+  exportHostIP
+fi
+
 # Set the Traefik host names
 if [ "$TRAEFIK" == "true" ]; then
     echo "$INFO \$TRAEFIK=true, setting Traefik hostnames..."

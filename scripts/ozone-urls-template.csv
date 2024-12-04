@@ -4,3 +4,4 @@ OpenMRS 3,${SERVER_SCHEME}://${O3_HOSTNAME}/openmrs/spa,admin,Admin123,openmrs
 SENAITE,${SERVER_SCHEME}://${SENAITE_HOSTNAME},admin,password,senaite
 Odoo,${SERVER_SCHEME}://${ODOO_HOSTNAME},admin,admin,odoo
 ERPNext,${SERVER_SCHEME}://${ERPNEXT_HOSTNAME},administrator,password,erpnext
+Keycloak,${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME},admin,password,keycloak

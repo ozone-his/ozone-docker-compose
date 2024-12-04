@@ -5,10 +5,14 @@ services:
     depends_on: 
       env-substitution:
         condition: service_completed_successfully
+      postgresql:
+        condition: service_healthy
     environment: 
       - SITE=${SITE}
-      - ADMIN_USER=${SENAITE_ADMIN_USER}
-      - ADMIN_PASSWORD=${SENAITE_ADMIN_PASSWORD}
+      - PASSWORD=${SENAITE_ADMIN_PASSWORD}
+      - RELSTORAGE_ADAPTER_OPTIONS=type postgresql,dsn dbname='${SENAITE_DB_NAME}' user='${SENAITE_DB_USER}' password='${SENAITE_DB_PASSWORD}' host='${SENAITE_DB_HOST}', driver pg8000
+      - RELSTORAGE_KEEP_HISTORY=false
+      - RELSTORAGE_BLOB_DIR=/home/senaite/senaitelims/blobstorage
     image: mekomsolutions/senaite:latest
     labels:
       - "traefik.enable=true"
@@ -17,13 +21,14 @@ services:
       - "traefik.http.routers.senaite.middlewares=senaite"
       - "traefik.http.middlewares.senaite.addprefix.prefix=/VirtualHostBase/https/${SENAITE_HOSTNAME}/senaite/VirtualHostRoot"
     networks:
-      - ozone
-      - web
+      ozone:
+        aliases:
+          - senaite
+      web:
     restart: unless-stopped
     volumes:
       - ${SENAITE_CONFIG_PATH}:/data/importdata/senaite
-      - senaite-filestorage:/data/filestorage
-      - senaite-blobstorage:/data/blobstorage
+      - ${SENAITE_BLOBSTORAGE_PATH:-senaite-blobstorage}:/home/senaite/senaitelims/blobstorage
 
   # OpenMRS - SENAITE integration service
   eip-openmrs-senaite:
@@ -78,6 +83,14 @@ services:
       EIP_DB_PASSWORD_SENAITE: ${EIP_DB_PASSWORD_SENAITE}
     volumes:
       - "${SQL_SCRIPTS_PATH}/mysql/eip-openmrs-senaite:/docker-entrypoint-initdb.d/db/eip-openmrs-senaite"
+
+  postgresql:
+    environment:
+      SENAITE_DB_NAME: ${SENAITE_DB_NAME}
+      SENAITE_DB_USER: ${SENAITE_DB_USER}
+      SENAITE_DB_PASSWORD: ${SENAITE_DB_PASSWORD}
+    volumes:
+      - "${SQL_SCRIPTS_PATH}/postgresql/senaite:/docker-entrypoint-initdb.d/db/senaite"
     
   env-substitution:
     environment:

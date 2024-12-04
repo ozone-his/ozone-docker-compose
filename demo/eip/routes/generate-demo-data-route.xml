@@ -5,7 +5,15 @@
         
         <log message="Scheduled demo data generation." />
 
-        <to uri="direct:authenticate-to-openmrs"/>
+        <choice>
+            <when>
+                <simple>{{oauth.enabled}}</simple>
+                <to uri="direct:oauth2-authenticate-to-openmrs"/>
+            </when>
+            <otherwise>
+                <to uri="direct:authenticate-to-openmrs"/>
+            </otherwise>
+        </choice>
 
         <setProperty name="number-of-demo-patients">
             <simple>${properties:number.of.demo.patients:50}</simple>

@@ -1,0 +1,75 @@
+services:
+
+  keycloak:
+    image: docker.io/bitnami/keycloak:22.0.5
+    restart: unless-stopped
+    volumes:
+      - ${KEYCLOAK_CONFIG_PATH}/realms:/keycloak-files/realm-config
+      - ${KEYCLOAK_CONFIG_PATH}/themes/carbon:/opt/bitnami/keycloak/themes/carbon
+    environment:
+      KC_HOSTNAME_URL: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      PROXY_ADDRESS_FORWARDING: "true"
+      KC_HTTP_ENABLED: 'true'
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      KC_PROXY: reencrypt
+      KC_HEALTH_ENABLED: 'true'
+      KC_METRICS_ENABLED: 'true'
+      KEYCLOAK_DATABASE_VENDOR: postgresql
+      KEYCLOAK_DATABASE_HOST: postgresql
+      KEYCLOAK_DATABASE_PORT_NUMBER: 5432
+      KEYCLOAK_DATABASE_NAME: ${KEYCLOAK_DB}
+      KEYCLOAK_DATABASE_USER: ${KEYCLOAK_DB_USER}
+      KEYCLOAK_DATABASE_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KEYCLOAK_DATABASE_SCHEMA: ${KEYCLOAK_DB_SCHEMA}
+      KEYCLOAK_CREATE_ADMIN_USER: "true"
+      KEYCLOAK_ADMIN_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+      KEYCLOAK_EXTRA_ARGS_PREPENDED: "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true"
+      KEYCLOAK_EXTRA_ARGS: "
+       -Dkeycloak.profile.feature.scripts=enabled
+       -Dkeycloak.migration.action=import
+       -Dkeycloak.migration.provider=dir
+       -Dkeycloak.migration.dir=/keycloak-files/realm-config
+       -Dkeycloak.migration.strategy=OVERWRITE_EXISTING"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://0.0.0.0:8080/health/ready"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
+    depends_on:
+      postgresql:
+        condition: service_started
+      env-substitution:
+        condition: service_completed_successfully
+    networks:
+      ozone:
+      web:
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.keycloak.rule: "Host(`${KEYCLOAK_HOSTNAME}`)"
+      traefik.http.routers.keycloak.entrypoints: "websecure"
+      traefik.http.services.keycloak.loadbalancer.server.port: 8080
+
+  postgresql:
+    environment:
+      KEYCLOAK_DB: ${KEYCLOAK_DB}
+      KEYCLOAK_DB_SCHEMA: ${KEYCLOAK_DB_SCHEMA}
+      KEYCLOAK_DB_USER: ${KEYCLOAK_DB_USER}
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - "${SQL_SCRIPTS_PATH}/postgresql/keycloak:/docker-entrypoint-initdb.d/db/keycloak"
+
+  env-substitution:
+    environment:
+      - KEYCLOAK_URL=${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      - KEYCLOAK_INTERNAL_HOST_URL=${KEYCLOAK_INTERNAL_HOST_URL}
+      - KEYCLOAK_ADMIN_SA_CLIENT_SECRET=${KEYCLOAK_ADMIN_SA_CLIENT_SECRET}
+      - EIP_CLIENT_SECRET=${EIP_CLIENT_SECRET}
+      - SUPERSET_CLIENT_SECRET=${SUPERSET_CLIENT_SECRET}
+      - SUPERSET_CLIENT_UUID=${SUPERSET_CLIENT_UUID}
+      - SUPERSET_PUBLIC_URL=${SERVER_SCHEME}://${SUPERSET_HOSTNAME}
+
+volumes:
+  keycloak-realm: ~

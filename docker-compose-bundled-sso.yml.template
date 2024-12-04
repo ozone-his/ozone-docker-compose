@@ -1,0 +1,115 @@
+services:
+  keycloak:
+    image: ${dockerUserName}/${sanitizedArtifactId}-keycloak:${dockertag}
+    restart: unless-stopped
+    environment:
+      KC_HOSTNAME_URL: \${SERVER_SCHEME}://\${KEYCLOAK_HOSTNAME}
+      PROXY_ADDRESS_FORWARDING: "true"
+      KC_HTTP_ENABLED: 'true'
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      KC_PROXY: reencrypt
+      KC_HEALTH_ENABLED: 'true'
+      KC_METRICS_ENABLED: 'true'
+      KEYCLOAK_DATABASE_VENDOR: postgresql
+      KEYCLOAK_DATABASE_HOST: postgresql
+      KEYCLOAK_DATABASE_PORT_NUMBER: 5432
+      KEYCLOAK_DATABASE_NAME: \${KEYCLOAK_DB}
+      KEYCLOAK_DATABASE_USER: \${KEYCLOAK_DB_USER}
+      KEYCLOAK_DATABASE_PASSWORD: \${KEYCLOAK_DB_PASSWORD}
+      KEYCLOAK_DATABASE_SCHEMA: \${KEYCLOAK_DB_SCHEMA}
+      KEYCLOAK_CREATE_ADMIN_USER: "true"
+      KEYCLOAK_ADMIN_USER: \${KEYCLOAK_USER}
+      KEYCLOAK_ADMIN_PASSWORD: \${KEYCLOAK_PASSWORD}
+      HOST_URL: \${SERVER_SCHEME}://\${O3_HOSTNAME}
+      KEYCLOAK_AUTH_SERVER_URL: \${SERVER_SCHEME}://\${KEYCLOAK_HOSTNAME}
+      ODOO_PUBLIC_URL: \${SERVER_SCHEME}://\${ODOO_HOSTNAME}
+      OPENMRS_PUBLIC_URL: \${SERVER_SCHEME}://\${O3_HOSTNAME}
+      SENAITE_PUBLIC_URL: \${SERVER_SCHEME}://\${SENAITE_HOSTNAME}
+      SUPERSET_PUBLIC_URL: \${SERVER_SCHEME}://\${SUPERSET_HOSTNAME}
+      ODOO_CLIENT_SECRET: \${ODOO_CLIENT_SECRET}
+      ODOO_CLIENT_UUID: \${ODOO_CLIENT_UUID}
+      OPENMRS_CLIENT_SECRET: \${OPENMRS_CLIENT_SECRET}
+      OPENMRS_CLIENT_UUID: \${OPENMRS_CLIENT_UUID}
+      SENAITE_CLIENT_SECRET: \${SENAITE_CLIENT_SECRET}
+      SENAITE_CLIENT_UUID: \${SENAITE_CLIENT_UUID}
+      SUPERSET_CLIENT_SECRET: \${SUPERSET_CLIENT_SECRET}
+      SUPERSET_CLIENT_UUID: \${SUPERSET_CLIENT_UUID}
+      KEYCLOAK_ADMIN_SA_CLIENT_SECRET: \${KEYCLOAK_ADMIN_SA_CLIENT_SECRET}
+      EIP_CLIENT_SECRET: \${EIP_CLIENT_SECRET}
+      KEYCLOAK_EXTRA_ARGS_PREPENDED: "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true"
+      KEYCLOAK_EXTRA_ARGS: "
+        -Dkeycloak.profile.feature.scripts=enabled
+        -Dkeycloak.migration.replace-placeholders=true
+        -Dkeycloak.migration.action=import
+        -Dkeycloak.migration.provider=dir
+        -Dkeycloak.migration.dir=/keycloak-files/realm-config
+        -Dkeycloak.migration.strategy=OVERWRITE_EXISTING"
+
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://0.0.0.0:8080/health/ready"]
+        interval: 15s
+        timeout: 3s
+        retries: 5
+        start_period: 30s
+
+    depends_on:
+      postgresql:
+        condition: service_started
+    networks:
+      ozone:
+      web:
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.keycloak.rule: "Host(`\${KEYCLOAK_HOSTNAME}`)"
+      traefik.http.routers.keycloak.entrypoints: "websecure"
+      traefik.http.services.keycloak.loadbalancer.server.port: 8080
+
+  postgresql:
+    environment:
+      KEYCLOAK_DB: \${KEYCLOAK_DB}
+      KEYCLOAK_DB_SCHEMA: \${KEYCLOAK_DB_SCHEMA}
+      KEYCLOAK_DB_USER: \${KEYCLOAK_DB_USER}
+      KEYCLOAK_DB_PASSWORD: \${KEYCLOAK_DB_PASSWORD}
+  # Odoo
+  odoo:
+    environment:
+     - KEYCLOAK_URL=\${SERVER_SCHEME}://\${KEYCLOAK_HOSTNAME}
+     - ODOO_CLIENT_UUID=\${ODOO_CLIENT_UUID}
+     - ODOO_CLIENT_SECRET=\${ODOO_CLIENT_SECRET}
+     - ADDONS=sale_management,stock,account_account,purchase,mrp,mrp_product_expiry,product_expiry,l10n_generic_coa,odoo_initializer,ozone_settings,server_environment,auth_oidc_environment,auth_oidc
+  # EIP Odoo OpenMRS Integration Service
+  eip-odoo-openmrs:
+    environment:
+      OAUTH_ACCESS_TOKEN_URL: \${OAUTH_ACCESS_TOKEN_URL}
+      OAUTH_ENABLED: \${OAUTH_ENABLED}
+      OAUTH_CLIENT_ID: \${OAUTH_CLIENT_ID}
+      OAUTH_CLIENT_SECRET: \${OAUTH_CLIENT_SECRET}
+      OAUTH_CLIENT_SCOPE: \${OAUTH_CLIENT_SCOPE}
+
+  # OpenMRS Backend
+  openmrs:
+    environment:
+      KEYCLOAK_URL: \${SERVER_SCHEME}://\${KEYCLOAK_HOSTNAME}
+      OPENMRS_CLIENT_UUID: \${OPENMRS_CLIENT_UUID}
+      OPENMRS_CLIENT_SECRET: \${OPENMRS_CLIENT_SECRET}
+
+  frontend:
+    environment:
+      SPA_CONFIG_URLS: \${SPA_CONFIG_URLS},/openmrs/spa/configs/ozone-frontend-config-sso.json
+
+  # SENAITE
+  senaite:
+    environment:
+      OAUTH_CONFIG_FILE: /data/oidc/client.json
+      OAUTH_CONFIG_PATH: /data/oidc
+      KEYCLOAK_URL: \${SERVER_SCHEME}://\${KEYCLOAK_HOSTNAME}
+      SENAITE_CLIENT_UUID: \${SENAITE_CLIENT_UUID}
+      SENAITE_CLIENT_SECRET: \${SENAITE_CLIENT_SECRET}
+  # OpenMRS - SENAITE integration service
+  eip-openmrs-senaite:
+    environment:
+      OAUTH_ACCESS_TOKEN_URL: \${OAUTH_ACCESS_TOKEN_URL}
+      OAUTH_ENABLED: \${OAUTH_ENABLED}
+      OAUTH_CLIENT_ID: \${OAUTH_CLIENT_ID}
+      OAUTH_CLIENT_SECRET: \${OAUTH_CLIENT_SECRET}
+      OAUTH_CLIENT_SCOPE: \${OAUTH_CLIENT_SCOPE}

@@ -1,0 +1,22 @@
+services:
+
+  senaite:
+    image: mekomsolutions/senaite-ozonepro
+    restart: unless-stopped
+    environment:
+      - OAUTH_CONFIG_FILE=/data/oidc/client.json
+    volumes:
+      - ${SENAITE_OIDC_CONFIG_PATH}/:/data/oidc
+
+  env-substitution:
+    environment:
+      - SENAITE_CLIENT_SECRET=${SENAITE_CLIENT_SECRET}
+      - SENAITE_CLIENT_UUID=${SENAITE_CLIENT_UUID}
+
+  eip-openmrs-senaite:
+    environment:
+      OAUTH_ACCESS_TOKEN_URL: ${OAUTH_ACCESS_TOKEN_URL}
+      OAUTH_ENABLED: ${OAUTH_ENABLED}
+      OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID}
+      OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
+      OAUTH_CLIENT_SCOPE: ${OAUTH_CLIENT_SCOPE}
