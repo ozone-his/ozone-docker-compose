@@ -1,7 +1,7 @@
 services:
 
   senaite:
-    image: mekomsolutions/senaite-ozonepro
+    image: mekomsolutions/senaite-sso
     restart: unless-stopped
     environment:
       - OAUTH_CONFIG_FILE=/data/oidc/client.json
