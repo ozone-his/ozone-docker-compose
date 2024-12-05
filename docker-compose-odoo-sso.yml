@@ -3,11 +3,6 @@ services:
     environment:
       - ADDONS=sale_management,stock,account_account,purchase,mrp,mrp_product_expiry,product_expiry,l10n_generic_coa,odoo_initializer,ozone_settings,server_environment,auth_oidc_environment,auth_oidc
 
-  env-substitution:
-    environment:
-      - ODOO_CLIENT_SECRET=${ODOO_CLIENT_SECRET}
-      - ODOO_CLIENT_UUID=${ODOO_CLIENT_UUID}
-
   eip-odoo-openmrs:
     environment:
       OAUTH_ACCESS_TOKEN_URL: ${OAUTH_ACCESS_TOKEN_URL}
