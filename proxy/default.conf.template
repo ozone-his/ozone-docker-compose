@@ -156,6 +156,17 @@ server {
     proxy_redirect http://$host/ /;
   }
 
+  # bahmnireports
+  location = /bahmnireports {
+    return 301 /bahmnireports/;
+  }
+
+  location /bahmnireports/ {
+    set $bahmnireports reports:8051;
+    proxy_pass http://$bahmnireports;
+    proxy_redirect http://$host/ /;
+  }
+
   # Bahmni Web
   location = /bahmni {
     return 301 /bahmni/;
