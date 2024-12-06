@@ -42,6 +42,7 @@ function exportPaths () {
     export ERPNEXT_SCRIPTS_PATH=$DISTRO_PATH/binaries/erpnext/scripts/
     export KEYCLOAK_CONFIG_PATH=$DISTRO_PATH/configs/keycloak
     export BAHMNI_OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/bahmniemr/modules
+    export BAHMNI_CONFIG_OVERRIDE_VOLUME=$DISTRO_PATH/configs/bahmni
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
@@ -61,7 +62,8 @@ function exportPaths () {
     echo "→ ERPNEXT_CONFIG_PATH=$ERPNEXT_CONFIG_PATH"
     echo "→ ERPNEXT_SCRIPTS_PATH=$ERPNEXT_SCRIPTS_PATH"
     echo "→ KEYCLOAK_CONFIG_PATH=$KEYCLOAK_CONFIG_PATH"
-
+    echo "→ BAHMNI_OPENMRS_MODULES_PATH=$BAHMNI_OPENMRS_MODULES_PATH"
+    echo "→ BAHMNI_CONFIG_OVERRIDE_VOLUME=$CONFIG_OVERRIDE_VOLUME"
 }
 
 function setDockerComposeCLIOptions () {
