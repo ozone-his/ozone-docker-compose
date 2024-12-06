@@ -7,10 +7,10 @@ x-log-config: &log-config
 services:
 
   bahmni-config:
-    image: 'bahmni/standard-config:${CONFIG_IMAGE_TAG:?}'
+    image: 'bahmni/standard-config:${BAHMNI_CONFIG_IMAGE_TAG:?}'
     volumes:
-      - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
-      - '${CONFIG_OVERRIDE_VOLUME:-bahmni-config-override}:/usr/local/bahmni_config_override'
+      - '${BAHMNI_CONFIG_VOLUME:?}:/usr/local/bahmni_config'
+      - '${BAHMNI_CONFIG_OVERRIDE_VOLUME:-bahmni-config-override}:/usr/local/bahmni_config_override'
     logging: *log-config
     restart: unless-stopped
     networks:
