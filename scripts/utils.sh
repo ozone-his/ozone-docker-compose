@@ -41,6 +41,8 @@ function exportPaths () {
     export ERPNEXT_CONFIG_PATH=$DISTRO_PATH/configs/erpnext/initializer_config/
     export ERPNEXT_SCRIPTS_PATH=$DISTRO_PATH/binaries/erpnext/scripts/
     export KEYCLOAK_CONFIG_PATH=$DISTRO_PATH/configs/keycloak
+    export BAHMNI_OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/bahmniemr/modules
+    export BAHMNI_CONFIG_OVERRIDE_VOLUME=$DISTRO_PATH/configs/bahmni
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
@@ -60,12 +62,18 @@ function exportPaths () {
     echo "→ ERPNEXT_CONFIG_PATH=$ERPNEXT_CONFIG_PATH"
     echo "→ ERPNEXT_SCRIPTS_PATH=$ERPNEXT_SCRIPTS_PATH"
     echo "→ KEYCLOAK_CONFIG_PATH=$KEYCLOAK_CONFIG_PATH"
-
+    echo "→ BAHMNI_OPENMRS_MODULES_PATH=$BAHMNI_OPENMRS_MODULES_PATH"
+    echo "→ BAHMNI_CONFIG_OVERRIDE_VOLUME=$CONFIG_OVERRIDE_VOLUME"
 }
 
 function setDockerComposeCLIOptions () {
     # Parse 'docker-compose-files.txt' to get the list of Docker Compose files to run
     dockerComposeFiles=$(cat docker-compose-files.txt)
+
+    if [ "$RUN_WITH_BAHMNI_EMR" == "true" ]; then
+        export ENABLE_SSO=false
+    fi
+
     for file in ${dockerComposeFiles}
     do
         if [ "$ENABLE_SSO" != "true" ]; then
@@ -73,6 +81,15 @@ function setDockerComposeCLIOptions () {
                 continue
             fi
         fi
+
+        if [[ "$file" == *"-bahmniemr.yml" && "$RUN_WITH_BAHMNI_EMR" == "false" ]]; then
+            continue
+        fi
+
+        if [[ "$file" == *"-openmrs.yml" && "$RUN_WITH_BAHMNI_EMR" == "true" ]]; then
+            continue
+        fi
+        
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../$file"
     done
 
