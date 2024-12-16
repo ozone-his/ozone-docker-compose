@@ -4,6 +4,7 @@ docker-compose-odoo.yml
 docker-compose-odoo-sso.yml
 docker-compose-openmrs.yml
 docker-compose-openmrs-sso.yml
+docker-compose-bahmniemr.yml
 docker-compose-senaite.yml
 docker-compose-senaite-sso.yml
 docker-compose-backup.yml
