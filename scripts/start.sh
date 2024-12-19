@@ -56,6 +56,7 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
     if command -v gp version &> /dev/null; then
         export GITPOD_ENV="true"
         export USE_HTTPS="true"
+        setGitpodHostnames
     else
         export GITPOD_ENV="false"
     fi
