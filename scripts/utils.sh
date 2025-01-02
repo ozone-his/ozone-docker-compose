@@ -41,6 +41,9 @@ function exportPaths () {
     export ERPNEXT_CONFIG_PATH=$DISTRO_PATH/configs/erpnext/initializer_config/
     export ERPNEXT_SCRIPTS_PATH=$DISTRO_PATH/binaries/erpnext/scripts/
     export KEYCLOAK_CONFIG_PATH=$DISTRO_PATH/configs/keycloak
+    export EIP_OPENMRS_ORTHANC_ROUTES_PATH=$DISTRO_PATH/binaries/eip-openmrs-orthanc
+    export ORTHANC_CONFIG_PATH=$DISTRO_PATH/configs/orthanc/initializer_config
+
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
@@ -60,6 +63,8 @@ function exportPaths () {
     echo "→ ERPNEXT_CONFIG_PATH=$ERPNEXT_CONFIG_PATH"
     echo "→ ERPNEXT_SCRIPTS_PATH=$ERPNEXT_SCRIPTS_PATH"
     echo "→ KEYCLOAK_CONFIG_PATH=$KEYCLOAK_CONFIG_PATH"
+    echo "→ EIP_OPENMRS_ORTHANC_ROUTES_PATH=$EIP_OPENMRS_ORTHANC_ROUTES_PATH"
+    echo "→ ORTHANC_CONFIG_PATH=$ORTHANC_CONFIG_PATH"
 
 }
 
