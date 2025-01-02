@@ -41,8 +41,7 @@ services:
       restic-compose-backup.mariadb: true
 
   postgresql:
-    command: "postgres -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10"
-    image: postgres:13
+    command: postgres -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10 -c max_connections=200
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: ${POSTGRES_USER}
@@ -52,6 +51,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    image: postgres:13
     networks:
       - ozone
     ports:

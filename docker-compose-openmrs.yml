@@ -16,13 +16,14 @@ services:
       OMRS_CONFIG_CONNECTION_USERNAME: ${OPENMRS_DB_USER:-openmrs}
       OMRS_CONFIG_CONNECTION_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
       HOST_URL: https://${O3_HOSTNAME}
+      OAUTH2_ENABLED: ${ENABLE_SSO}
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/health/started" ]
       interval: 10s
       timeout: 5s
       retries: 48
       start_period: 120s
-    image: openmrs/openmrs-reference-application-3-backend:3.1.1
+    image: openmrs/openmrs-core:2.6.x-nightly-amazoncorretto-11
     labels:
       traefik.enable: "true"
       traefik.http.routers.openmrs.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs`)"
@@ -47,6 +48,7 @@ services:
       - "${OPENMRS_CONFIG_CHECKSUMS_PATH:-openmrs-config-checksums}:/openmrs/data/configuration_checksums"
       - "${OPENMRS_PROPERTIES_PATH}:/etc/properties/"
       - "${OPENMRS_PROPERTIES_PATH}/fhirproxy.properties:/openmrs/data/fhirproxy/config.properties"
+      - "${OPENMRS_PROPERTIES_PATH}/oauth2.properties:/openmrs/data/oauth2.properties"
       - "${OPENMRS_PERSON_IMAGES_PATH:-openmrs-person-images}:/openmrs/data/person_images"
       - "${OPENMRS_COMPLEX_OBS_PATH:-openmrs-complex-obs}:/openmrs/data/complex_obs"
 

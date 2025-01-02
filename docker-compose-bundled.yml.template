@@ -295,6 +295,10 @@ services:
       - OPENMRS_DB_PASSWORD=\${OPENMRS_DB_PASSWORD}
       - OPENMRS_USER=\${OPENMRS_USER}
       - OPENMRS_PASSWORD=\${OPENMRS_PASSWORD}
+      - EIP_FHIR_RESOURCES=Patient,ServiceRequest
+      - EIP_FHIR_SERVER_URL=http://openmrs:8080/openmrs/ws/fhir2/R4
+      - EIP_FHIR_USERNAME=\${OPENMRS_USER}
+      - EIP_FHIR_PASSWORD=\${OPENMRS_PASSWORD}
     image:  ${dockerUserName}/${sanitizedArtifactId}-eip-openmrs-senaite:${dockertag}
     networks:
       ozone:
@@ -318,11 +322,9 @@ services:
       - "\${PROXY_PUBLIC_PORT:-80}:80"
       - "8069:8069"
       - "8081:8081"
-      - "8088:8088"
-      - "8082:8082"
+      - "8084:8084"
     volumes:
       - "\${PROXY_TLS_CERTS_PATH:-proxy-tls-certs}:/etc/tls"
-version: "3.7"
 
 volumes:
   mysql-data: ~
@@ -343,4 +345,3 @@ volumes:
   senaite-blobstorage: ~
   senaite-filestorage: ~
   proxy-tls-certs: ~
-  

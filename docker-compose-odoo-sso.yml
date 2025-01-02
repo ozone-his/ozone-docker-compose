@@ -1,0 +1,12 @@
+services:
+  odoo:
+    environment:
+      - ADDONS=sale_management,stock,account_account,purchase,mrp,mrp_product_expiry,product_expiry,l10n_generic_coa,odoo_initializer,ozone_settings,server_environment,auth_oidc_environment,auth_oidc
+
+  eip-odoo-openmrs:
+    environment:
+      OAUTH_ACCESS_TOKEN_URL: ${OAUTH_ACCESS_TOKEN_URL}
+      OAUTH_ENABLED: ${ENABLE_SSO}
+      OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID}
+      OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
+      OAUTH_CLIENT_SCOPE: ${OAUTH_CLIENT_SCOPE}

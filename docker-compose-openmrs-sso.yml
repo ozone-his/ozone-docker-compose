@@ -1,0 +1,19 @@
+services:
+  openmrs:
+    environment:
+      KEYCLOAK_URL: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      OAUTH2_ENABLED: ${ENABLE_SSO}
+    volumes:
+      - "./openmrs/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+
+  frontend:
+    environment:
+      SPA_CONFIG_URLS: ${SPA_CONFIG_URLS},/openmrs/spa/configs/ozone-frontend-config-sso.json
+    volumes:
+      - "${OPENMRS_FRONTEND_CONFIG_PATH}/ozone-frontend-config-sso.json:/usr/share/nginx/html/configs/ozone-frontend-config-sso.json"
+
+  env-substitution:
+    environment:
+      - OAUTH2_ENABLED=${ENABLE_SSO}
+      - HOST_URL=${SERVER_SCHEME}://${O3_HOSTNAME}
+      - KEYCLOAK_AUTH_SERVER_URL=${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
