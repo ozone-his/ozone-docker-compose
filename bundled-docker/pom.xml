@@ -65,10 +65,8 @@
                                 <resource>
                                     <directory>${project.basedir}/</directory>
                                     <includes>
-                                        <include>eip-erpnext-openmrs/**</include>
                                         <include>eip-odoo-openmrs/**</include>
                                         <include>eip-openmrs-senaite/**</include>
-                                        <include>erpnext/**</include>
                                         <include>frontend/**</include>
                                         <include>mysql/**</include>
                                         <include>odoo/**</include>
