@@ -20,29 +20,6 @@ services:
       - web
     ports:
     - "8889:8042"
-#    depends_on:
-#      env-substitution:
-#        condition: service_completed_successfully
-
-  # keycloak:
-  #   image: orthancteam/orthanc-keycloak:latest
-  #   restart: always
-  #   ports:
-  #     - "8080:8080"
-  #   environment:
-  #     - ORTHANC__USER__NAME=orthanc
-  #     - ORTHANC__USER__PASSWORD=orthanc
-  #     - KC_DB="postgresql"
-  #     - KC_DB_URL="jdbc:postgresql://postgres:5432/keycloak"
-  #     - KC_DB_USERNAME="orthanc"
-  #     - KC_DB_PASSWORD="orthanc"
-  #   networks:
-  #     - ozone
-  #     - web
-
-#  env-substitution:
-#    environment:
-#      - ORTHANC_PUBLIC_URL=http://${ORTHANC_HOSTNAME}
 
   # Orthanc - OpenMRS integration service
   eip-openmrs-orthanc:
@@ -60,6 +37,7 @@ services:
       - EIP_DB_USER_ORTHANC=${EIP_DB_USER_ORTHANC}
       - EIP_DB_PASSWORD_ORTHANC=${EIP_DB_PASSWORD_ORTHANC}
       - OPENMRS_URL=http://openmrs:8080/openmrs
+      - ORTHANC_URL=http://orthanc:8042
       - EIP_PROFILE=prod
       - MYSQL_ADMIN_USER=root
       - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -74,6 +52,8 @@ services:
       - EIP_FHIR_SERVER_URL=http://openmrs:8080/openmrs/ws/fhir2/R4
       - EIP_FHIR_USERNAME=${OPENMRS_USER}
       - EIP_FHIR_PASSWORD=${OPENMRS_PASSWORD}
+      - OPENMRS_USERNAME=${OPENMRS_USER}
+      - OPENMRS_PASSWORD=${OPENMRS_PASSWORD}
     image: mekomsolutions/eip-client
     networks:
       ozone:
@@ -94,7 +74,7 @@ services:
 
 secrets:
   orthanc.json:
-    file: orthanc.json
+    file: ${ORTHANC_CONFIG_PATH}/orthanc.json
 
 networks:
   ozone:
