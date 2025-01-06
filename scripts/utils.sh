@@ -192,35 +192,62 @@ function isOzoneRunning {
     fi
 }
 
-function displayAccessURLsWithCredentials {
-    services=()
+function setupProjectName() {
+    # Check if ozone-info.json exists and read project name from it
+    ozoneInfo="../$DISTRO_PATH/ozone-info.json"
+    if [ -f "$ozoneInfo" ]; then
+        export PROJECT_NAME=$(grep -o '"name":\s*"[^\"]*"' "$ozoneInfo" | cut -d'"' -f4)
+    else
+        export PROJECT_NAME="ozone"
+    fi
+    echo "$PROJECT_NAME" > /tmp/project_name.txt
+}
+
+function extractServicesFromComposeFiles() {
+    definedServices=()
     is_defined=()
 
+    echo "$INFO Extracting services from docker-compose files..."
     # Read docker-compose-files.txt and extract the list of services run
     while read -r line; do
-        if [[ $line != *-sso.yml ]]; then
-            serviceWithoutExtension=${line%.yml}
-            service=${serviceWithoutExtension#docker-compose-}
+      if [[ $line != *-sso.yml ]]; then
+        serviceWithoutExtension=${line%.yml}
+        service=${serviceWithoutExtension#docker-compose-}
 
-            services+=("$service")
-            is_defined+=(1)
-        fi
+        definedServices+=("$service")
+        is_defined+=(1)
+      fi
     done < docker-compose-files.txt
+    # Save services to temp file
+    echo "$INFO Saving services to temp file..."
+    printf "%s\n" "${definedServices[@]}" > /tmp/defined_services.txt
+}
 
+function displayAccessURLsWithCredentials {
     echo "HIS Component,URL,Username,Password" > .urls_1.txt
     echo "-,-,-,-" >> .urls_1.txt
+
+    definedServices=()
+    while read -r service; do
+        definedServices+=("$service")
+    done < /tmp/defined_services.txt
+    echo "$INFO Defined Services: ${definedServices[*]}"
+
     tail -n +2 ozone-urls-template.csv | while IFS=',' read -r component url username password service ; do
-        for i in "${!services[@]}"; do
-            if [[ "${services[$i]}" == "$service" && "${is_defined[$i]}" == 1 ]]; then
+        for i in "${!definedServices[@]}"; do
+            if [[ "${definedServices[$i]}" == "$service" ]]; then
                 if [[ "$service" == "keycloak" && "$ENABLE_SSO" == "false" ]]; then
-                  continue
+                    continue
                 fi
-                echo "$component,$url,$username,$password" >> .urls_1.txt
+                url=$(echo "$url" | sed 's/\r//g')
+                component=$(echo "$component" | sed 's/\r//g')
+                username=$(echo "$username" | sed 's/\r//g')
+                password=$(echo "$password" | sed 's/\r//g')
+                echo "${component},${url},${username},${password}" >> .urls_1.txt
                 break
             fi
         done
     done
-
     envsubst < .urls_1.txt > .urls_2.txt
 
     echo ""

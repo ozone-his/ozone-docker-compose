@@ -90,6 +90,7 @@ services:
   # OpenMRS Backend
   openmrs:
     environment:
+      OAUTH2_ENABLED: \${ENABLE_SSO}
       KEYCLOAK_URL: \${SERVER_SCHEME}://\${KEYCLOAK_HOSTNAME}
       OPENMRS_CLIENT_UUID: \${OPENMRS_CLIENT_UUID}
       OPENMRS_CLIENT_SECRET: \${OPENMRS_CLIENT_SECRET}
