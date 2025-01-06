@@ -98,6 +98,9 @@ services:
   frontend:
     environment:
       SPA_CONFIG_URLS: \${SPA_CONFIG_URLS},/openmrs/spa/configs/ozone-frontend-config-sso.json
+      ODOO_PUBLIC_URL: \${SERVER_SCHEME}://\${ODOO_HOSTNAME}
+      SENAITE_PUBLIC_URL: \${SERVER_SCHEME}://\${SENAITE_HOSTNAME}
+      SUPERSET_PUBLIC_URL: \${SERVER_SCHEME}://\${SUPERSET_HOSTNAME}
 
   # SENAITE
   senaite:
