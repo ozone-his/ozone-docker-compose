@@ -231,7 +231,6 @@ function displayAccessURLsWithCredentials {
     while read -r service; do
         definedServices+=("$service")
     done < /tmp/defined_services.txt
-    echo "$INFO Defined Services: ${definedServices[*]}"
 
     tail -n +2 ozone-urls-template.csv | while IFS=',' read -r component url username password service ; do
         for i in "${!definedServices[@]}"; do
