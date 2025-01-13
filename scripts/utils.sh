@@ -83,6 +83,12 @@ function setDockerComposeCLIOptions () {
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../docker-compose-restore.yml"
     fi
 
+    # Add docker-compose-restore-sso.yml file to prevent Keycloak from being started before the restore
+
+    if [ "$RESTORE" == "true" ] && [ "$ENABLE_SSO" == "true" ]; then
+        export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../docker-compose-restore-sso.yml"
+    fi
+
     # Set the default env file
     export dockerComposeEnvFilePath="../.env"
 
