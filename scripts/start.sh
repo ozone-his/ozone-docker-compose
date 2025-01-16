@@ -34,14 +34,7 @@ if [ "$DEMO" == "true" ]; then
     echo "→ NUMBER_OF_DEMO_PATIENTS=$NUMBER_OF_DEMO_PATIENTS"
 fi
 
-# Check if ozone-info.json exists and read project name from it
-ozoneInfo="../$DISTRO_PATH/ozone-info.json"
-if [ -f "$ozoneInfo" ]; then
-    export PROJECT_NAME=$(grep -o '"name":\s*"[^\"]*"' "$ozoneInfo" | cut -d'"' -f4)
-else
-    export PROJECT_NAME="ozone"
-fi
-echo "$PROJECT_NAME" > /tmp/project_name.txt
+setupProjectName
 
 if ! isOzoneRunning "$PROJECT_NAME"; then
     echo "$INFO Starting Ozone project with name: $PROJECT_NAME"
@@ -106,4 +99,5 @@ else
     echo "$ERROR Docker versions < 20.10.13 are not supported"
 fi
 
+extractServicesFromComposeFiles
 displayAccessURLsWithCredentials

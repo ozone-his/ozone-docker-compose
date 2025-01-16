@@ -41,6 +41,7 @@ function exportPaths () {
     export ERPNEXT_CONFIG_PATH=$DISTRO_PATH/configs/erpnext/initializer_config/
     export ERPNEXT_SCRIPTS_PATH=$DISTRO_PATH/binaries/erpnext/scripts/
     export KEYCLOAK_CONFIG_PATH=$DISTRO_PATH/configs/keycloak
+    export KEYCLOAK_BINARIES_PATH=$DISTRO_PATH/binaries/keycloak
     export EIP_OPENMRS_ORTHANC_ROUTES_PATH=$DISTRO_PATH/binaries/eip-openmrs-orthanc
     export ORTHANC_CONFIG_PATH=$DISTRO_PATH/configs/orthanc/initializer_config
 
@@ -63,6 +64,7 @@ function exportPaths () {
     echo "→ ERPNEXT_CONFIG_PATH=$ERPNEXT_CONFIG_PATH"
     echo "→ ERPNEXT_SCRIPTS_PATH=$ERPNEXT_SCRIPTS_PATH"
     echo "→ KEYCLOAK_CONFIG_PATH=$KEYCLOAK_CONFIG_PATH"
+    echo "→ KEYCLOAK_BINARIES_PATH=$KEYCLOAK_BINARIES_PATH"
     echo "→ EIP_OPENMRS_ORTHANC_ROUTES_PATH=$EIP_OPENMRS_ORTHANC_ROUTES_PATH"
     echo "→ ORTHANC_CONFIG_PATH=$ORTHANC_CONFIG_PATH"
 
@@ -84,6 +86,12 @@ function setDockerComposeCLIOptions () {
     # Add restore file if restore env is set
     if [ "$RESTORE" == "true" ]; then
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../docker-compose-restore.yml"
+    fi
+
+    # Add docker-compose-restore-sso.yml file to prevent Keycloak from being started before the restore
+
+    if [ "$RESTORE" == "true" ] && [ "$ENABLE_SSO" == "true" ]; then
+        export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../docker-compose-restore-sso.yml"
     fi
 
     # Set the default env file
@@ -197,35 +205,61 @@ function isOzoneRunning {
     fi
 }
 
-function displayAccessURLsWithCredentials {
-    services=()
+function setupProjectName() {
+    # Check if ozone-info.json exists and read project name from it
+    ozoneInfo="../$DISTRO_PATH/ozone-info.json"
+    if [ -f "$ozoneInfo" ]; then
+        export PROJECT_NAME=$(grep -o '"name":\s*"[^\"]*"' "$ozoneInfo" | cut -d'"' -f4)
+    else
+        export PROJECT_NAME="ozone"
+    fi
+    echo "$PROJECT_NAME" > /tmp/project_name.txt
+}
+
+function extractServicesFromComposeFiles() {
+    definedServices=()
     is_defined=()
 
+    echo "$INFO Extracting services from docker-compose files..."
     # Read docker-compose-files.txt and extract the list of services run
     while read -r line; do
-        if [[ $line != *-sso.yml ]]; then
-            serviceWithoutExtension=${line%.yml}
-            service=${serviceWithoutExtension#docker-compose-}
+      if [[ $line != *-sso.yml ]]; then
+        serviceWithoutExtension=${line%.yml}
+        service=${serviceWithoutExtension#docker-compose-}
 
-            services+=("$service")
-            is_defined+=(1)
-        fi
+        definedServices+=("$service")
+        is_defined+=(1)
+      fi
     done < docker-compose-files.txt
+    # Save services to temp file
+    echo "$INFO Saving services to temp file..."
+    printf "%s\n" "${definedServices[@]}" > /tmp/defined_services.txt
+}
 
+function displayAccessURLsWithCredentials {
     echo "HIS Component,URL,Username,Password" > .urls_1.txt
     echo "-,-,-,-" >> .urls_1.txt
+
+    definedServices=()
+    while read -r service; do
+        definedServices+=("$service")
+    done < /tmp/defined_services.txt
+
     tail -n +2 ozone-urls-template.csv | while IFS=',' read -r component url username password service ; do
-        for i in "${!services[@]}"; do
-            if [[ "${services[$i]}" == "$service" && "${is_defined[$i]}" == 1 ]]; then
+        for i in "${!definedServices[@]}"; do
+            if [[ "${definedServices[$i]}" == "$service" ]]; then
                 if [[ "$service" == "keycloak" && "$ENABLE_SSO" == "false" ]]; then
-                  continue
+                    continue
                 fi
-                echo "$component,$url,$username,$password" >> .urls_1.txt
+                url=$(echo "$url" | sed 's/\r//g')
+                component=$(echo "$component" | sed 's/\r//g')
+                username=$(echo "$username" | sed 's/\r//g')
+                password=$(echo "$password" | sed 's/\r//g')
+                echo "${component},${url},${username},${password}" >> .urls_1.txt
                 break
             fi
         done
     done
-
     envsubst < .urls_1.txt > .urls_2.txt
 
     echo ""
