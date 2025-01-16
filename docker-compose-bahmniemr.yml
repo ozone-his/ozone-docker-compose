@@ -59,6 +59,7 @@ services:
       - 'bahmni-patient-images:/home/bahmni/patient_images'
       - 'bahmni-document-images:/home/bahmni/document_images'
       - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
+      - "${BAHMNI_CONFIG_OVERRIDE_VOLUME:-openmrs-config}/initializer_config:/openmrs/distribution/openmrs_config/"
       - 'configuration_checksums:/openmrs/data/configuration_checksums'
       - 'sms-token:/openmrs/data/sms-token'
     depends_on:
@@ -73,6 +74,7 @@ services:
       start_period: 180s
     networks:
       - ozone
+    command: ["sh", "-c", "./bahmni_startup.sh && rm -r /openmrs/data/configuration/*"]
 
   mysql:
     environment:
