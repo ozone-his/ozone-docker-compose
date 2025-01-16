@@ -1,11 +1,9 @@
-version: "3.8"
-
 services:
   orthanc:
     command: /run/secrets/
     secrets:
-      - orthanc.json
-    image: sidvaish97/orthanc_test:v1.0
+      - orthanc.json # CAUTION: This is an experiment implementation, not for production use.
+    image: mekomsolutions/orthanc:latest
     platform: linux/amd64
     restart: always
     environment:
@@ -74,7 +72,7 @@ services:
 
 secrets:
   orthanc.json:
-    file: ${ORTHANC_CONFIG_PATH}/orthanc.json
+    file: ${ORTHANC_CONFIG_PATH}/orthanc.json # CAUTION: This is an experiment implementation, not for production use.
 
 networks:
   ozone:
