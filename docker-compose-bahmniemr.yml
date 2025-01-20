@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
     networks:
       - ozone
-    command: ["sh", "-c", "rm -rf /etc/bahmni_config/masterdata/configuration && cp -r /usr/local/bahmni_config_override/bahmniemr_config/* /etc/bahmni_config/masterdata/openmrs && ./start.sh"]
+    command: ["sh", "-c", "rm -rf /etc/bahmni_config/masterdata/configuration && cp -r /usr/local/bahmni_config_override/bahmniemr_config/* /etc/bahmni_config/openmrs && ./start.sh"]
 
   openmrs:
     image: bahmni/openmrs:${OPENMRS_IMAGE_TAG:?}
