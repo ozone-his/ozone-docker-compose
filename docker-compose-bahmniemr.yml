@@ -75,6 +75,10 @@ services:
     networks:
       - ozone
 
+  eip-openmrs-senaite:
+    environment:
+      RUN_WITH_BAHMNI_EMR: ${RUN_WITH_BAHMNI_EMR}
+
   mysql:
     environment:
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
