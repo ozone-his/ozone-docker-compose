@@ -98,8 +98,10 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
         ($dockerComposeDemoCommand)
     fi
 
+    else
+        echo "$ERROR Docker compose versions < 2.x are not supported"
+    fi
 else
-    echo "$ERROR Docker compose versions < 2.x are not supported"
     echo "$ERROR Docker versions < 20.10.13 are not supported"
 fi
 
