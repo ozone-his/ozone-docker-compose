@@ -1,3 +1,2 @@
-FROM mekomsolutions/senaite-sso
+FROM mekomsolutions/senaite
 ADD configs/senaite/initializer_config /data/importdata/senaite
-ADD configs/senaite/oidc /data/oidc

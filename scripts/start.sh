@@ -34,14 +34,7 @@ if [ "$DEMO" == "true" ]; then
     echo "→ NUMBER_OF_DEMO_PATIENTS=$NUMBER_OF_DEMO_PATIENTS"
 fi
 
-# Check if ozone-info.json exists and read project name from it
-ozoneInfo="../$DISTRO_PATH/ozone-info.json"
-if [ -f "$ozoneInfo" ]; then
-    export PROJECT_NAME=$(grep -o '"name":\s*"[^\"]*"' "$ozoneInfo" | cut -d'"' -f4)
-else
-    export PROJECT_NAME="ozone"
-fi
-echo "$PROJECT_NAME" > /tmp/project_name.txt
+setupProjectName
 
 if ! isOzoneRunning "$PROJECT_NAME"; then
     echo "$INFO Starting Ozone project with name: $PROJECT_NAME"
@@ -53,12 +46,15 @@ fi
 INSTALLED_DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
 MINIMUM_REQUIRED_DOCKER_VERSION_REGEX="^((([2-9][1-9]|[3-9][0]|[0-9]{3,}).*)|(20\.([0-9]{3,}|[1-9][1-9]|[2-9][0]).*)|(20\.10\.([0-9]{3,}|[2-9][0-9]|[1][3-9])))"
 if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; then
-    if command -v gp version &> /dev/null; then
-        export GITPOD_ENV="true"
-        export USE_HTTPS="true"
-    else
-        export GITPOD_ENV="false"
-    fi
+    INSTALLED_DOCKER_COMPOSE_VERSION=$(docker compose version --short 2>/dev/null)
+    MINIMUM_REQUIRED_DOCKER_COMPOSE_VERSION_REGEX="^([2-9]|[1-9][0-9]+)\.*"
+    if [[ $INSTALLED_DOCKER_COMPOSE_VERSION =~ $MINIMUM_REQUIRED_DOCKER_COMPOSE_VERSION_REGEX ]]; then
+        if command -v gp version &> /dev/null; then
+            export GITPOD_ENV="true"
+            export USE_HTTPS="true"
+        else
+            export GITPOD_ENV="false"
+        fi
 
     # Export the scheme
     exportScheme
@@ -102,8 +98,12 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
         ($dockerComposeDemoCommand)
     fi
 
+    else
+        echo "$ERROR Docker compose versions < 2.x are not supported"
+    fi
 else
     echo "$ERROR Docker versions < 20.10.13 are not supported"
 fi
 
+extractServicesFromComposeFiles
 displayAccessURLsWithCredentials

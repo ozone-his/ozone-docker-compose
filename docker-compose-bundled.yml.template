@@ -47,6 +47,9 @@ services:
       ODOO_DB_NAME: \${ODOO_DATABASE}
       ODOO_DB_USER: \${ODOO_DB_USER}
       ODOO_DB_PASSWORD: \${ODOO_DB_PASSWORD}
+      SENAITE_DB_NAME: \${SENAITE_DB_NAME}
+      SENAITE_DB_USER: \${SENAITE_DB_USER}
+      SENAITE_DB_PASSWORD: \${SENAITE_DB_PASSWORD}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -121,7 +124,6 @@ services:
       odoo:
         condition: service_started
     environment:
-      - DB_EVENT_DESTINATIONS_ODOO=\${DB_EVENT_DESTINATIONS_ODOO}
       - EIP_DB_NAME_ODOO=\${EIP_DB_NAME_ODOO}
       - EIP_DB_USER_ODOO=\${EIP_DB_USER_ODOO}
       - EIP_DB_PASSWORD_ODOO=\${EIP_DB_PASSWORD_ODOO}
@@ -129,17 +131,9 @@ services:
       - ODOO_USER=\${ODOO_USER}
       - ODOO_PASSWORD=\${ODOO_PASSWORD}
       - CREATE_CUSTOMER_IF_NOT_EXIST=\${CREATE_CUSTOMER_IF_NOT_EXIST}
-      - ODOO_CUSTOMER_EXTERNAL_ID=\${ODOO_CUSTOMER_EXTERNAL_ID}
-      - ODOO_CUSTOMER_DOB_FIELD=\${ODOO_CUSTOMER_DOB_FIELD}
-      - ODOO_CUSTOMER_WEIGHT_FIELD=\${ODOO_CUSTOMER_WEIGHT_FIELD}
-      - EMR_WEIGHT_CONCEPT=\${EMR_WEIGHT_CONCEPT}
-      - OPENMRS_IDENTIFIER_TYPE_UUID=\${OPENMRS_IDENTIFIER_TYPE_UUID}
-      - ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE=\${ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE}
-      - ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE=\${ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE}
       - ODOO_URL=http://odoo:8069
       - OPENMRS_URL=http://openmrs:8080/openmrs
       - EIP_PROFILE=prod
-      - EIP_WATCHED_TABLES=patient,person_name,person_address,patient_identifier,orders,test_order,drug_order
       - MYSQL_ADMIN_USER=root
       - MYSQL_ADMIN_USER_PASSWORD=\${MYSQL_ROOT_PASSWORD}
       - OPENMRS_DB_HOST=\${OPENMRS_DB_HOST}
@@ -162,6 +156,7 @@ services:
     restart: unless-stopped
     volumes:
       - eip-home-odoo:/eip-home
+
   # OpenMRS 3 Backend
   openmrs:
     depends_on:
@@ -175,7 +170,7 @@ services:
       OMRS_CONFIG_CONNECTION_DATABASE: openmrs
       OMRS_CONFIG_CONNECTION_USERNAME: \${OPENMRS_DB_USER:-openmrs}
       OMRS_CONFIG_CONNECTION_PASSWORD: \${OPENMRS_DB_PASSWORD:-openmrs}
-      HOST_URL: https://\${O3_HOSTNAME}
+      HOST_URL: \${SERVER_SCHEME}://\${O3_HOSTNAME}
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/health/started" ]
       interval: 10s
@@ -206,9 +201,9 @@ services:
       API_URL: /openmrs
       SPA_CONFIG_URLS: \${SPA_CONFIG_URLS}
       SPA_DEFAULT_LOCALE: \${SPA_DEFAULT_LOCALE}
-      ODOO_PUBLIC_URL: https://\${ODOO_HOSTNAME:-http://localhost:8069}
-      OPENMRS_PUBLIC_URL: https://\${O3_HOSTNAME:-http://localhost}
-      SENAITE_PUBLIC_URL: https://\${SENAITE_HOSTNAME:-http://localhost:8081}
+      ODOO_PUBLIC_URL: \${SERVER_SCHEME}://\${ODOO_HOSTNAME:-localhost:8069}
+      OPENMRS_PUBLIC_URL: \${SERVER_SCHEME}://\${O3_HOSTNAME:-localhost}
+      SENAITE_PUBLIC_URL: \${SERVER_SCHEME}://\${SENAITE_HOSTNAME:-localhost:8081}/senaite
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
       timeout: 5s
@@ -239,10 +234,15 @@ services:
       - ozone
       - web
     restart: unless-stopped
+
   # SENAITE
   senaite:
     environment: 
       - SITE=\${SITE}
+      - PASSWORD=\${SENAITE_ADMIN_PASSWORD}
+      - RELSTORAGE_ADAPTER_OPTIONS=type postgresql,dsn dbname='\${SENAITE_DB_NAME}' user='\${SENAITE_DB_USER}' password='\${SENAITE_DB_PASSWORD}' host='\${SENAITE_DB_HOST}', driver pg8000
+      - RELSTORAGE_KEEP_HISTORY=false
+      - RELSTORAGE_BLOB_DIR=/home/senaite/senaitelims/blobstorage
       - ADMIN_USER=\${SENAITE_ADMIN_USER}
       - ADMIN_PASSWORD=\${SENAITE_ADMIN_PASSWORD}
     image:  ${dockerUserName}/${sanitizedArtifactId}-senaite:${dockertag}
@@ -277,15 +277,10 @@ services:
       - OPENMRS_SERVER_USER=\${OPENMRS_USER}
       - OPENMRS_SERVER_PASSWORD=\${OPENMRS_PASSWORD}
       - OPENMRS_RESULTS_ENCOUNTER_TYPE_UUID=\${RESULTS_ENCOUNTER_TYPE_UUID}
-      - OPENMRS_IDENTIFIER_TYPE_UUID=\${OPENMRS_IDENTIFIER_TYPE_UUID}
-      - OPENMRS_CONCEPT_COMPLEX_UUID=\${CONCEPT_COMPLEX_UUID}
-      - BAHMNI_TEST_ORDER_TYPE_UUID=\${BAHMNI_TEST_ORDER_TYPE_UUID}
       - EIP_PROFILE=prod
-      - EIP_WATCHED_TABLES=patient,person_name,person_address,patient_identifier,orders,test_order
       - EIP_DB_NAME_SENAITE=\${EIP_DB_NAME_SENAITE}
       - EIP_DB_USER_SENAITE=\${EIP_DB_USER_SENAITE}
       - EIP_DB_PASSWORD_SENAITE=\${EIP_DB_PASSWORD_SENAITE}
-      - DB_EVENT_DESTINATIONS_SENAITE=\${DB_EVENT_DESTINATIONS_SENAITE}
       - MYSQL_ADMIN_USER=root
       - MYSQL_ADMIN_USER_PASSWORD=\${MYSQL_ROOT_PASSWORD}
       - OPENMRS_DB_HOST=\${OPENMRS_DB_HOST}
@@ -307,7 +302,11 @@ services:
     restart: unless-stopped
     volumes:
       - eip-home-senaite:/eip-home
+
+  # Proxy
   proxy:
+    environment:
+      - GITPOD_ENV=\${GITPOD_ENV}
     restart: unless-stopped
     image:  ${dockerUserName}/${sanitizedArtifactId}-proxy:${dockertag}
     healthcheck:

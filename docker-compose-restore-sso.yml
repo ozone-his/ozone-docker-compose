@@ -1,0 +1,7 @@
+services:
+  keycloak:
+    depends_on:
+      restore:
+        condition: service_completed_successfully
+    profiles:
+      - keycloak-restore
