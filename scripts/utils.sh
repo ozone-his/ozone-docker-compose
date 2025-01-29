@@ -158,12 +158,14 @@ function setTraefikHostnames {
     export ERPNEXT_HOSTNAME=erpnext-"${IP_WITH_DASHES}.traefik.me"
     export KEYCLOAK_HOSTNAME=auth-"${IP_WITH_DASHES}.traefik.me"
     export FHIR_ODOO_HOSTNAME=fhir-erp-"${IP_WITH_DASHES}.traefik.me"
+    export ORTHANC_HOSTNAME=pacs-"${IP_WITH_DASHES}.traefik.me"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
     echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
     echo "→ KEYCLOAK_HOSTNAME=$KEYCLOAK_HOSTNAME"
     echo "→ FHIR_ODOO_HOSTNAME=$FHIR_ODOO_HOSTNAME"
+    echo "→ ORTHANC_HOSTNAME=$ORTHANC_HOSTNAME"
 
 }
 
@@ -176,6 +178,7 @@ function setNginxHostnames {
     export ERPNEXT_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8082"
     export FHIR_ODOO_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8083"
     export KEYCLOAK_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8084"
+    export ORTHANC_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8889"
 
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
@@ -183,6 +186,7 @@ function setNginxHostnames {
     echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
     echo "→ FHIR_ODOO_HOSTNAME=$FHIR_ODOO_HOSTNAME"
     echo "→ KEYCLOAK_HOSTNAME=$KEYCLOAK_HOSTNAME"
+    echo "→ ORTHANC_HOSTNAME=$ORTHANC_HOSTNAME"
 
 }
 
