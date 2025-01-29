@@ -75,6 +75,41 @@ services:
     networks:
       - ozone
 
+  # Bahmni EIP routes
+  eip-bahmni:
+    depends_on:
+      env-substitution:
+        condition: service_completed_successfully
+      openmrs:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+    environment:
+      - EIP_PROFILE=prod
+      - EIP_DB_NAME_BAHMNI=${EIP_DB_PASSWORD_BAHMNI}
+      - EIP_DB_USER_BAHMNI=${EIP_DB_PASSWORD_BAHMNI}
+      - EIP_DB_PASSWORD_BAHMNI=${EIP_DB_PASSWORD_BAHMNI}
+      - MYSQL_ADMIN_USER=root
+      - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - OPENMRS_DB_HOST=${OPENMRS_DB_HOST}
+      - OPENMRS_DB_PORT=${OPENMRS_DB_PORT}
+      - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
+      - OPENMRS_DB_USER=${OPENMRS_DB_USER}
+      - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
+      - BAHMNI_TEST_ORDER_TYPE_UUID=${BAHMNI_TEST_ORDER_TYPE_UUID}
+    image: mekomsolutions/eip-client:sha-b2f32ae
+    networks:
+      ozone:
+        aliases:
+          - eip-client-bahmni
+    restart: unless-stopped
+    volumes:
+      # - "${EIP_BAHMNI_ROUTES_PATH}:/eip-client/routes"
+      # - "${EIP_BAHMNI_ROUTES_PATH}:/eip-client/config"
+      - "${BAHMNI_CONFIG_OVERRIDE_PATH:-bahmni-eip}/bahmni_eip/routes:/routes"
+      - "${BAHMNI_CONFIG_OVERRIDE_PATH:-bahmni-eip}/bahmni_eip/config:/config"
+      - eip-home-bahmni:/eip-home
+
   eip-openmrs-senaite:
     environment:
       RUN_WITH_BAHMNI_EMR: ${RUN_WITH_BAHMNI_EMR}
@@ -84,8 +119,12 @@ services:
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
       OPENMRS_DB_USER: ${OPENMRS_DB_USER}
       OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
+      EIP_DB_NAME_BAHMNI: ${EIP_DB_NAME_BAHMNI}
+      EIP_DB_USER_BAHMNI: ${EIP_DB_USER_BAHMNI}
+      EIP_DB_PASSWORD_BAHMNI: ${EIP_DB_PASSWORD_BAHMNI}
     volumes:
       - "${SQL_SCRIPTS_PATH}/mysql/openmrs:/docker-entrypoint-initdb.d/db/openmrs"
+      - "${SQL_SCRIPTS_PATH}/mysql/eip-bahmni:/docker-entrypoint-initdb.d/db/eip-bahmni"
     # command: 
     #   - "--sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
     logging: *log-config
