@@ -6,6 +6,4 @@ docker-compose-openmrs.yml
 docker-compose-openmrs-sso.yml
 docker-compose-senaite.yml
 docker-compose-senaite-sso.yml
-docker-compose-orthanc.yml
-docker-compose-orthanc-sso.yml
 docker-compose-backup.yml
