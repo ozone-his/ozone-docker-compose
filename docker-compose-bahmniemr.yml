@@ -250,6 +250,7 @@ services:
       - ozone
 
 volumes:
+  eip-home-bahmni:
   openmrs-data:
   openmrsdbdata:
   bahmni-config-override: ~
