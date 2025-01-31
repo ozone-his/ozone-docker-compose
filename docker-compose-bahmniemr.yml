@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
     networks:
       - ozone
-    command: ["sh", "-c", "rm -rf /etc/bahmni_config/masterdata/configuration && cp -r /usr/local/bahmni_config_override/bahmniemr_config/* /etc/bahmni_config/openmrs && ./start.sh"]
+    command: ["sh", "-c", "rm -rf /etc/bahmni_config/masterdata/configuration && cp -r /usr/local/bahmni_config_override/frontend/* /etc/bahmni_config/openmrs && ./start.sh"]
 
   openmrs:
     image: bahmni/openmrs:${OPENMRS_IMAGE_TAG:?}
@@ -59,7 +59,7 @@ services:
       - 'bahmni-patient-images:/home/bahmni/patient_images'
       - 'bahmni-document-images:/home/bahmni/document_images'
       - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
-      - "${BAHMNI_CONFIG_OVERRIDE_PATH:-openmrs-config}/initializer_config:/openmrs/distribution/openmrs_config/"
+      - "${BAHMNI_CONFIG_OVERRIDE_PATH:-openmrs-config}/initializer:/openmrs/distribution/openmrs_config/"
       - 'configuration_checksums:/openmrs/data/configuration_checksums'
       - 'sms-token:/openmrs/data/sms-token'
     depends_on:
@@ -106,8 +106,8 @@ services:
     volumes:
       # - "${EIP_BAHMNI_ROUTES_PATH}:/eip-client/routes"
       # - "${EIP_BAHMNI_ROUTES_PATH}:/eip-client/config"
-      - "${BAHMNI_CONFIG_OVERRIDE_PATH:-bahmni-eip}/bahmni_eip/routes:/routes"
-      - "${BAHMNI_CONFIG_OVERRIDE_PATH:-bahmni-eip}/bahmni_eip/config:/config"
+      - "${BAHMNI_CONFIG_OVERRIDE_PATH:-bahmni-eip}/eip/routes:/routes"
+      - "${BAHMNI_CONFIG_OVERRIDE_PATH:-bahmni-eip}/eip/config:/config"
       - eip-home-bahmni:/eip-home
 
   eip-openmrs-senaite:
