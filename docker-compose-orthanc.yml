@@ -6,7 +6,7 @@ services:
     image: mekomsolutions/orthanc:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.orthanc.loadbalancer.server.port=8080"
+      - "traefik.http.services.orthanc.loadbalancer.server.port=8889"
       - "traefik.http.routers.orthanc.rule=Host(`${ORTHANC_HOSTNAME}`)"
       - "traefik.http.routers.orthanc.middlewares=orthanc"
     platform: linux/amd64
