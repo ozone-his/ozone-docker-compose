@@ -110,10 +110,6 @@ services:
       - "${BAHMNI_CONFIG_OVERRIDE_PATH:-bahmni-eip}/eip/config:/config"
       - eip-home-bahmni:/eip-home
 
-  eip-openmrs-senaite:
-    environment:
-      RUN_WITH_BAHMNI_EMR: ${RUN_WITH_BAHMNI_EMR}
-
   mysql:
     environment:
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
