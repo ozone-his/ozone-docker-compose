@@ -58,6 +58,7 @@ services:
       - ORTHANC_PUBLIC_URL=${SERVER_SCHEME}://${ORTHANC_HOSTNAME}
     image: mekomsolutions/eip-client
     networks:
+      web:
       ozone:
         aliases:
           - eip-openmrs-orthanc
