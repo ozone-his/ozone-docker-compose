@@ -4,6 +4,11 @@ services:
     secrets:
       - orthanc.json # CAUTION: This is an experimental implementation, not for production use.
     image: mekomsolutions/orthanc:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.orthanc.loadbalancer.server.port=8889"
+      - "traefik.http.routers.orthanc.rule=Host(`${ORTHANC_HOSTNAME}`)"
+      - "traefik.http.routers.orthanc.middlewares=orthanc"
     platform: linux/amd64
     restart: always
     environment:
@@ -50,8 +55,10 @@ services:
       - EIP_FHIR_SERVER_URL=http://openmrs:8080/openmrs/ws/fhir2/R4
       - EIP_FHIR_USERNAME=${OPENMRS_USER}
       - EIP_FHIR_PASSWORD=${OPENMRS_PASSWORD}
+      - ORTHANC_PUBLIC_URL=${SERVER_SCHEME}://${ORTHANC_HOSTNAME}
     image: mekomsolutions/eip-client
     networks:
+      web:
       ozone:
         aliases:
           - eip-openmrs-orthanc
@@ -67,6 +74,10 @@ services:
       EIP_DB_PASSWORD_ORTHANC: ${EIP_DB_PASSWORD_ORTHANC}
     volumes:
       - "${SQL_SCRIPTS_PATH}/mysql/eip-openmrs-orthanc:/docker-entrypoint-initdb.d/db/eip-openmrs-orthanc"
+
+  env-substitution:
+    environment:
+      - ORTHANC_PUBLIC_URL=${SERVER_SCHEME}://${ORTHANC_HOSTNAME}
 
 secrets:
   orthanc.json:
