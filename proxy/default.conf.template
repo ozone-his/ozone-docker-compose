@@ -84,6 +84,13 @@ server {
   location /openmrs {
     set $openmrs openmrs:8080;
     proxy_pass http://$openmrs;
+    set $reporting_session "";
+    if ($http_cookie ~* "JSESSIONID=([^;]+)") {
+        set $reporting_session $1;
+    }
+    if ($reporting_session) {
+        add_header Set-Cookie "reporting_session=$reporting_session; Path=/; Max-Age=86400; HttpOnly";
+    }
   }
 
   location = / {

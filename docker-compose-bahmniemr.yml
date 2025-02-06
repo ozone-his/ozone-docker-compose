@@ -96,7 +96,7 @@ services:
       - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
       - OPENMRS_DB_USER=${OPENMRS_DB_USER}
       - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
-      - BAHMNI_TEST_ORDER_TYPE_UUID=${BAHMNI_TEST_ORDER_TYPE_UUID}
+      - BAHMNI_TEST_ORDER_TYPE_UUID=${EIP_TEST_ORDER_TYPE_UUID}
     image: mekomsolutions/eip-client:sha-b2f32ae
     networks:
       ozone:
