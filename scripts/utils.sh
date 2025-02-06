@@ -44,7 +44,8 @@ function exportPaths () {
     export KEYCLOAK_BINARIES_PATH=$DISTRO_PATH/binaries/keycloak
     export EIP_OPENMRS_ORTHANC_ROUTES_PATH=$DISTRO_PATH/binaries/eip-openmrs-orthanc
     export ORTHANC_CONFIG_PATH=$DISTRO_PATH/configs/orthanc/initializer_config
-
+    export BAHMNI_OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/bahmniemr/modules
+    export BAHMNI_CONFIG_OVERRIDE_PATH=$DISTRO_PATH/configs/bahmni
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
@@ -67,12 +68,18 @@ function exportPaths () {
     echo "→ KEYCLOAK_BINARIES_PATH=$KEYCLOAK_BINARIES_PATH"
     echo "→ EIP_OPENMRS_ORTHANC_ROUTES_PATH=$EIP_OPENMRS_ORTHANC_ROUTES_PATH"
     echo "→ ORTHANC_CONFIG_PATH=$ORTHANC_CONFIG_PATH"
-
+    echo "→ BAHMNI_OPENMRS_MODULES_PATH=$BAHMNI_OPENMRS_MODULES_PATH"
+    echo "→ BAHMNI_CONFIG_OVERRIDE_PATH=$BAHMNI_CONFIG_OVERRIDE_PATH"
 }
 
 function setDockerComposeCLIOptions () {
     # Parse 'docker-compose-files.txt' to get the list of Docker Compose files to run
     dockerComposeFiles=$(cat docker-compose-files.txt)
+
+    if [ "$RUN_WITH_BAHMNI_EMR" == "true" ]; then
+        export ENABLE_SSO=false
+    fi
+
     for file in ${dockerComposeFiles}
     do
         if [ "$ENABLE_SSO" != "true" ]; then
@@ -80,6 +87,15 @@ function setDockerComposeCLIOptions () {
                 continue
             fi
         fi
+
+        if [[ "$file" == *"-bahmniemr.yml" && "$RUN_WITH_BAHMNI_EMR" == "false" ]]; then
+            continue
+        fi
+
+        if [[ "$file" == *"-openmrs.yml" && "$RUN_WITH_BAHMNI_EMR" == "true" ]]; then
+            continue
+        fi
+        
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../$file"
     done
 
