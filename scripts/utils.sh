@@ -45,7 +45,7 @@ function exportPaths () {
     export EIP_OPENMRS_ORTHANC_ROUTES_PATH=$DISTRO_PATH/binaries/eip-openmrs-orthanc
     export ORTHANC_CONFIG_PATH=$DISTRO_PATH/configs/orthanc/initializer_config
     export BAHMNI_OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/bahmniemr/modules
-    export BAHMNI_CONFIG_OVERRIDE_PATH=$DISTRO_PATH/configs/bahmni
+    export BAHMNI_CONFIG_OVERRIDE_PATH=$DISTRO_PATH/configs/bahmniemr
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
