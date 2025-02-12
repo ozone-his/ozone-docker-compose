@@ -76,10 +76,6 @@ function setDockerComposeCLIOptions () {
     # Parse 'docker-compose-files.txt' to get the list of Docker Compose files to run
     dockerComposeFiles=$(cat docker-compose-files.txt)
 
-    if [ "$RUN_WITH_BAHMNI_EMR" == "true" ]; then
-        export ENABLE_SSO=false
-    fi
-
     for file in ${dockerComposeFiles}
     do
         if [ "$ENABLE_SSO" != "true" ]; then
@@ -87,15 +83,6 @@ function setDockerComposeCLIOptions () {
                 continue
             fi
         fi
-
-        if [[ "$file" == *"-bahmniemr.yml" && "$RUN_WITH_BAHMNI_EMR" == "false" ]]; then
-            continue
-        fi
-
-        if [[ "$file" == *"-openmrs.yml" && "$RUN_WITH_BAHMNI_EMR" == "true" ]]; then
-            continue
-        fi
-        
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../$file"
     done
 
