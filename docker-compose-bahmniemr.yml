@@ -7,7 +7,7 @@ x-log-config: &log-config
 services:
 
   bahmni-config:
-    image: 'bahmni/standard-config:${BAHMNI_CONFIG_IMAGE_TAG:?}'
+    image: bahmni/standard-config:1.0.0
     volumes:
       - '${BAHMNI_CONFIG_VOLUME:?}:/usr/local/bahmni_config'
       - '${BAHMNI_CONFIG_OVERRIDE_PATH:-bahmni-config-override}:/usr/local/bahmni_config_override'
@@ -18,7 +18,7 @@ services:
     command: ["sh", "-c", "rm -rf /etc/bahmni_config/masterdata/configuration && cp -r /usr/local/bahmni_config_override/frontend/* /etc/bahmni_config/openmrs && ./start.sh"]
 
   openmrs:
-    image: bahmni/openmrs:${OPENMRS_IMAGE_TAG:?}
+    image: bahmni/openmrs:1.1.1
     environment:
       TZ: ${TIMEZONE}
       OMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
@@ -126,7 +126,7 @@ services:
     logging: *log-config
 
   bahmni-web:
-    image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
+    image: bahmni/bahmni-web:1.1.0
     volumes:
       - "${BAHMNI_CONFIG_VOLUME:?}:/usr/local/apache2/htdocs/bahmni_config/:ro"
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
@@ -137,7 +137,7 @@ services:
       - ozone
 
   implementer-interface:
-    image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}
+    image: bahmni/implementer-interface:1.1.1
     #volumes:
     #  - "${IMPLEMENTER_INTERFACE_CODE_PATH:?}/dist:/usr/local/apache2/htdocs/implementer_interface"
     depends_on:
@@ -148,7 +148,7 @@ services:
       - ozone
 
   reports:
-    image: bahmni/reports:${REPORTS_IMAGE_TAG:?}
+    image: bahmni/reports:1.1.0
     environment:
       TZ: ${TIMEZONE}
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
@@ -181,7 +181,7 @@ services:
 
   reportsdb:
     platform: linux/amd64
-    image: ${REPORTS_DB_IMAGE_NAME:?}
+    image: mysql:8.0
     environment:
       TZ: ${TIMEZONE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
@@ -196,7 +196,7 @@ services:
       - ozone
 
   patient-documents:
-    image: 'bahmni/patient-documents:${PATIENT_DOCUMENTS_TAG:?}'
+    image: 'bahmni/patient-documents:1.1.1'
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
       - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
@@ -212,7 +212,7 @@ services:
       - ozone
 
   appointments:
-    image: bahmni/appointments:${APPOINTMENTS_IMAGE_TAG:?}
+    image: bahmni/appointments:1.1.1
     restart: unless-stopped
     # volumes:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
@@ -220,7 +220,7 @@ services:
       - ozone
 
   sms-service:
-    image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
+    image: bahmni/sms-service:1.1.0
     restart: unless-stopped
     environment:
       TZ: ${TIMEZONE}
@@ -236,7 +236,7 @@ services:
       - ozone
 
   ipd:
-    image: bahmni/microfrontend-ipd:${IPD_TAG:?}
+    image: bahmni/microfrontend-ipd:1.0.0
     container_name: ipd
     restart: unless-stopped
     # volumes:
