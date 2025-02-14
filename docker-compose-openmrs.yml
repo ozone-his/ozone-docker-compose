@@ -104,6 +104,10 @@ services:
   env-substitution:
     environment:
       - OPENMRS_PUBLIC_URL=${SERVER_SCHEME}://${O3_HOSTNAME}
+      - ODOO_HOST=http://odoo
+      - ODOO_USER=${ODOO_USER}
+      - ODOO_PASSWORD=${ODOO_PASSWORD}
+      - ODOO_DB=${ODOO_DB}
 
 volumes:  
   openmrs-core: ~
