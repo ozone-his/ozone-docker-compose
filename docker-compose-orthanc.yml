@@ -84,10 +84,6 @@ secrets:
   orthanc.json:
     file: ${ORTHANC_CONFIG_PATH}/orthanc.json # CAUTION: This is an experimental implementation, not for production use.
 
-networks:
-  ozone:
-  web:
-
 volumes:
   orthanc-db:
   eip-home-orthanc: ~
