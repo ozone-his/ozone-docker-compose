@@ -6,9 +6,8 @@ services:
     image: mekomsolutions/orthanc:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.orthanc.loadbalancer.server.port=8889"
+      - "traefik.http.services.orthanc.loadbalancer.server.port=8042"
       - "traefik.http.routers.orthanc.rule=Host(`${ORTHANC_HOSTNAME}`)"
-      - "traefik.http.routers.orthanc.middlewares=orthanc"
     platform: linux/amd64
     restart: always
     environment:
@@ -19,8 +18,10 @@ services:
     volumes:
       - orthanc-db:/var/lib/orthanc/db
     networks:
-      - ozone
-      - web
+      web:
+      ozone:
+        aliases:
+         - orthanc
     ports:
     - "8889:8042"
 
