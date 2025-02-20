@@ -23,7 +23,7 @@ services:
       timeout: 5s
       retries: 48
       start_period: 120s
-    image: openmrs/openmrs-core:2.6.14
+    image: openmrs/openmrs-core:2.6.x-nightly-amazoncorretto-11
     labels:
       traefik.enable: "true"
       traefik.http.routers.openmrs.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs`)"
@@ -62,7 +62,7 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
       timeout: 5s
-    image: openmrs/openmrs-reference-application-3-frontend:3.2.1
+    image: openmrs/openmrs-reference-application-3-frontend:${O3_DOCKER_IMAGE_TAG:-nightly}
     labels:
       traefik.enable: "true"
       traefik.http.routers.frontend.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs/spa/`)"
