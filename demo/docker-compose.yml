@@ -1,7 +1,7 @@
 services:
 
   eip-demo:
-    image: mekomsolutions/eip-client
+    image: mekomsolutions/eip-client:2.2.0
     restart: "no"
     environment:
       - NUMBER_OF_DEMO_PATIENTS=${NUMBER_OF_DEMO_PATIENTS}
