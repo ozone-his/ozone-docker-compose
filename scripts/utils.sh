@@ -44,7 +44,8 @@ function exportPaths () {
     export KEYCLOAK_BINARIES_PATH=$DISTRO_PATH/binaries/keycloak
     export EIP_OPENMRS_ORTHANC_ROUTES_PATH=$DISTRO_PATH/binaries/eip-openmrs-orthanc
     export ORTHANC_CONFIG_PATH=$DISTRO_PATH/configs/orthanc/initializer_config
-
+    export BAHMNI_OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/bahmniemr/modules
+    export BAHMNI_CONFIG_OVERRIDE_PATH=$DISTRO_PATH/configs/bahmniemr
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
@@ -67,12 +68,14 @@ function exportPaths () {
     echo "→ KEYCLOAK_BINARIES_PATH=$KEYCLOAK_BINARIES_PATH"
     echo "→ EIP_OPENMRS_ORTHANC_ROUTES_PATH=$EIP_OPENMRS_ORTHANC_ROUTES_PATH"
     echo "→ ORTHANC_CONFIG_PATH=$ORTHANC_CONFIG_PATH"
-
+    echo "→ BAHMNI_OPENMRS_MODULES_PATH=$BAHMNI_OPENMRS_MODULES_PATH"
+    echo "→ BAHMNI_CONFIG_OVERRIDE_PATH=$BAHMNI_CONFIG_OVERRIDE_PATH"
 }
 
 function setDockerComposeCLIOptions () {
     # Parse 'docker-compose-files.txt' to get the list of Docker Compose files to run
     dockerComposeFiles=$(cat docker-compose-files.txt)
+
     for file in ${dockerComposeFiles}
     do
         if [ "$ENABLE_SSO" != "true" ]; then
@@ -81,6 +84,11 @@ function setDockerComposeCLIOptions () {
             fi
         fi
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../$file"
+
+        # If running with Bahmni EMR, disable Demo service
+        if [ "$file" == "docker-compose-bahmniemr.yml" ]; then
+            export DEMO="false"
+        fi
     done
 
     # Add restore file if restore env is set
@@ -179,6 +187,7 @@ function setNginxHostnames {
     export FHIR_ODOO_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8083"
     export KEYCLOAK_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8084"
     export ORTHANC_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8889"
+    export BAHMNI_EMR_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
 
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
@@ -187,6 +196,7 @@ function setNginxHostnames {
     echo "→ FHIR_ODOO_HOSTNAME=$FHIR_ODOO_HOSTNAME"
     echo "→ KEYCLOAK_HOSTNAME=$KEYCLOAK_HOSTNAME"
     echo "→ ORTHANC_HOSTNAME=$ORTHANC_HOSTNAME"
+    echo "→ BAHMNI_EMR_HOSTNAME=$BAHMNI_EMR_HOSTNAME"
 
 }
 
