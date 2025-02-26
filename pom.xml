@@ -25,7 +25,6 @@
   </properties>
 
   <modules>
-    <module>demo</module>
     <module>bundled-docker</module>
   </modules>
 
