@@ -201,6 +201,7 @@ services:
       - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
       - OPENMRS_DB_USER=${OPENMRS_DB_USER}
       - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
+      - OPENMRS_BASEURL=http://openmrs:8080/openmrs
       - EIP_FHIR_RESOURCES=Patient,ServiceRequest,MedicationRequest,Encounter
       - EIP_FHIR_SERVER_URL=http://openmrs:8080/openmrs/ws/fhir2/R4
       - EIP_FHIR_USERNAME=${OPENMRS_USER}
