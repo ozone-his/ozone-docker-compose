@@ -28,7 +28,7 @@ services:
       restore:
         condition: service_completed_successfully
   restore:
-    image: mekomsolutions/restic-compose-backup-restore:0.17.1-1.0.0
+    image: mekomsolutions/restic-compose-backup-restore
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       # Map local restic repository
