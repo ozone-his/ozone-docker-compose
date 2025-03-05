@@ -1,4 +1,4 @@
-FROM openmrs/openmrs-reference-application-3-frontend:nightly
+FROM openmrs/openmrs-reference-application-3-frontend:3.2.1
 
 ADD distro/binaries/openmrs/frontend /usr/share/nginx/html
 ADD distro/configs/openmrs/frontend_config /usr/share/nginx/html/configs
