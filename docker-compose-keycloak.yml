@@ -6,6 +6,7 @@ services:
     volumes:
       - ${KEYCLOAK_CONFIG_PATH}/realms:/keycloak-files/realm-config
       - ${KEYCLOAK_CONFIG_PATH}/themes/carbon:/opt/bitnami/keycloak/themes/carbon
+      - ${KEYCLOAK_CONFIG_PATH}/providers:/opt/bitnami/keycloak/providers
     environment:
       KC_HOSTNAME_URL: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
       PROXY_ADDRESS_FORWARDING: "true"
