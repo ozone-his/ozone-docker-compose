@@ -1,0 +1,18 @@
+services:
+
+  # Bahmni EIP routes
+  eip-bahmni:
+    environment:
+      - BAHMNI_TEST_ORDER_TYPE_UUID=f8ae333e-9d1a-423e-a6a8-c3a0687ebcf2
+
+  # Bahmni EMR - SENAITE integration service
+  eip-openmrs-senaite:
+    environment:
+      - RUN_WITH_BAHMNI_EMR=true
+      - EIP_TEST_ORDER_TYPE_UUID=f8ae333e-9d1a-423e-a6a8-c3a0687ebcf2
+      - OPENMRS_RESULTS_ENCOUNTER_TYPE_UUID=265f8971-e481-11ef-93fc-0242ac130003
+
+  # Bahmni EMR - Odoo integration service
+  eip-odoo-openmrs:
+    environment:
+      - EIP_TEST_ORDER_TYPE_UUID=f8ae333e-9d1a-423e-a6a8-c3a0687ebcf2
