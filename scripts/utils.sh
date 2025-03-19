@@ -186,6 +186,23 @@ function setNginxHostnames {
 
 }
 
+function setGitpodHostnames {
+    echo "$INFO Gitpod Environment detected, exporting Gitpod hostnames..."
+    export O3_HOSTNAME="80-${GITPOD_WORKSPACE_URL#https://}"
+    export ODOO_HOSTNAME="8069-${GITPOD_WORKSPACE_URL#https://}"
+    export SENAITE_HOSTNAME="8081-${GITPOD_WORKSPACE_URL#https://}"
+    export ERPNEXT_HOSTNAME="8082-${GITPOD_WORKSPACE_URL#https://}"
+    export FHIR_ODOO_HOSTNAME="8083-${GITPOD_WORKSPACE_URL#https://}"
+    export KEYCLOAK_HOSTNAME="8084-${GITPOD_WORKSPACE_URL#https://}"
+
+    echo "→ O3_HOSTNAME=$O3_HOSTNAME"
+    echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
+    echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
+    echo "→ ERPNEXT_HOSTNAME=$ERPNEXT_HOSTNAME"
+    echo "→ FHIR_ODOO_HOSTNAME=$FHIR_ODOO_HOSTNAME"
+    echo "→ KEYCLOAK_HOSTNAME=$KEYCLOAK_HOSTNAME"
+}
+
 function exportScheme() {
     if [ "$USE_HTTPS" == "true" ]; then
         export SERVER_SCHEME="https"
