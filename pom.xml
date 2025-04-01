@@ -25,17 +25,11 @@
   </properties>
 
   <modules>
-    <module>demo</module>
     <module>bundled-docker</module>
   </modules>
 
   <dependencies>
-    <dependency>
-      <groupId>com.ozonehis</groupId>
-      <artifactId>ozone-demo-data</artifactId>
-      <type>zip</type>
-      <version>${ozoneDemoDataVersion}</version>
-    </dependency>
+
   </dependencies>
 
   <build>

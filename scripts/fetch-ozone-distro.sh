@@ -5,7 +5,7 @@ set -e
 if [ -z "$1" ]
 then
       echo "Missing parameter. Please provide the Ozone Distro version as a parameter"
-      echo "Eg: $0 1.0.0-alpha.6"
+      echo "Eg: $0 1.0.0-alpha.13"
       exit 1
 fi
 

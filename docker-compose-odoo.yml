@@ -48,8 +48,10 @@ services:
       restic-compose-backup.volumes: true
       restic-compose-backup.volumes.include: "${ODOO_FILESTORE:-odoo-filestore},${ODOO_CONFIG_CHECKSUMS_PATH:-odoo-checksums}"
     networks:
-      - ozone
-      - web
+      ozone:
+        aliases:
+         - odoo
+      web:
     restart: unless-stopped
     volumes:
       - "${ODOO_FILESTORE:-odoo-filestore}:/var/lib/odoo/filestore"
@@ -121,6 +123,7 @@ services:
       traefik.http.routers.fhir-erp.entrypoints: "websecure"
       traefik.http.services.fhir-erp.loadbalancer.server.port: 8080
     networks:
+      web:
       ozone:
         aliases:
           - fhir-erp

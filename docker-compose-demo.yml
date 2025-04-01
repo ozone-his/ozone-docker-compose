@@ -1,0 +1,28 @@
+services:
+  demo-data:
+    image: mekomsolutions/ozone-demo-data
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - OPENMRS_SERVER_URL=http://openmrs:8080/openmrs
+      - OPENMRS_USERNAME=${OPENMRS_USER}
+      - OPENMRS_PASSWORD=${OPENMRS_PASSWORD}
+      - OPENMRS_OAUTH_ENABLED=${ENABLE_SSO}
+      - OPENMRS_OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
+      - OPENMRS_OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+      - KEYCLOAK_SERVER_URL=${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      - KEYCLOAK_DEMO_DATA_REALM=ozone
+      - KEYCLOAK_USERS_JSON_PATH=/app/keycloak/users.json
+      - KEYCLOAK_USER_CREATION_ENABLED=${ENABLE_SSO}
+      - KEYCLOAK_DEMO_DATA_CLIENT_ID=keycloak-admin-sa
+      - KEYCLOAK_DEMO_DATA_CLIENT_SECRET=${KEYCLOAK_ADMIN_SA_CLIENT_SECRET}
+    restart: on-failure
+    networks:
+      ozone:
+      web:
+    volumes:
+      - ${KEYCLOAK_CONFIG_PATH}/demo:/app/keycloak
+
+networks:
+  ozone:
+  web:
+    external: true

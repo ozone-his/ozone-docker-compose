@@ -3,12 +3,11 @@ services:
     command: /run/secrets/
     secrets:
       - orthanc.json # CAUTION: This is an experimental implementation, not for production use.
-    image: mekomsolutions/orthanc:latest
+    image: mekomsolutions/orthanc
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.orthanc.loadbalancer.server.port=8889"
+      - "traefik.http.services.orthanc.loadbalancer.server.port=8042"
       - "traefik.http.routers.orthanc.rule=Host(`${ORTHANC_HOSTNAME}`)"
-      - "traefik.http.routers.orthanc.middlewares=orthanc"
     platform: linux/amd64
     restart: always
     environment:
@@ -19,8 +18,10 @@ services:
     volumes:
       - orthanc-db:/var/lib/orthanc/db
     networks:
-      - ozone
-      - web
+      web:
+      ozone:
+        aliases:
+         - orthanc
     ports:
     - "8889:8042"
 
@@ -82,10 +83,6 @@ services:
 secrets:
   orthanc.json:
     file: ${ORTHANC_CONFIG_PATH}/orthanc.json # CAUTION: This is an experimental implementation, not for production use.
-
-networks:
-  ozone:
-  web:
 
 volumes:
   orthanc-db:
