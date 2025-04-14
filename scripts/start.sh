@@ -90,6 +90,10 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
 
     # Run the Demo service
     if [ "$DEMO" == "true" ]; then
+        # Pull the demo image
+        echo "$INFO Pulling demo image..."
+        docker compose -p $PROJECT_NAME $dockerComposeDemoCLIOptions pull
+        # Set the Docker Compose command for the demo
         dockerComposeDemoCommand="docker compose -p $PROJECT_NAME $dockerComposeDemoCLIOptions up -d"
         echo "$INFO Running demo service..."
         echo ""
