@@ -96,6 +96,12 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
         echo "$dockerComposeDemoCommand"
         echo ""
         ($dockerComposeDemoCommand)
+    else
+        echo "$INFO Skipping running demo service... (\$DEMO!=true)"
+        echo ""
+        echo "$INFO Your $PROJECT_NAME instance is now running without demo data."
+        echo "$INFO To run the demo service, use the following command: ./start-demo.sh or ./start-demo-with-sso.sh for SSO enabled"
+        echo ""
     fi
 
     else
