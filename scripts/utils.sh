@@ -276,7 +276,11 @@ function displayAccessURLsWithCredentials {
     echo "$INFO 🔗 Access each ${OZONE_LABEL:-Ozone FOSS} components at the following URL:"
     echo ""
     if [ "$ENABLE_SSO" == "true" ]; then
-        awk -F, 'NR==1 {printf "%-15s %-40s\n", $1, $2} NR>2 && $1 != "Keycloak" {printf "%-15s %-40s\n", $1, $2} END {print "-\nUsername: jdoe\nPassword: password\n-\nIdentity Provider(IDP)\nKeycloak -", $2, " Username:", $3, " Password:", $4}' .urls_2.txt
+        if [ "$DEMO" == "true" ]; then
+            awk -F, 'NR==1 {printf "%-15s %-40s\n", $1, $2} NR>2 && $1 != "Keycloak" {printf "%-15s %-40s\n", $1, $2} END {print "-\nUsername: jdoe\nPassword: password\n-\nIdentity Provider(IDP)\nKeycloak -", $2, " Username:", $3, " Password:", $4}' .urls_2.txt
+        else
+            awk -F, 'NR==1 {printf "%-15s %-40s\n", $1, $2} NR>2 && $1 != "Keycloak" {printf "%-15s %-40s\n", $1, $2} END {print "-\n⚠️  No demo users are available. Please create users manually in Keycloak.\n-\nIdentity Provider(IDP)\nKeycloak -", $2, " Username:", $3, " Password:", $4}' .urls_2.txt
+        fi
     else
         awk -F, 'NR==1 {printf "%-15s %-40s %-15s %-15s\n", $1, $2, $3, $4} NR>2 && $1 != "Keycloak" {printf "%-15s %-40s %-15s %-15s\n", $1, $2, $3, $4}' .urls_2.txt
     fi
