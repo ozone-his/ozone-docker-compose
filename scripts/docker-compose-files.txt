@@ -7,3 +7,4 @@ docker-compose-openmrs-sso.yml
 docker-compose-senaite.yml
 docker-compose-senaite-sso.yml
 docker-compose-backup.yml
+docker-compose-openelis.yml
