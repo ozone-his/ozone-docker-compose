@@ -44,7 +44,7 @@ services:
             - database
             - certs
         ports:
-            - "8080:8080"
+            - "8085:8080"
             - "8443:8443"
         restart: always
         networks:
@@ -77,7 +77,7 @@ services:
             - database
             - certs
         ports:
-            - "8081:8080"
+            - "8086:8080"
 #            - "8444:8443"
         networks:
             - default
@@ -116,7 +116,7 @@ services:
         container_name: openelisglobal-proxy
         platform: linux/amd64
         ports:
-            - 80:80
+            - 81:80
             - 443:443
         volumes:
             - certs-vol:/etc/nginx/certs/
