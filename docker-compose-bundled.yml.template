@@ -4,7 +4,6 @@ networks:
     external: true
 
 services:
-  # MySQL
   mysql:
     command:
       - --character-set-server=utf8mb4
@@ -38,7 +37,6 @@ services:
     volumes:
       - "\${MYSQL_DATADIR:-mysql-data}:/var/lib/mysql"
 
-  # PostgreSQL
   postgresql:
     command: "postgres -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10"
     image: ${dockerUserName}/${sanitizedArtifactId}-postgresql:${dockertag}
@@ -86,14 +84,14 @@ services:
       traefik.http.routers.odoo-https.service: odoo
       traefik.http.routers.odoo-https.middlewares: gzip,sslheader,limit
       #----------------------------- routes for: odoo/web/database || odoo/website/info  -----------------------------
-      # https 
+      # https
       traefik.http.routers.odoo-db-https.rule: Host(`\${ODOO_HOSTNAME}`) && (PathPrefix(`/web/database`) || PathPrefix(`/website/info`))
       traefik.http.routers.odoo-db-https.entrypoints: websecure
       traefik.http.routers.odoo-db-https.service: odoo
       traefik.http.routers.odoo-db-https.middlewares: gzip,sslheader,limit
       traefik.http.services.odoo-db-https.loadbalancer.server.port: 8069
       #---------------------------------------- routes for: odoo/longpolling ------------------------------------------------
-      # https 
+      # https
       traefik.http.routers.odoo-im-https.rule: Host(`\${ODOO_HOSTNAME}`) && (PathPrefix(`/longpolling`))
       traefik.http.routers.odoo-im-https.entrypoints: websecure
       traefik.http.routers.odoo-im-https.service: odoo-im
@@ -312,11 +310,7 @@ services:
     restart: unless-stopped
     image: ${dockerUserName}/${sanitizedArtifactId}-proxy:${dockertag}
     healthcheck:
-      test:
-        - CMD
-        - curl
-        - "-f"
-        - "http://localhost/"
+      test: ["CMD", "curl", "-f", "http://localhost/"]
     networks:
       ozone:
     ports:
