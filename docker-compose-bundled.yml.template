@@ -4,6 +4,7 @@ networks:
     external: true
 
 services:
+  # MySQL
   mysql:
     command:
       - --character-set-server=utf8mb4
@@ -28,7 +29,7 @@ services:
       EIP_DB_PASSWORD_SENAITE: \${EIP_DB_PASSWORD_SENAITE}
     healthcheck:
       test: "exit 0"
-    image:  ${dockerUserName}/${sanitizedArtifactId}-mysql:${dockertag}
+    image: ${dockerUserName}/${sanitizedArtifactId}-mysql:${dockertag}
     networks:
       - ozone
     ports:
@@ -37,9 +38,10 @@ services:
     volumes:
       - "\${MYSQL_DATADIR:-mysql-data}:/var/lib/mysql"
 
+  # PostgreSQL
   postgresql:
     command: "postgres -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10"
-    image:  ${dockerUserName}/${sanitizedArtifactId}-postgresql:${dockertag}
+    image: ${dockerUserName}/${sanitizedArtifactId}-postgresql:${dockertag}
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: \${POSTGRES_USER}
@@ -75,7 +77,7 @@ services:
       - ADDONS=sale_management,stock,account_account,purchase,mrp,odoo_initializer,ozone_settings,mrp_product_expiry,product_expiry,l10n_generic_coa
       - INITIALIZER_DATA_FILES_PATH=/mnt/odoo_config
       - INITIALIZER_CONFIG_FILE_PATH=/mnt/odoo_config/initializer_config.json
-    image:  ${dockerUserName}/${sanitizedArtifactId}-odoo:${dockertag}
+    image: ${dockerUserName}/${sanitizedArtifactId}-odoo:${dockertag}
     labels:
       traefik.enable: true
       # https
@@ -147,7 +149,7 @@ services:
       - EIP_FHIR_SERVER_URL=http://openmrs:8080/openmrs/ws/fhir2/R4
       - EIP_FHIR_USERNAME=\${OPENMRS_USER}
       - EIP_FHIR_PASSWORD=\${OPENMRS_PASSWORD}
-    image:  ${dockerUserName}/${sanitizedArtifactId}-eip-odoo-openmrs:${dockertag}
+    image: ${dockerUserName}/${sanitizedArtifactId}-eip-odoo-openmrs:${dockertag}
     networks:
       ozone:
         aliases:
@@ -177,7 +179,7 @@ services:
       timeout: 5s
       retries: 48
       start_period: 120s
-    image:  ${dockerUserName}/${sanitizedArtifactId}-openmrs-backend:${dockertag}
+    image: ${dockerUserName}/${sanitizedArtifactId}-openmrs-backend:${dockertag}
     labels:
       traefik.enable: "true"
       traefik.http.routers.openmrs.rule: "Host(`\${O3_HOSTNAME}`) && PathPrefix(`/openmrs`)"
@@ -207,7 +209,7 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
       timeout: 5s
-    image:  ${dockerUserName}/${sanitizedArtifactId}-openmrs-frontend:${dockertag}
+    image: ${dockerUserName}/${sanitizedArtifactId}-openmrs-frontend:${dockertag}
     labels:
       traefik.enable: "true"
       traefik.http.routers.frontend.rule: "Host(`\${O3_HOSTNAME}`) && PathPrefix(`/openmrs/spa/`)"
@@ -245,7 +247,7 @@ services:
       - RELSTORAGE_BLOB_DIR=/home/senaite/senaitelims/blobstorage
       - ADMIN_USER=\${SENAITE_ADMIN_USER}
       - ADMIN_PASSWORD=\${SENAITE_ADMIN_PASSWORD}
-    image:  ${dockerUserName}/${sanitizedArtifactId}-senaite:${dockertag}
+    image: ${dockerUserName}/${sanitizedArtifactId}-senaite:${dockertag}
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.senaite.loadbalancer.server.port=8080"
@@ -294,7 +296,7 @@ services:
       - EIP_FHIR_SERVER_URL=http://openmrs:8080/openmrs/ws/fhir2/R4
       - EIP_FHIR_USERNAME=\${OPENMRS_USER}
       - EIP_FHIR_PASSWORD=\${OPENMRS_PASSWORD}
-    image:  ${dockerUserName}/${sanitizedArtifactId}-eip-openmrs-senaite:${dockertag}
+    image: ${dockerUserName}/${sanitizedArtifactId}-eip-openmrs-senaite:${dockertag}
     networks:
       ozone:
         aliases:
@@ -308,7 +310,7 @@ services:
     environment:
       - GITPOD_ENV=\${GITPOD_ENV}
     restart: unless-stopped
-    image:  ${dockerUserName}/${sanitizedArtifactId}-proxy:${dockertag}
+    image: ${dockerUserName}/${sanitizedArtifactId}-proxy:${dockertag}
     healthcheck:
       test:
         - CMD
