@@ -38,15 +38,9 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
     # Create the networks
     docker network inspect web >/dev/null 2>&1 ||  docker network create web
     # Run the docker compose command
-    if [ "$ENABLE_SSO" == "true" ]; then
-        dockerComposeCommand="docker compose -p $PROJECT_NAME --env-file ../.env -f ../docker-compose-bundled.yml -f ../docker-compose-bundled-sso.yml up -d"
-        echo "$INFO Running Docker Compose command: $dockerComposeCommand"
-        $dockerComposeCommand
-    else
-        dockerComposeCommand="docker compose -p $PROJECT_NAME --env-file ../.env -f ../docker-compose-bundled.yml up -d"
-        echo "$INFO Running Docker Compose command: $dockerComposeCommand"
-        $dockerComposeCommand
-    fi
+    dockerComposeCommand="docker compose -p $PROJECT_NAME --env-file ../.env -f ../${bundled.docker.compose.output.filename} up -d"
+    echo "$INFO Running Docker Compose command: $dockerComposeCommand"
+    $dockerComposeCommand
 else
     echo "$ERROR Docker version $INSTALLED_DOCKER_VERSION is not supported. Please install Docker version >= 20.10.0"
     exit 1
