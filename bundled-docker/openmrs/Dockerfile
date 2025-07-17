@@ -6,3 +6,4 @@ ADD distro/configs/openmrs/initializer_config /openmrs/distribution/openmrs_conf
 ADD distro/configs/openmrs/properties/fhirproxy.properties /openmrs/data/fhirproxy/config.properties
 ADD distro/configs/openmrs/properties/oauth2.properties /openmrs/data/oauth2.properties
 ADD bundled-docker/openmrs/tomcat/server.xml /usr/local/tomcat/conf/server.xml
+ADD bundled-docker/openmrs/log4j2.xml /openmrs/data/log4j2.xml
