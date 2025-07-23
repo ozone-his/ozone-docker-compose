@@ -51,6 +51,8 @@ services:
       - "${OPENMRS_PROPERTIES_PATH}/oauth2.properties:/openmrs/data/oauth2.properties"
       - "${OPENMRS_PERSON_IMAGES_PATH:-openmrs-person-images}:/openmrs/data/person_images"
       - "${OPENMRS_COMPLEX_OBS_PATH:-openmrs-complex-obs}:/openmrs/data/complex_obs"
+      - "${DISTRO_PATH}/configs/openmrs/int.demo.openelis-global.org.truststore.p12:/etc/openelis-global/truststore"
+      - "${DISTRO_PATH}/configs/openmrs/openmrs.org.keystore.p12:/etc/openelis-global/keystore"
 
   # OpenMRS 3 Frontend
   frontend:
