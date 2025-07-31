@@ -11,7 +11,7 @@ services:
       PROXY_ADDRESS_FORWARDING: "true"
       KC_HTTP_ENABLED: 'true'
       KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
-      KC_PROXY: reencrypt
+      KC_PROXY: passthrough
       KC_HEALTH_ENABLED: 'true'
       KC_METRICS_ENABLED: 'true'
       KEYCLOAK_DATABASE_VENDOR: postgresql
