@@ -23,7 +23,7 @@ services:
       timeout: 5s
       retries: 48
       start_period: 120s
-    image: openmrs/openmrs-core:2.6.x-nightly-amazoncorretto-11
+    image: openmrs/openmrs-core:2.7.4-amazoncorretto-17
     labels:
       traefik.enable: "true"
       traefik.http.routers.openmrs.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs`)"
