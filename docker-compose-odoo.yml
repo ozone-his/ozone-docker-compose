@@ -47,6 +47,7 @@ services:
       #=====================================================backup================================================================
       restic-compose-backup.volumes: true
       restic-compose-backup.volumes.include: "${ODOO_FILESTORE:-odoo-filestore},${ODOO_CONFIG_CHECKSUMS_PATH:-odoo-checksums}"
+      app_name: "odoo"
     networks:
       ozone:
         aliases:
@@ -96,6 +97,8 @@ services:
       - EIP_FHIR_PASSWORD=${OPENMRS_PASSWORD}
       - EIP_TEST_ORDER_TYPE_UUID=${EIP_TEST_ORDER_TYPE_UUID}
     image: mekomsolutions/eip-client
+    labels:
+      - "app_name=eip"
     networks:
       ozone:
         aliases:

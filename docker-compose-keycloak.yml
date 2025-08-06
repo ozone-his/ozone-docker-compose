@@ -30,7 +30,9 @@ services:
        -Dkeycloak.migration.action=import
        -Dkeycloak.migration.provider=dir
        -Dkeycloak.migration.dir=/keycloak-files/realm-config
-       -Dkeycloak.migration.strategy=IGNORE_EXISTING"
+       -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
+       --log-console-output=json
+       --log-console-json-format=ecs"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://0.0.0.0:8080/health/ready"]
       interval: 15s
@@ -51,6 +53,7 @@ services:
       traefik.http.routers.keycloak.rule: "Host(`${KEYCLOAK_HOSTNAME}`)"
       traefik.http.routers.keycloak.entrypoints: "websecure"
       traefik.http.services.keycloak.loadbalancer.server.port: 8080
+      app_name: "keycloak"
 
   postgresql:
     environment:

@@ -22,6 +22,7 @@ services:
       - "traefik.http.routers.senaite.rule=Host(`${SENAITE_HOSTNAME}`)"
       - "traefik.http.routers.senaite.middlewares=senaite"
       - "traefik.http.middlewares.senaite.addprefix.prefix=/VirtualHostBase/https/${SENAITE_HOSTNAME}/senaite/VirtualHostRoot"
+      - "app_name=senaite"
     networks:
       ozone:
         aliases:
@@ -71,6 +72,8 @@ services:
       - RUN_WITH_BAHMNI_EMR=${RUN_WITH_BAHMNI_EMR}
       - EIP_TEST_ORDER_TYPE_UUID=${EIP_TEST_ORDER_TYPE_UUID}
     image: mekomsolutions/eip-client
+    labels:
+      - "app_name=eip"
     networks:
       ozone:
         aliases:
