@@ -1,0 +1,30 @@
+server:
+  log_level: info
+
+metrics:
+  global:
+    remote_write:
+      - url: ${LOKI_URL}
+        basic_auth:
+          username: ""
+          password: ""
+
+logs:
+  configs:
+    - name: default
+      positions:
+        filename: /tmp/positions.yaml
+      clients:
+        - url: ${LOKI_URL}
+      scrape_configs:
+        - job_name: docker-logs
+          # Discover Docker containers via the Docker socket
+          docker_sd_configs:
+            - host: unix:///var/run/docker.sock
+          # Optional: Filter or add labels to your logs
+          relabel_configs:
+            - source_labels: [__meta_docker_container_name]
+              target_label: container_name
+              regex: '/(.*)'
+            - source_labels: [__meta_docker_container_label_app_name]
+              target_label: app_name
