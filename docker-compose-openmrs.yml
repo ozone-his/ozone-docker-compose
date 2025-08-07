@@ -35,7 +35,6 @@ services:
       #=====================================================backup================================================================
       restic-compose-backup.volumes: true
       restic-compose-backup.volumes.include: "${OPENMRS_CONFIG_CHECKSUMS_PATH:-openmrs-config-checksums},${OPENMRS_PERSON_IMAGES_PATH:-openmrs-person-images},${OPENMRS_COMPLEX_OBS_PATH:-openmrs-complex-obs}"
-      app_name: "openmrs"
     networks:
       - ozone
       - web

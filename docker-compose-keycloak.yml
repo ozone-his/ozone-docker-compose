@@ -53,7 +53,6 @@ services:
       traefik.http.routers.keycloak.rule: "Host(`${KEYCLOAK_HOSTNAME}`)"
       traefik.http.routers.keycloak.entrypoints: "websecure"
       traefik.http.services.keycloak.loadbalancer.server.port: 8080
-      app_name: "keycloak"
 
   postgresql:
     environment:
