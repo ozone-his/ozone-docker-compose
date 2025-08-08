@@ -30,7 +30,7 @@ services:
        -Dkeycloak.migration.action=import
        -Dkeycloak.migration.provider=dir
        -Dkeycloak.migration.dir=/keycloak-files/realm-config
-       -Dkeycloak.migration.strategy=OVERWRITE_EXISTING"
+       -Dkeycloak.migration.strategy=IGNORE_EXISTING"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://0.0.0.0:8080/health/ready"]
       interval: 15s
