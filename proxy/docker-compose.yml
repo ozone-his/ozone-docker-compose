@@ -6,6 +6,7 @@ services:
         TIMEZONE: "${TIMEZONE}"
     environment:
       - GITPOD_ENV=${GITPOD_ENV}
+      - PROXY_CLIENT_MAX_BODY_SIZE=${PROXY_CLIENT_MAX_BODY_SIZE:-10m}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
     networks:
