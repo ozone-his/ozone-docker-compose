@@ -1,4 +1,4 @@
-FROM openmrs/openmrs-core:2.6.x-nightly-amazoncorretto-11
+FROM openmrs/openmrs-core:2.7.4-amazoncorretto-17
 
 # Add modules & configurations for the ozone distribution
 ADD distro/binaries/openmrs/modules /openmrs/distribution/openmrs_modules
