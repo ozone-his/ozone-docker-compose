@@ -20,6 +20,11 @@ services:
     volumes:
       - ${GRAFANA_DATA_DIR:-grafana-data}:/var/lib/grafana
       - ./logging/grafana/provisioning:/etc/grafana/provisioning:ro
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.grafana.rule: "Host(`${GRAFANA_DOMAIN}`)"
+      traefik.http.routers.grafana.tls.certresolver: "le"
+      traefik.http.services.grafana.loadbalancer.server.port: "3000"
 
 volumes:
   grafana-data:
