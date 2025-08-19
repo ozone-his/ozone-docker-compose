@@ -6,8 +6,8 @@ metrics:
     remote_write:
       - url: ${LOKI_URL}
         basic_auth:
-          username: ""
-          password: ""
+          username: ${LOKI_USERNAME}
+          password: ${LOKI_PASSWORD}
 
 logs:
   configs:
