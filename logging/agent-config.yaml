@@ -1,0 +1,92 @@
+server:
+  log_level: info
+
+metrics:
+  global:
+    remote_write:
+      - url: ${LOKI_URL}
+        basic_auth:
+          username: ${LOKI_USERNAME}
+          password: ${LOKI_PASSWORD}
+
+logs:
+  configs:
+    - name: default
+      positions:
+        filename: /tmp/positions.yaml
+      clients:
+        - url: ${LOKI_URL}
+      scrape_configs:
+        - job_name: docker-logs
+          docker_sd_configs:
+            - host: unix:///var/run/docker.sock
+          relabel_configs:
+            - source_labels: [__meta_docker_container_name]
+              target_label: container_name
+              regex: '/(.*)'
+          pipeline_stages:
+            - docker:
+            - match:
+                selector: '{__docker_container_name=~".*openmrs.*"}'
+                stages:
+                  - json:
+                      expressions:
+                        level: level
+                        msg: message
+                        ts: timestamp
+                  - labels:
+                      level:
+                      ts:
+                  - output:
+                      source: msg
+            - match:
+                selector: '{__docker_container_name=~".*eip.*"}'
+                stages:
+                  - json:
+                      expressions:
+                        level: level
+                        msg: message
+                        ts: timestamp
+                  - labels:
+                      level:
+                      ts:
+                  - output:
+                      source: msg
+            - match:
+                selector: '{__docker_container_name=~".*odoo.*"}'
+                stages:
+                  - regex:
+                      expression: '^(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) (?P<process_id>\d+) (?P<level>[A-Z]+) (?P<module>[^:]+): (?P<message>.*)$'
+                  - labels:
+                      ts:
+                      process_id:
+                      level:
+                      module:
+                  - output:
+                      source: message
+            - match:
+                selector: '{__docker_container_name=~".*senaite.*"}'
+                stages:
+                  - regex:
+                      expression: '^(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) \d+ (?P<level>[A-Z]+) (?P<module>[^:]+):(?P<line>\d+) (?P<worker>\w+) (?P<msg>.*)$'
+                  - labels:
+                      level:
+                      ts:
+                      module:
+                      line:
+                      worker:
+                  - output:
+                      source: msg
+            - match:
+                selector: '{__docker_container_name=~".*keycloak.*"}'
+                stages:
+                  - json:
+                      expressions:
+                        level: log.level
+                        msg: message
+                        ts: timestamp
+                  - labels:
+                      level:
+                      ts:
+                  - output:
+                      source: msg
