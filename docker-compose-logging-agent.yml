@@ -1,6 +1,6 @@
 services:
   grafana-agent:
-    image: mekomsolutions/maven-parent-grafana-agent
+    image: grafana/agent:latest
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/log:/var/log:ro
