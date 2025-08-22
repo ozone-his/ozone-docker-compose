@@ -75,6 +75,7 @@
                                         <include>proxy/**</include>
                                         <include>senaite/**</include>
                                         <include>keycloak/**</include>
+                                        <include>grafana-agent/**</include>
                                         <include>scripts/**</include>
                                     </includes>
                                 </resource>
