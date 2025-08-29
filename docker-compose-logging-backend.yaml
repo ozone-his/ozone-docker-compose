@@ -1,5 +1,4 @@
 services:
-
   loki:
     image: grafana/loki:3.0.0
     container_name: loki
@@ -25,7 +24,10 @@ services:
       traefik.http.routers.grafana.rule: "Host(`${GRAFANA_DOMAIN}`)"
       traefik.http.routers.grafana.tls.certresolver: "le"
       traefik.http.services.grafana.loadbalancer.server.port: "3000"
+    networks:
+      web:
 
 volumes:
   grafana-data:
   loki-data:
+
