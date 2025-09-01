@@ -121,7 +121,7 @@ services:
       - ODOO_HOST=http://odoo
       - ODOO_PORT=8069
       - ODOO_DATABASE=${ODOO_DATABASE}
-      - EIP_ODOO_DRUGS_CATEGORY_EXT_ID=categ_products_drug_orders
+      - EIP_ODOO_DRUGS_CATEGORY_EXT_ID=${EIP_ODOO_DRUGS_CATEGORY_EXT_ID}
     image: mekomsolutions/fhir-odoo
     labels:
       traefik.enable: "true"
