@@ -8,6 +8,8 @@ services:
     volumes:     
      - ./logging/loki-config.yaml:/etc/loki/loki.yaml
      - ${LOKI_DATA_DIR:-loki-data}:/loki
+    networks:
+      logging:
   grafana:
     image: grafana/grafana:10.2.3
     ports:
@@ -26,11 +28,13 @@ services:
       traefik.http.services.grafana.loadbalancer.server.port: "3000"
     networks:
       web:
+      logging:
 
 volumes:
   grafana-data:
   loki-data:
 
 networks:
+  logging:
   web:
    external: true
