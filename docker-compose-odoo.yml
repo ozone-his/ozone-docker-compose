@@ -95,6 +95,11 @@ services:
       - EIP_FHIR_USERNAME=${OPENMRS_USER}
       - EIP_FHIR_PASSWORD=${OPENMRS_PASSWORD}
       - EIP_TEST_ORDER_TYPE_UUID=${EIP_TEST_ORDER_TYPE_UUID}
+      - EIP_ODOO_FHIR_SERVER_URL=${EIP_ODOO_FHIR_SERVER_URL}
+      - EIP_ODOO_FHIR_USERNAME=${ODOO_USER}
+      - EIP_ODOO_FHIR_PASSWORD=${ODOO_PASSWORD}
+      - EIP_PRODUCT_SYNC_INITIAL_DELAY=${EIP_PRODUCT_SYNC_INITIAL_DELAY}
+      - EIP_PRODUCT_SYNC_DELAY=${EIP_PRODUCT_SYNC_DELAY}
     image: mekomsolutions/eip-client
     networks:
       ozone:
@@ -116,6 +121,7 @@ services:
       - ODOO_HOST=http://odoo
       - ODOO_PORT=8069
       - ODOO_DATABASE=${ODOO_DATABASE}
+      - EIP_ODOO_DRUGS_CATEGORY_EXT_ID=${EIP_ODOO_DRUGS_CATEGORY_EXT_ID}
     image: mekomsolutions/fhir-odoo
     labels:
       traefik.enable: "true"
