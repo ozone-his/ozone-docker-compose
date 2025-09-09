@@ -37,8 +37,18 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
     exportScheme
     # Create the networks
     docker network inspect web >/dev/null 2>&1 ||  docker network create web
+
+    # Check for env file - use concatenated.env if it exists, otherwise use .env
+    if [ -f "../concatenated.env" ]; then
+        ENV_FILE="../concatenated.env"
+        echo "$INFO Using concatenated.env file"
+    else
+        ENV_FILE="../.env"
+        echo "$INFO Using .env file"
+    fi
+
     # Run the docker compose command
-    dockerComposeCommand="docker compose -p $PROJECT_NAME --env-file ../.env -f ../${bundled.docker.compose.output.filename} up -d"
+    dockerComposeCommand="docker compose -p $PROJECT_NAME --env-file $ENV_FILE -f ../${bundled.docker.compose.output.filename} up -d"
     echo "$INFO Running Docker Compose command: $dockerComposeCommand"
     $dockerComposeCommand
 else
@@ -46,7 +56,6 @@ else
     exit 1
 fi
 
-# Static list of services
-definedServices=("openmrs" "odoo" "senaite" "keycloak")
-printf "%s\n" "${definedServices[@]}" > /tmp/defined_services.txt
+# Extract service names from docker-compose file
+docker compose -f ../"${bundled.docker.compose.output.filename}" config --services > /tmp/defined_services.txt
 displayAccessURLsWithCredentials
