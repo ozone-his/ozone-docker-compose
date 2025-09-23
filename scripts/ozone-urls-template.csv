@@ -1,5 +1,5 @@
-HIS Component,URL,Username,Password,Service
--,-,-,-
+HIS App,URL,Username,Password,Service
+-,-,-,-,
 OpenMRS 3,${SERVER_SCHEME}://${O3_HOSTNAME}/openmrs/spa,admin,Admin123,openmrs
 Bahmni EMR,${SERVER_SCHEME}://${BAHMNI_EMR_HOSTNAME}/bahmni/home,superman,Admin123,bahmniemr
 SENAITE,${SERVER_SCHEME}://${SENAITE_HOSTNAME},admin,password,senaite
