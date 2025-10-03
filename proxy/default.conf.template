@@ -27,6 +27,11 @@ map $GITPOD_ENV $senaite_rewrite {
     default /VirtualHostBase/http/$host/senaite/VirtualHostRoot/;
 }
 
+map $GITPOD_ENV $forwarded_proto {
+    "true"   https;
+    default  $scheme;
+}
+
 upstream frontend {
   # always assume the frontend will be available
   server frontend max_fails=0;
@@ -266,7 +271,7 @@ server {
     proxy_set_header Host $http_host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Proto $forwarded_proto;
 
 
 
@@ -300,6 +305,7 @@ server {
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $forwarded_proto;
         set $senaite senaite:8080;
         proxy_pass http://$senaite;
         rewrite ^(.*)$ $senaite_rewrite/$1 break;
@@ -310,7 +316,7 @@ server {
     listen 8082;
     location / {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Proto $forwarded_proto;
         set $erpnext erpnext:8080;
         proxy_pass http://$erpnext;
     }
@@ -320,7 +326,7 @@ server {
     listen 8083;
     location / {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Proto $forwarded_proto;
         set $fhirOdoo fhir-odoo:8080;
         proxy_pass http://$fhirOdoo;
     }
@@ -330,7 +336,7 @@ server {
     listen 8084;
     location / {
         proxy_set_header Host $http_host;
-        proxy_set_header X-Forwarded-Proto http;
+        proxy_set_header X-Forwarded-Proto $forwarded_proto;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         set $keycloak keycloak:8080;
         proxy_pass http://$keycloak;
