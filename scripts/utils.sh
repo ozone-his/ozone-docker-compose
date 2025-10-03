@@ -87,8 +87,10 @@ function setDockerComposeCLIOptions () {
 
         # If running with Bahmni EMR, disable Demo service
         if [ "$file" == "docker-compose-bahmniemr.yml" ]; then
+            echo "⚠️ Bahmni EMR is enabled. Disabling the demo service."
             export DEMO="false"
         fi
+        
     done
 
     # Add restore file if restore env is set
