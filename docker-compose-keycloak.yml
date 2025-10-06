@@ -8,6 +8,7 @@ services:
       - ${KEYCLOAK_CONFIG_PATH}/themes/carbon:/opt/bitnami/keycloak/themes/carbon
     environment:
       KC_HOSTNAME_URL: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      KC_HOSTNAME_ADMIN_URL: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
       PROXY_ADDRESS_FORWARDING: "true"
       KC_HTTP_ENABLED: 'true'
       KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
