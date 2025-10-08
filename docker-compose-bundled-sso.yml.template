@@ -367,7 +367,6 @@ services:
       SUPERSET_CLIENT_ENABLED: \${SUPERSET_CLIENT_ENABLED}
       KEYCLOAK_ADMIN_SA_CLIENT_SECRET: \${KEYCLOAK_ADMIN_SA_CLIENT_SECRET}
       EIP_CLIENT_SECRET: \${OAUTH_CLIENT_SECRET}
-      KEYCLOAK_EXTRA_ARGS_PREPENDED: "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true"
       KEYCLOAK_EXTRA_ARGS: "
         -Dkeycloak.profile.feature.scripts=enabled
         -Dkeycloak.migration.replace-placeholders=true

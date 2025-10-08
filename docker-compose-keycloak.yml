@@ -25,7 +25,6 @@ services:
       KEYCLOAK_CREATE_ADMIN_USER: "true"
       KEYCLOAK_ADMIN_USER: ${KEYCLOAK_USER}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
-      KEYCLOAK_EXTRA_ARGS_PREPENDED: "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true"
       KEYCLOAK_EXTRA_ARGS: "
        -Dkeycloak.profile.feature.scripts=enabled
        -Dkeycloak.migration.action=import
