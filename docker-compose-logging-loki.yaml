@@ -1,0 +1,20 @@
+services:
+  loki:
+    image: grafana/loki:3.0.0
+    container_name: loki
+    ports:
+      - 3100:3100
+    command: -config.file=/etc/loki/loki.yaml
+    volumes:     
+     - ./logging/loki-config.yaml:/etc/loki/loki.yaml
+     - ${LOKI_DATA_DIR:-loki-data}:/loki
+    networks:
+      logging:
+
+volumes:
+  loki-data:
+
+networks:
+  logging:
+  web:
+   external: true
