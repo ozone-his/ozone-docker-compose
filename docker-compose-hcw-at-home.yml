@@ -1,0 +1,116 @@
+services:
+
+  coturn:
+    image: docker.io/coturn/coturn
+    ports:
+      - "3478:3478"
+      - "3478:3478/udp"
+      - "49152-49162:49152-49162/udp"
+    command: "--fingerprint --lt-cred-mech --user myuser:mypass --realm yourdomain.com"
+
+  mediasoup:
+    image: docker.io/iabsis/mediasoup-api
+    environment:
+      - JWT_SECRET=Super3trong4ey$
+      - API_USER=abcd
+      - API_SECRET=1234
+      - ANNOUNCED_IP=192.168.1.10
+      - RTC_MIN_PORT=40000
+      - RTC_MAX_PORT=40010
+      - LISTEN=3443
+      - CERT=/usr/src/app/certs/sample.localhost.cert.pem
+      - KEY=/usr/src/app/certs/sample.localhost.key.pem
+      ## Redis server
+      - REDIS_HOST=redis
+      - TURN_SERVER1=turn:192.168.1.10
+      - TURN_USERNAME1=myuser
+      - TURN_PASSWORD1=mypass
+    ports:
+      - "3443:3443"
+      - "40000-40010:40000-40010/tcp"
+      - "40000-40010:40000-40010/udp"
+    depends_on:
+      - redis
+    volumes:
+      - ./data/certbot/:/etc/mediasoup-api/certs
+    entrypoint: ["/bin/bash", "-c", "PUBLIC_IP=$(hostname -i) node server.js"]
+
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    #environment:
+    #  - MONGO_INITDB_ROOT_USERNAME=mongo
+    #  - MONGO_INITDB_ROOT_PASSWORD=mongo
+    volumes:
+      #  - ./conf.txt:/etc/mongod.conf
+      - ./data/mongo:/data/db
+    ports:
+      - "27017:27017"
+
+  patient:
+    image: docker.io/iabsis/hcw-patient:dev
+    ports:
+      - "4000:8080"#4080 for ssl
+    environment:
+      - BACKEND_URL=http://backend:1337
+    depends_on:
+      - mongo
+      - backend
+
+  doctor:
+    image: docker.io/iabsis/hcw-doctor:dev
+    ports:
+      - "4001:8081"#4081 for ssl
+    environment:
+      - BACKEND_URL=http://backend:1337
+    depends_on:
+      - mongo
+      - backend
+    volumes:
+      - ./nginx_doc.conf:/etc/nginx/conf.d/default.conf
+
+  admin:
+    image: docker.io/iabsis/hcw-admin
+    ports:
+      - "8002:8082"
+    environment:
+      - BACKEND_URL=http://backend:1337
+    depends_on:
+      - mongo
+      - backend
+
+  backend:
+    image: docker.io/iabsis/hcw-backend:5.3.44
+    ports:
+      - "1337:1337"
+    environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=1
+      - DB_URI=mongodb://mongo:27017/hcw-athome
+      - REDIS_HOST=redis
+      #- APP_SECRET=''
+      - NODE_ENV=production
+      - PUBLIC_URL=http://localhost:4000
+      #- MAIL_SMTP_HOST=
+      #- MAIL_SMTP_PORT=
+      #- MAIL_SMTP_SECURE=true
+      #- MAIL_SMTP_SENDER=
+      #- MAIL_SMTP_USER=
+      #- MAIL_SMTP_PASSWORD=
+      - LOGIN_METHOD=password
+      - DOCTOR_URL=http://localhost:4001
+      - MEDIASOUP_URL=https://localhost:3443
+      - MEDIASOUP_USER=abcd
+      - MEDIASOUP_SECRET=1234
+      - BRANDING=Ozone@Home
+      - ACCESSIBILITY_MODE=false
+      - ATTACHMENTS_DIR=/data/attachments
+
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ./data/attachments:/data/attachments
+    restart: unless-stopped
+
+  redis:
+    image: redis
