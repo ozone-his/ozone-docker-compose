@@ -41,7 +41,7 @@ services:
       restic-compose-backup.mariadb: true
 
   postgresql:
-    command: postgres -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10 -c max_connections=200
+    command: postgres -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10 -c max_connections=200 -c max_slot_wal_keep_size=2GB
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: ${POSTGRES_USER}
