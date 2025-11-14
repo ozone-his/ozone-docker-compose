@@ -6,7 +6,7 @@ services:
       - "3478:3478"
       - "3478:3478/udp"
       - "49152-49162:49152-49162/udp"
-    command: "--fingerprint --lt-cred-mech --user myuser:mypass --realm yourdomain.com"
+    command: "--fingerprint --lt-cred-mech"
 
   mediasoup:
     image: docker.io/iabsis/mediasoup-api
@@ -22,9 +22,6 @@ services:
       - KEY=/usr/src/app/certs/sample.localhost.key.pem
       ## Redis server
       - REDIS_HOST=redis
-      - TURN_SERVER1=turn:192.168.1.10
-      - TURN_USERNAME1=myuser
-      - TURN_PASSWORD1=mypass
     ports:
       - "3443:3443"
       - "40000-40010:40000-40010/tcp"
