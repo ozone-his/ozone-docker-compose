@@ -1,0 +1,57 @@
+services:
+
+ # OpenMRS - SENAITE integration service
+  eip-openmrs-senaite:
+    depends_on:
+      env-substitution:
+        condition: service_completed_successfully
+      openmrs:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      senaite:
+        condition: service_started
+    environment:
+      - SENAITE_SERVER_URL=http://senaite:8080/senaite
+      - SENAITE_SERVER_USER=${SENAITE_ADMIN_USER}
+      - SENAITE_SERVER_PASSWORD=${SENAITE_ADMIN_PASSWORD}
+      - OPENMRS_SERVER_URL=http://openmrs:8080/openmrs
+      - OPENMRS_SERVER_USER=${OPENMRS_USER}
+      - OPENMRS_SERVER_PASSWORD=${OPENMRS_PASSWORD}
+      - OPENMRS_RESULTS_ENCOUNTER_TYPE_UUID=${RESULTS_ENCOUNTER_TYPE_UUID}
+      - EIP_PROFILE=prod
+      - EIP_DB_NAME_SENAITE=${EIP_DB_NAME_SENAITE}
+      - EIP_DB_USER_SENAITE=${EIP_DB_USER_SENAITE}
+      - EIP_DB_PASSWORD_SENAITE=${EIP_DB_PASSWORD_SENAITE}
+      - MYSQL_ADMIN_USER=root
+      - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - OPENMRS_DB_HOST=${OPENMRS_DB_HOST}
+      - OPENMRS_DB_PORT=${OPENMRS_DB_PORT}
+      - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
+      - OPENMRS_DB_USER=${OPENMRS_DB_USER}
+      - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
+      - OPENMRS_USER=${OPENMRS_USER}
+      - OPENMRS_PASSWORD=${OPENMRS_PASSWORD}
+      - EIP_FHIR_RESOURCES=Patient,ServiceRequest
+      - EIP_FHIR_SERVER_URL=http://openmrs:8080/openmrs/ws/fhir2/R4
+      - EIP_FHIR_USERNAME=${OPENMRS_USER}
+      - EIP_FHIR_PASSWORD=${OPENMRS_PASSWORD}
+      - RUN_WITH_BAHMNI_EMR=${RUN_WITH_BAHMNI_EMR}
+      - EIP_TEST_ORDER_TYPE_UUID=${EIP_TEST_ORDER_TYPE_UUID}
+    image: mekomsolutions/eip-client
+    networks:
+      ozone:
+        aliases:
+          - eip-client-senaite
+    restart: unless-stopped
+    volumes:
+      - "${EIP_OPENMRS_SENAITE_ROUTES_PATH}:/eip-client/routes"
+      - eip-home-senaite:/eip-home
+
+  mysql:
+    environment:
+      EIP_DB_NAME_SENAITE: ${EIP_DB_NAME_SENAITE}
+      EIP_DB_USER_SENAITE: ${EIP_DB_USER_SENAITE}
+      EIP_DB_PASSWORD_SENAITE: ${EIP_DB_PASSWORD_SENAITE}
+    volumes:
+      - "${SQL_SCRIPTS_PATH}/mysql/eip-openmrs-senaite:/docker-entrypoint-initdb.d/db/eip-openmrs-senaite"
