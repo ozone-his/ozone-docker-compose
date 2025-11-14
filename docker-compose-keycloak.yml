@@ -1,7 +1,7 @@
 services:
 
   keycloak:
-    image: docker.io/bitnamilegacy/keycloak:22.0.5
+    image: bitnamilegacy/keycloak:22.0.5
     restart: unless-stopped
     volumes:
       - ${KEYCLOAK_CONFIG_PATH}/realms:/keycloak-files/realm-config
