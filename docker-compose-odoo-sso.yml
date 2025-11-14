@@ -2,11 +2,3 @@ services:
   odoo:
     environment:
       - ADDONS=${ODOO_ADDONS},auth_oidc,auth_oauth_autologin
-
-  eip-odoo-openmrs:
-    environment:
-      OAUTH_ACCESS_TOKEN_URL: ${OAUTH_ACCESS_TOKEN_URL}
-      OAUTH_ENABLED: ${ENABLE_SSO}
-      OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID}
-      OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
-      OAUTH_CLIENT_SCOPE: ${OAUTH_CLIENT_SCOPE}
