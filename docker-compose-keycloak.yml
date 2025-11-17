@@ -1,37 +1,31 @@
 services:
 
   keycloak:
-    image: bitnamilegacy/keycloak:22.0.5
+    image: quay.io/keycloak/keycloak:26.4.5
     restart: unless-stopped
+    entrypoint: [ "/bin/bash", "-c" ]
+    command: >
+      "/opt/keycloak/bin/kc.sh build --health-enabled=true --metrics-enabled=true &&
+       /opt/keycloak/bin/kc.sh start --optimized --import-realm"
     volumes:
-      - ${KEYCLOAK_CONFIG_PATH}/realms:/keycloak-files/realm-config
+      - ${KEYCLOAK_CONFIG_PATH}/realms:/opt/keycloak/data/import
       - ${KEYCLOAK_CONFIG_PATH}/themes/carbon:/opt/bitnami/keycloak/themes/carbon
     environment:
-      KC_HOSTNAME_URL: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
-      KC_HOSTNAME_ADMIN_URL: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
-      PROXY_ADDRESS_FORWARDING: "true"
-      KC_HTTP_ENABLED: 'true'
-      KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
-      KC_PROXY: reencrypt
-      KC_HEALTH_ENABLED: 'true'
-      KC_METRICS_ENABLED: 'true'
-      KEYCLOAK_DATABASE_VENDOR: postgresql
-      KEYCLOAK_DATABASE_HOST: postgresql
-      KEYCLOAK_DATABASE_PORT_NUMBER: 5432
-      KEYCLOAK_DATABASE_NAME: ${KEYCLOAK_DB}
-      KEYCLOAK_DATABASE_USER: ${KEYCLOAK_DB_USER}
-      KEYCLOAK_DATABASE_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
-      KEYCLOAK_DATABASE_SCHEMA: ${KEYCLOAK_DB_SCHEMA}
-      KEYCLOAK_CREATE_ADMIN_USER: "true"
-      KEYCLOAK_ADMIN_USER: ${KEYCLOAK_USER}
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
-      KEYCLOAK_EXTRA_ARGS: "
-       -Dkeycloak.profile.feature.scripts=enabled
-       -Dkeycloak.migration.action=import
-       -Dkeycloak.migration.provider=dir
-       -Dkeycloak.migration.dir=/keycloak-files/realm-config
-       -Dkeycloak.migration.strategy=IGNORE_EXISTING
-       --log-console-output=json"
+      KC_HOSTNAME: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      KC_HOSTNAME_ADMIN: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      KC_HOSTNAME_STRICT: 'false'
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: 'true'
+      KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: true
+      KC_HTTP_ENABLED: true
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgresql:5432/${KEYCLOAK_DB}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+      KC_DIR: /opt/keycloak/data/import
+      KC_OVERRIDE: 'false'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://0.0.0.0:8080/health/ready"]
       interval: 15s
