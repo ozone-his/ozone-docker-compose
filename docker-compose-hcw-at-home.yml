@@ -11,10 +11,10 @@ services:
   mediasoup:
     image: docker.io/iabsis/mediasoup-api
     environment:
-      - JWT_SECRET=Super3trong4ey$
-      - API_USER=abcd
-      - API_SECRET=1234
-      - ANNOUNCED_IP=192.168.1.10
+      #- JWT_SECRET=Super3trong4ey$
+      #- API_USER=abcd
+      #- API_SECRET=1234
+      #- ANNOUNCED_IP=192.168.1.10
       - RTC_MIN_PORT=40000
       - RTC_MAX_PORT=40010
       - LISTEN=3443
@@ -96,8 +96,8 @@ services:
       - LOGIN_METHOD=password
       - DOCTOR_URL=http://localhost:4001
       - MEDIASOUP_URL=https://localhost:3443
-      - MEDIASOUP_USER=abcd
-      - MEDIASOUP_SECRET=1234
+      #- MEDIASOUP_USER=abcd
+      #- MEDIASOUP_SECRET=1234
       - BRANDING=Ozone@Home
       - ACCESSIBILITY_MODE=false
       - ATTACHMENTS_DIR=/data/attachments
