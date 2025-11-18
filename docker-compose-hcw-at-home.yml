@@ -34,13 +34,12 @@ services:
 
   mongo:
     image: mongo:6
-    container_name: mongo
     #environment:
     #  - MONGO_INITDB_ROOT_USERNAME=mongo
     #  - MONGO_INITDB_ROOT_PASSWORD=mongo
     volumes:
       #  - ./conf.txt:/etc/mongod.conf
-      - ./data/mongo:/data/db
+      - mongo-data:/data/db
     ports:
       - "27017:27017"
 
@@ -77,7 +76,7 @@ services:
       - backend
 
   backend:
-    image: docker.io/iabsis/hcw-backend:5.3.44
+    image: docker.io/iabsis/hcw-backend:5.3.49
     ports:
       - "1337:1337"
     environment:
@@ -111,3 +110,6 @@ services:
 
   redis:
     image: redis
+
+volumes:
+  mongo-data: ~
