@@ -44,7 +44,7 @@ services:
       - "27017:27017"
 
   patient:
-    image: docker.io/iabsis/hcw-patient:dev
+    image: docker.io/iabsis/hcw-patient:5.3.24
     ports:
       - "4000:8080"#4080 for ssl
     environment:
@@ -54,7 +54,7 @@ services:
       - backend
 
   doctor:
-    image: docker.io/iabsis/hcw-doctor:dev
+    image: docker.io/iabsis/hcw-doctor:5.3.37
     ports:
       - "4001:8081"#4081 for ssl
     environment:
@@ -62,11 +62,11 @@ services:
     depends_on:
       - mongo
       - backend
-    volumes:
-      - ./nginx_doc.conf:/etc/nginx/conf.d/default.conf
+    #volumes:
+    #  - ./nginx_doc.conf:/etc/nginx/conf.d/default.conf
 
   admin:
-    image: docker.io/iabsis/hcw-admin
+    image: docker.io/iabsis/hcw-admin:5.3.13
     ports:
       - "8002:8082"
     environment:
@@ -109,7 +109,7 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis
+    image: redis:8.4.0-bookworm
 
 volumes:
   mongo-data: ~
