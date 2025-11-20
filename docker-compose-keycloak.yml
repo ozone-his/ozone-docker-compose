@@ -9,7 +9,7 @@ services:
        /opt/keycloak/bin/kc.sh start --optimized --import-realm"
     volumes:
       - ${KEYCLOAK_CONFIG_PATH}/realms:/opt/keycloak/data/import
-      - ${KEYCLOAK_CONFIG_PATH}/themes/carbon:/opt/bitnami/keycloak/themes/carbon
+      - ${KEYCLOAK_CONFIG_PATH}/themes/carbon:/opt/keycloak/themes/carbon
     environment:
       KC_HOSTNAME: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
       KC_HOSTNAME_ADMIN: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
@@ -27,7 +27,7 @@ services:
       KC_DIR: /opt/keycloak/data/import
       KC_OVERRIDE: 'false'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://0.0.0.0:8080/health/ready"]
+      test: ["CMD", "curl", "-f", "http://0.0.0.0:9000/health/ready"]
       interval: 15s
       timeout: 3s
       retries: 5

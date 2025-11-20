@@ -16,6 +16,7 @@ services:
       - KEYCLOAK_USER_CREATION_ENABLED=${ENABLE_SSO}
       - KEYCLOAK_DEMO_DATA_CLIENT_ID=keycloak-admin-sa
       - KEYCLOAK_DEMO_DATA_CLIENT_SECRET=${KEYCLOAK_ADMIN_SA_CLIENT_SECRET}
+      - KEYCLOAK_HEALTHCHECK_ENDPOINT=http://keycloak:9000/health/ready
     restart: on-failure
     networks:
       ozone:
