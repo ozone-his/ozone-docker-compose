@@ -50,13 +50,13 @@ services:
       - "15432:5432"
     restart: always
     env_file:
-      - ./volumes/database/database.env
+      - ../../distro/binaries/openelis/volumes/database/database.env
     environment:
       - DB_PASSWORD=${OE_DB_PASSWORD}
       - DB_SUPERUSER_PASSWORD=${ADMIN_PASSWORD}
     volumes:
       # preserves the database between containers
-      - ./volumes/database/data:/var/lib/postgresql/data
+      - ../../distro/binaries/openelis/volumes/database/data:/var/lib/postgresql/data
 
     logging: *local-logging
     networks:
@@ -94,13 +94,13 @@ services:
       - SSL_TRUSTSTORE_PASSWORD
     volumes:
       -  key_trust-store-volume:/etc/openelis-global
-      - ./volumes/plugins/:/var/lib/openelis-global/plugins
-      - ./volumes/logs/oeLogs:/var/lib/openelis-global/logs
-      - ./volumes/logs/tomcatLogs/:/usr/local/tomcat/logs
-      - ./volumes/properties/SystemConfiguration.properties:/var/lib/openelis-global/properties/SystemConfiguration.properties
-      - ./volumes/analyzer/analyzer-test-map.csv:/var/lib/openelis-global/analyzer/analyzer-test-map.csv
-      - ./volumes/odoo/odoo-test-product-mapping.csv:/var/lib/openelis-global/odoo/odoo-test-product-mapping.csv
-      - ./volumes/ocl:/var/lib/openelis-global/ocl
+      - ../../distro/binaries/openelis/volumes/plugins/:/var/lib/openelis-global/plugins
+      - ../../distro/binaries/openelis/volumes/logs/oeLogs:/var/lib/openelis-global/logs
+      - ../../distro/binaries/openelis/volumes/logs/tomcatLogs/:/usr/local/tomcat/logs
+      - ../../distro/binaries/openelis/volumes/properties/SystemConfiguration.properties:/var/lib/openelis-global/properties/SystemConfiguration.properties
+      - ../../distro/binaries/openelis/volumes/analyzer/analyzer-test-map.csv:/var/lib/openelis-global/analyzer/analyzer-test-map.csv
+      - ../../distro/binaries/openelis/volumes/odoo/odoo-test-product-mapping.csv:/var/lib/openelis-global/odoo/odoo-test-product-mapping.csv
+      - ../../distro/binaries/openelis/volumes/ocl:/var/lib/openelis-global/ocl
       -  lucene_index-vol:/var/lib/lucene_index
     secrets:
       - source: common.properties
@@ -160,7 +160,7 @@ services:
     volumes:
       - certs-vol:/etc/nginx/certs/
       - keys-vol:/etc/nginx/keys/
-      - ./volumes/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../../distro/binaries/openelis/volumes/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       # - /KEYSTORE_PASSWORD:/etc/nginx/private/key_pass
       # - /etc/openelis-global/nginx.cert.pem:/etc/nginx/certs/cert.crt
       # - /etc/openelis-global/nginx.key.pem:/etc/nginx/certs/cert.key
@@ -180,7 +180,7 @@ services:
   #         - "8445:8443"
   #         - "12001:12001"
   #     volumes:
-  #         - ./volumes/astm/configuration.yml:/app/configuration.yml
+  #         - ../../distro/binaries/openelis/volumes/astm/configuration.yml:/app/configuration.yml
   #         -  key_trust-store-volume:/etc/openelis-global
   #     environment:
   #         SPRING_PROFILE: dev
@@ -216,7 +216,7 @@ services:
 
 secrets:
   common.properties:
-    file:  ./volumes/properties/common.properties
+    file:  ../../distro/binaries/openelis/volumes/properties/common.properties
 
 networks:
   openelis-network:
