@@ -51,6 +51,7 @@ function exportPaths () {
     export OPENELIS_PROPERTIES_PATH=$DISTRO_PATH/configs/openelis/properties
     export EIP_ODOO_OPENELIS_ROUTES_PATH=$DISTRO_PATH/binaries/eip-odoo-openelis
     export EIP_ODOO_OPENELIS_DATA_DIR=$DISTRO_PATH/data/eip_odoo_openelis
+    export EIP_HCW_OPENMRS_ROUTES_PATH=$DISTRO_PATH/binaries/eip-hcwathome-openmrs
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
@@ -75,11 +76,6 @@ function exportPaths () {
     echo "→ ORTHANC_CONFIG_PATH=$ORTHANC_CONFIG_PATH"
     echo "→ BAHMNI_OPENMRS_MODULES_PATH=$BAHMNI_OPENMRS_MODULES_PATH"
     echo "→ BAHMNI_CONFIG_OVERRIDE_PATH=$BAHMNI_CONFIG_OVERRIDE_PATH"
-    echo "→ OPENELIS_CONFIG_PATH=$OPENELIS_CONFIG_PATH"
-    echo "→ OPENELIS_BINARIES_PATH=$OPENELIS_BINARIES_PATH"
-    echo "→ OPENELIS_PROPERTIES_PATH=$OPENELIS_PROPERTIES_PATH"
-    echo "→ EIP_ODOO_OPENELIS_ROUTES_PATH=$EIP_ODOO_OPENELIS_ROUTES_PATH"
-    echo "→ EIP_ODOO_OPENELIS_DATA_DIR=$EIP_ODOO_OPENELIS_DATA_DIR"
 }
 
 function setDockerComposeCLIOptions () {
@@ -166,15 +162,13 @@ function setTraefikHostnames {
     echo "$INFO Exporting Traefik hostnames..."
 
     export USE_HTTPS="true"
-    export O3_HOSTNAME="openmrs.docker.localhost"
-    export ODOO_HOSTNAME="erp.docker.localhost"
-    export SENAITE_HOSTNAME="lims.docker.localhost"
-    export ERPNEXT_HOSTNAME="erpnext.docker.localhost"
-    export KEYCLOAK_HOSTNAME="auth.docker.localhost"
-    export FHIR_ODOO_HOSTNAME="fhir-erp.docker.localhost"
-    export ORTHANC_HOSTNAME="pacs.docker.localhost"
-    export OPENELIS_HOSTNAME="openelis.docker.localhost"
-    export FHIR_OPENELIS_HOSTNAME="fhir-openelis.docker.localhost"
+    export O3_HOSTNAME=emr-"${IP_WITH_DASHES}.traefik.me"
+    export ODOO_HOSTNAME=erp-"${IP_WITH_DASHES}.traefik.me"
+    export SENAITE_HOSTNAME=lims-"${IP_WITH_DASHES}.traefik.me"
+    export ERPNEXT_HOSTNAME=erpnext-"${IP_WITH_DASHES}.traefik.me"
+    export KEYCLOAK_HOSTNAME=auth-"${IP_WITH_DASHES}.traefik.me"
+    export FHIR_ODOO_HOSTNAME=fhir-erp-"${IP_WITH_DASHES}.traefik.me"
+    export ORTHANC_HOSTNAME=pacs-"${IP_WITH_DASHES}.traefik.me"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
@@ -182,8 +176,6 @@ function setTraefikHostnames {
     echo "→ KEYCLOAK_HOSTNAME=$KEYCLOAK_HOSTNAME"
     echo "→ FHIR_ODOO_HOSTNAME=$FHIR_ODOO_HOSTNAME"
     echo "→ ORTHANC_HOSTNAME=$ORTHANC_HOSTNAME"
-    echo "→ OPENELIS_HOSTNAME=$OPENELIS_HOSTNAME"
-    echo "→ FHIR_OPENELIS_HOSTNAME=$FHIR_OPENELIS_HOSTNAME"
 
 }
 
@@ -197,8 +189,6 @@ function setNginxHostnames {
     export FHIR_ODOO_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8083"
     export KEYCLOAK_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8084"
     export ORTHANC_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8889"
-    export OPENELIS_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
-    export FHIR_OPENELIS_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:9092"
     export BAHMNI_EMR_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
 
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
@@ -209,8 +199,7 @@ function setNginxHostnames {
     echo "→ KEYCLOAK_HOSTNAME=$KEYCLOAK_HOSTNAME"
     echo "→ ORTHANC_HOSTNAME=$ORTHANC_HOSTNAME"
     echo "→ BAHMNI_EMR_HOSTNAME=$BAHMNI_EMR_HOSTNAME"
-    echo "→ OPENELIS_HOSTNAME=$OPENELIS_HOSTNAME"
-    echo "→ FHIR_OPENELIS_HOSTNAME=$FHIR_OPENELIS_HOSTNAME"
+
 }
 
 function setGitpodHostnames {
