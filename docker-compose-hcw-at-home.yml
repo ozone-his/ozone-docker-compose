@@ -126,13 +126,13 @@ services:
       EIP_DB_NAME: ${EIP_HCW_DB_NAME}
       EIP_DB_USER: ${EIP_HCW_DB_USER}
       EIP_DB_PASSWORD: ${EIP_HCW_DB_PASSWORD}
-      #EIP_DEBEZIUM_SERVER_ID: 2
-      #EIP_DEBEZIUM_SERVER_NAME: eip_hcwathome_openmrs
+      EIP_DEBEZIUM_SERVER_ID: ${EIP_HCW_DEBEZIUM_SERVER_ID}
+      EIP_DEBEZIUM_SERVER_NAME: eip_hcwathome_openmrs
       EIP_DEBEZIUM_USER: root
       EIP_DEBEZIUM_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      #EIP_LOGBACK_FILE: /eip-pro-client/logback.xml
-      #DEBEZIUM_OFFSET_FILE: /eip-pro-client/offset.txt
-      #DEBEZIUM_HISTORY_FILE: /eip-pro-client/history.txt
+      #EIP_LOGBACK_FILE: /eip-client/logback.xml
+      DEBEZIUM_OFFSET_FILE: /eip-client/offset.txt
+      DEBEZIUM_HISTORY_FILE: /eip-client/history.txt
       HCW_AT_HOME_BACKEND_URL: http://backend:1337
       HCW_AT_HOME_USER_EMAIL: ${HCW_BACKEND_USER_EMAIL}
       HCW_AT_HOME_PASSWORD: ${HCW_BACKEND_PASSWORD}
@@ -146,6 +146,13 @@ services:
       DEBEZIUM_EVENT_RETRY_INITIAL_DELAY: ${EIP_HCW_DEBEZIUM_EVENT_RETRY_INITIAL_DELAY}
       APPOINTMENTS_TASK_INITIAL_DELAY: ${EIP_HCW_APPOINTMENTS_TASK_INITIAL_DELAY}
       APPOINTMENTS_TASK_DELAY: ${EIP_HCW_APPOINTMENTS_TASK_DELAY}
+    volumes:
+      - "${EIP_HCW_OPENMRS_ROUTES_PATH}:/eip-client/routes"
+    networks:
+      web:
+      ozone:
+        aliases:
+          - eip-hcwathome-openmrs
 
 volumes:
   mongo-data: ~
