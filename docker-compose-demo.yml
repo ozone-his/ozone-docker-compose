@@ -1,6 +1,6 @@
 services:
   demo-data:
-    image: mekomsolutions/ozone-demo-data
+    image: mekomsolutions/ozone-demo-data:1.1.0
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - OPENMRS_SERVER_URL=http://openmrs:8080/openmrs
