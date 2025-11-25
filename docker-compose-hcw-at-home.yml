@@ -31,6 +31,11 @@ services:
     volumes:
       - ./data/certbot/:/etc/mediasoup-api/certs
     entrypoint: ["/bin/bash", "-c", "PUBLIC_IP=$(hostname -i) node server.js"]
+    networks:
+      web:
+      ozone:
+        aliases:
+          - mediasoup
 
   mongo:
     image: mongo:6
@@ -42,6 +47,11 @@ services:
       - mongo-data:/data/db
     ports:
       - "27017:27017"
+    networks:
+      web:
+      ozone:
+        aliases:
+          - mongo
 
   patient:
     image: docker.io/iabsis/hcw-patient:5.3.24
@@ -52,6 +62,11 @@ services:
     depends_on:
       - mongo
       - backend
+    networks:
+      web:
+      ozone:
+        aliases:
+          - patient
 
   doctor:
     image: docker.io/iabsis/hcw-doctor:5.3.37
@@ -62,6 +77,11 @@ services:
     depends_on:
       - mongo
       - backend
+    networks:
+      web:
+      ozone:
+        aliases:
+          - doctor
     #volumes:
     #  - ./nginx_doc.conf:/etc/nginx/conf.d/default.conf
 
@@ -74,6 +94,11 @@ services:
     depends_on:
       - mongo
       - backend
+    networks:
+      web:
+      ozone:
+        aliases:
+          - admin
 
   backend:
     image: docker.io/iabsis/hcw-backend:5.3.49
@@ -100,16 +125,24 @@ services:
       - BRANDING=Ozone@Home
       - ACCESSIBILITY_MODE=false
       - ATTACHMENTS_DIR=/data/attachments
-
     depends_on:
       - mongo
       - redis
     volumes:
       - ./data/attachments:/data/attachments
+    networks:
+      ozone:
+        aliases:
+          - backend
     restart: unless-stopped
 
   redis:
     image: redis:8.4.0-bookworm
+    networks:
+      web:
+      ozone:
+        aliases:
+          - redis
 
   eip-hcwathome-openmrs:
     image: mekomsolutions/eip-client
@@ -148,6 +181,11 @@ services:
       DEBEZIUM_EVENT_RETRY_DELAY: ${EIP_HCW_DEBEZIUM_EVENT_RETRY_DELAY}
       APPOINTMENTS_TASK_INITIAL_DELAY: ${EIP_HCW_APPOINTMENTS_TASK_INITIAL_DELAY}
       APPOINTMENTS_TASK_DELAY: ${EIP_HCW_APPOINTMENTS_TASK_DELAY}
+    depends_on:
+      backend:
+        condition: service_started
+      openmrs:
+        condition: service_healthy
     volumes:
       - "${EIP_HCW_OPENMRS_ROUTES_PATH}:/eip-client/routes"
     networks:
