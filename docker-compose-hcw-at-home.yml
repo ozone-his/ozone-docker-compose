@@ -155,6 +155,13 @@ services:
       ozone:
         aliases:
           - eip-hcwathome-openmrs
+  mysql:
+    environment:
+      EIP_DB_NAME_ODOO: ${EIP_HCW_DB_NAME}
+      EIP_DB_USER_ODOO: ${EIP_HCW_DB_USER}
+      EIP_DB_PASSWORD_ODOO: ${EIP_HCW_DB_PASSWORD}
+    volumes:
+      - "${SQL_SCRIPTS_PATH}/mysql/eip-hcwathome-openmrs:/docker-entrypoint-initdb.d/db/eip-hcwathome-openmrs"
 
 volumes:
   mongo-data: ~
