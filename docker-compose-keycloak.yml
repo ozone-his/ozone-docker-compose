@@ -26,6 +26,7 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
       KC_DIR: /opt/keycloak/data/import
       KC_OVERRIDE: 'false'
+      KC_LOG_CONSOLE_OUTPUT: json
     healthcheck:
       test: ["CMD", "curl", "-f", "http://0.0.0.0:9000/health/ready"]
       interval: 15s
