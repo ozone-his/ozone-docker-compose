@@ -36,7 +36,7 @@ services:
       - KEYSTORE_PW="kspass"
       - TRUSTSTORE_PW="tspass"
     networks:
-      - openelis-network
+      - ozone
     volumes:
       -  key_trust-store-volume:/etc/openelis-global
       -  keys-vol:/etc/ssl/private/
@@ -60,7 +60,7 @@ services:
 
     logging: *local-logging
     networks:
-      - openelis-network
+      - ozone
     healthcheck:
       test: [ "CMD", "pg_isready", "-q", "-d", "clinlims", "-U", "clinlims" ]
       timeout: 45s
@@ -79,8 +79,7 @@ services:
       - "8443:8443"
     restart: always
     networks:
-      openelis-network:
-        ipv4_address: 172.20.1.121
+      - ozone
     logging: *local-logging
     environment:
       - DEFAULT_PW=adminADMIN!
@@ -116,7 +115,7 @@ services:
       - db.openelis.org
       - certs
     networks:
-      - openelis-network
+      - ozone
     restart: always
     environment:
       TZ: America/New_York
@@ -144,7 +143,7 @@ services:
     container_name: openelisglobal-front-end
     platform: linux/amd64
     networks:
-      - openelis-network
+      - ozone
     environment:
       - CHOKIDAR_USEPOLLING=true
     logging: *local-logging
@@ -166,7 +165,7 @@ services:
       # - /etc/openelis-global/nginx.key.pem:/etc/nginx/certs/cert.key
     restart: unless-stopped
     networks:
-      - openelis-network
+      - ozone
     logging: *local-logging
     depends_on:
       - certs
@@ -191,7 +190,7 @@ services:
   #             -Djavax.net.ssl.trustStoreType=pkcs12
   #     logging: *local-logging
   #     networks:
-  #         - openelis-network
+  #         - ozone
   #     healthcheck:
   #         test: ["CMD", "/app/healthcheck.sh"]
   #         timeout: 10s
@@ -206,7 +205,7 @@ services:
     tty: true
     restart: always
     networks:
-      - openelis-network
+      - ozone
     environment:
       AUTOHEAL_CONTAINER_LABEL: all
       TZ: America/New_York
@@ -217,14 +216,6 @@ services:
 secrets:
   common.properties:
     file:  ../../distro/binaries/openelis/volumes/properties/common.properties
-
-networks:
-  openelis-network:
-    name: openelis-network
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.1.0/24
 
 volumes:
   db-data:
