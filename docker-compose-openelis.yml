@@ -154,7 +154,7 @@ services:
     container_name: openelisglobal-proxy
     platform: linux/amd64
     ports:
-      - 81:80
+      - 8090:80
       - 443:443
     volumes:
       - certs-vol:/etc/nginx/certs/
@@ -212,6 +212,10 @@ services:
     logging: *local-logging
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  env-substitution:
+    environment:
+      - OPENELIS_PUBLIC_URL=${SERVER_SCHEME}://${OPENELIS_HOSTNAME}
 
 secrets:
   common.properties:
