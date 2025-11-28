@@ -1,7 +1,7 @@
 services:
   odoo:
     environment:
-      - ADDONS=${ODOO_ADDONS},auth_oidc,auth_oauth_autologin
+      - ADDONS=${ODOO_ADDONS},auth_oidc,auth_oauth_autologin,ozone_user_roles
 
   eip-odoo-openmrs:
     environment:
