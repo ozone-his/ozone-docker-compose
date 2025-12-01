@@ -215,7 +215,7 @@ services:
 
   env-substitution:
     environment:
-      - OPENELIS_PUBLIC_URL=${SERVER_SCHEME}://${OPENELIS_HOSTNAME}
+      - OPENELIS_PUBLIC_URL=https://${HOST_NAME}
 
 secrets:
   common.properties:
