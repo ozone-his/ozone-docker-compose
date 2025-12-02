@@ -109,7 +109,7 @@ services:
       - DB_URI=mongodb://mongo:27017/hcw-athome
       - REDIS_HOST=redis
       #- APP_SECRET=''
-      - NODE_ENV=${HCW_AT_HOME_ENV:production}
+      - NODE_ENV=${HCW_AT_HOME_ENV:-production}
       - PUBLIC_URL=http://localhost:4000
       #- MAIL_SMTP_HOST=
       #- MAIL_SMTP_PORT=
