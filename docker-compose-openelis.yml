@@ -38,9 +38,9 @@ services:
     networks:
       - ozone
     volumes:
-      -  key_trust-store-volume:/etc/openelis-global
-      -  keys-vol:/etc/ssl/private/
-      -  certs-vol:/etc/ssl/certs/
+      - "${OPENELIS_TRUST_STORE:-key_trust-store-volume}:/etc/openelis-global"
+      - "${OPENELIS_KEYS:-keys-vol}:/etc/ssl/private/"
+      - "${OPENELIS_CERTS:-certs-vol}:/etc/ssl/certs/"
 
   db.openelis.org:
     container_name: openelisglobal-database
@@ -50,13 +50,13 @@ services:
       - "15432:5432"
     restart: always
     env_file:
-      - ../../distro/binaries/openelis/volumes/database/database.env
+      - "${OPENELIS_CONFIG_PATH}/database/database.env"
     environment:
       - DB_PASSWORD=${OE_DB_PASSWORD}
       - DB_SUPERUSER_PASSWORD=${ADMIN_PASSWORD}
     volumes:
       # preserves the database between containers
-      - ../../distro/binaries/openelis/volumes/database/data:/var/lib/postgresql/data
+      - "${OPENELIS_CONFIG_PATH}/database/data:/var/lib/postgresql/data"
 
     logging: *local-logging
     networks:
@@ -92,15 +92,15 @@ services:
       - SSL_TRUSTSTORE_PATH
       - SSL_TRUSTSTORE_PASSWORD
     volumes:
-      -  key_trust-store-volume:/etc/openelis-global
-      - ../../distro/binaries/openelis/volumes/plugins/:/var/lib/openelis-global/plugins
-      - ../../distro/binaries/openelis/volumes/logs/oeLogs:/var/lib/openelis-global/logs
-      - ../../distro/binaries/openelis/volumes/logs/tomcatLogs/:/usr/local/tomcat/logs
-      - ../../distro/binaries/openelis/volumes/properties/SystemConfiguration.properties:/var/lib/openelis-global/properties/SystemConfiguration.properties
-      - ../../distro/binaries/openelis/volumes/analyzer/analyzer-test-map.csv:/var/lib/openelis-global/analyzer/analyzer-test-map.csv
-      - ../../distro/binaries/openelis/volumes/odoo/odoo-test-product-mapping.csv:/var/lib/openelis-global/odoo/odoo-test-product-mapping.csv
-      - ../../distro/binaries/openelis/volumes/ocl:/var/lib/openelis-global/ocl
-      -  lucene_index-vol:/var/lib/lucene_index
+      - "${OPENELIS_TRUST_STORE:-key_trust-store-volume}:/etc/openelis-global"
+      - "${OPENELIS_CONFIG_PATH}/plugins/:/var/lib/openelis-global/plugins"
+      - "${OPENELIS_CONFIG_PATH}/logs/oeLogs:/var/lib/openelis-global/logs"
+      - "${OPENELIS_CONFIG_PATH}/logs/tomcatLogs/:/usr/local/tomcat/logs"
+      - "${OPENELIS_CONFIG_PATH}/properties/SystemConfiguration.properties:/var/lib/openelis-global/properties/SystemConfiguration.properties"
+      - "${OPENELIS_CONFIG_PATH}/analyzer/analyzer-test-map.csv:/var/lib/openelis-global/analyzer/analyzer-test-map.csv"
+      - "${OPENELIS_CONFIG_PATH}/odoo/odoo-test-product-mapping.csv:/var/lib/openelis-global/odoo/odoo-test-product-mapping.csv"
+      - "${OPENELIS_CONFIG_PATH}/ocl:/var/lib/openelis-global/ocl"
+      - "${OPENELIS_LUCENE_INDEX:-lucene_index-vol}:/var/lib/lucene_index"
     secrets:
       - source: common.properties
 
@@ -129,14 +129,14 @@ services:
       # Config variables loaded through Tomacat server.xml
       CATALINA_OPTS: "-Dhapi.ssl.truststorepath=${SSL_TRUSTSTORE_PATH} -Dhapi.ssl.truststorepassword=${SSL_TRUSTSTORE_PASSWORD} -Dhapi.ssl.keystorepath=${SSL_KEYSTORE_PATH} -Dhapi.ssl.keystorepassword=${SSL_KEYSTORE_PASSWORD}"
       # Config variables loaded through Hapi application.yml
-      FHIR_DATASOURCE_URL : "jdbc:postgresql://db.openelis.org:5432/clinlims?currentSchema=clinlims"
+      FHIR_DATASOURCE_URL: "jdbc:postgresql://db.openelis.org:5432/clinlims?currentSchema=clinlims"
       FHIR_DATASOURCE_USERNAME: "clinlims"
       FHIR_DATASOURCE_PASSWORD: ${OE_DB_PASSWORD}
       FHIR_SERVER_ADRESS: "http://fhir.openelis.org:8080/fhir/"
 
     logging: *local-logging
     volumes:
-      -  key_trust-store-volume:/etc/openelis-global
+      - "${OPENELIS_TRUST_STORE:-key_trust-store-volume}:/etc/openelis-global"
 
   frontend.openelis.org:
     image: itechuw/openelis-global-2-frontend:develop
@@ -157,9 +157,9 @@ services:
       - 8090:80
       - 443:443
     volumes:
-      - certs-vol:/etc/nginx/certs/
-      - keys-vol:/etc/nginx/keys/
-      - ../../distro/binaries/openelis/volumes/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - "${OPENELIS_CERTS:-certs-vol}:/etc/nginx/certs/"
+      - "${OPENELIS_KEYS:-keys-vol}:/etc/nginx/keys/"
+      - "${OPENELIS_CONFIG_PATH}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
       # - /KEYSTORE_PASSWORD:/etc/nginx/private/key_pass
       # - /etc/openelis-global/nginx.cert.pem:/etc/nginx/certs/cert.crt
       # - /etc/openelis-global/nginx.key.pem:/etc/nginx/certs/cert.key
@@ -169,35 +169,6 @@ services:
     logging: *local-logging
     depends_on:
       - certs
-
-  # astm-http-bridge:
-  #     container_name: astm-http-bridge
-  #     image: itechuw/astm-http-bridge:2.3.6
-  #     platform: linux/amd64
-  #     pull_policy: always
-  #     ports:
-  #         - "8445:8443"
-  #         - "12001:12001"
-  #     volumes:
-  #         - ../../distro/binaries/openelis/volumes/astm/configuration.yml:/app/configuration.yml
-  #         -  key_trust-store-volume:/etc/openelis-global
-  #     environment:
-  #         SPRING_PROFILE: dev
-  #         LOGGING_LEVEL_ORG_ITECH: TRACE
-  #         JAVA_OPTS: |
-  #             -Djavax.net.ssl.trustStore=/etc/openelis-global/truststore
-  #             -Djavax.net.ssl.trustStorePassword=tspass
-  #             -Djavax.net.ssl.trustStoreType=pkcs12
-  #     logging: *local-logging
-  #     networks:
-  #         - ozone
-  #     healthcheck:
-  #         test: ["CMD", "/app/healthcheck.sh"]
-  #         timeout: 10s
-  #         interval: 30s
-  #         retries: 3
-  #         start_period: 2m
-
 
   autoheal:
     container_name: autoheal-oe
@@ -211,7 +182,7 @@ services:
       TZ: America/New_York
     logging: *local-logging
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
   env-substitution:
     environment:
@@ -219,11 +190,11 @@ services:
 
 secrets:
   common.properties:
-    file:  ../../distro/binaries/openelis/volumes/properties/common.properties
+    file: "${OPENELIS_CONFIG_PATH}/properties/common.properties"
 
 volumes:
-  db-data:
-  key_trust-store-volume:
-  certs-vol:
-  keys-vol:
-  lucene_index-vol:
+  db-data: ~
+  key_trust-store-volume: ~
+  certs-vol: ~
+  keys-vol: ~
+  lucene_index-vol: ~
