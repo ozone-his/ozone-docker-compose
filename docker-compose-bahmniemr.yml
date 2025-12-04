@@ -20,7 +20,7 @@ services:
     command: ["sh", "-c", "rm -rf /etc/bahmni_config/masterdata/configuration && cp -r /usr/local/bahmni_config_override/frontend/* /etc/bahmni_config/openmrs && ./start.sh"]
 
   openmrs:
-    image: bahmni/openmrs:1.1.1
+    image: bahmni/openmrs:1.1.3
     environment:
       TZ: ${TIMEZONE}
       OMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
@@ -57,7 +57,7 @@ services:
       - "${BAHMNI_CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       - "bahmni-lab-results:/home/bahmni/uploaded_results"
       - "bahmni-uploaded-files:/home/bahmni/uploaded-files"
-      - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/openmrs/data/modules/"
+#      - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/openmrs/data/modules/"
       - 'bahmni-patient-images:/home/bahmni/patient_images'
       - 'bahmni-document-images:/home/bahmni/document_images'
       - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
@@ -196,7 +196,7 @@ services:
       - *ozone-network
 
   patient-documents:
-    image: 'bahmni/patient-documents:1.1.1'
+    image: bahmni/patient-documents:1.1.1
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
       - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
