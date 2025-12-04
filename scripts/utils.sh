@@ -158,13 +158,15 @@ function setTraefikHostnames {
     echo "$INFO Exporting Traefik hostnames..."
 
     export USE_HTTPS="true"
-    export O3_HOSTNAME=emr-"${IP_WITH_DASHES}.traefik.me"
-    export ODOO_HOSTNAME=erp-"${IP_WITH_DASHES}.traefik.me"
-    export SENAITE_HOSTNAME=lims-"${IP_WITH_DASHES}.traefik.me"
-    export ERPNEXT_HOSTNAME=erpnext-"${IP_WITH_DASHES}.traefik.me"
-    export KEYCLOAK_HOSTNAME=auth-"${IP_WITH_DASHES}.traefik.me"
-    export FHIR_ODOO_HOSTNAME=fhir-erp-"${IP_WITH_DASHES}.traefik.me"
-    export ORTHANC_HOSTNAME=pacs-"${IP_WITH_DASHES}.traefik.me"
+    export O3_HOSTNAME="openmrs.ozonelocal.com"
+    export ODOO_HOSTNAME="erp.ozonelocal.com"
+    export SENAITE_HOSTNAME="lims.ozonelocal.com"
+    export ERPNEXT_HOSTNAME="erpnext.ozonelocal.com"
+    export KEYCLOAK_HOSTNAME="auth.ozonelocal.com"
+    export FHIR_ODOO_HOSTNAME="fhir-erp.ozonelocal.com"
+    export ORTHANC_HOSTNAME="pacs.ozonelocal.com"
+    export OPENELIS_HOSTNAME="openelis.ozonelocal.com"
+    export FHIR_OPENELIS_HOSTNAME="fhir-openelis.ozonelocal.com"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
@@ -172,6 +174,8 @@ function setTraefikHostnames {
     echo "→ KEYCLOAK_HOSTNAME=$KEYCLOAK_HOSTNAME"
     echo "→ FHIR_ODOO_HOSTNAME=$FHIR_ODOO_HOSTNAME"
     echo "→ ORTHANC_HOSTNAME=$ORTHANC_HOSTNAME"
+    echo "→ OPENELIS_HOSTNAME=$OPENELIS_HOSTNAME"
+    echo "→ FHIR_OPENELIS_HOSTNAME=$FHIR_OPENELIS_HOSTNAME"
 
 }
 
