@@ -86,7 +86,6 @@ services:
       traefik.enable: "true"
       traefik.http.routers.openelis-api.rule: "Host(`${OPENELIS_HOSTNAME}`) && PathPrefix(`/api/`)"
       traefik.http.routers.openelis-api.entrypoints: "websecure"
-      traefik.http.routers.openelis-api.tls: "true"
       traefik.http.services.openelis-api.loadbalancer.server.port: 8080
     environment:
       - DEFAULT_PW=adminADMIN!
@@ -165,9 +164,6 @@ services:
       traefik.http.routers.openelis-frontend.rule: "Host(`${OPENELIS_HOSTNAME}`)"
       traefik.http.routers.openelis-frontend.entrypoints: "websecure"
       traefik.http.services.openelis-frontend.loadbalancer.server.port: 80
-      traefik.http.routers.openelis-frontend.tls: "true"
-
-
 
   autoheal:
     container_name: autoheal-oe
