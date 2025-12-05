@@ -1,31 +1,3 @@
-version: '3.6'
-
-x-logging:
-  &local-logging
-  driver: "local"
-  options:
-    max-size: "20m"
-    max-file: "50"
-
-x-loki-logging:
-  &loki-logging
-  driver: "loki"
-  options:
-    max-size: "20m"
-    max-file: "50"
-    loki-url: "[% loki_url %]"
-    loki-external-labels: "container_name={{.Name}},hostname=[% host_name %]"
-    loki-pipeline-stages: |
-      - multiline:
-          firstline: '^\d{4}-\d{2}-\d{2}[T ]?\d{2}:\d{2}:\d{2}.\d{3}'
-      - labeldrop:
-          - compose_project
-          - compose_service
-          - filename
-          - source
-          - stream
-          - swarm_service
-          - swarm_stack
 services:
   certs:
     container_name: oe-certs
@@ -57,8 +29,6 @@ services:
     volumes:
       # preserves the database between containers
       - "${OPENELIS_CONFIG_PATH}/database/data:/var/lib/postgresql/data"
-
-    logging: *local-logging
     networks:
       - ozone
     healthcheck:
@@ -81,7 +51,6 @@ services:
     networks:
       ozone:
       web:
-    logging: *local-logging
     environment:
       - DEFAULT_PW=adminADMIN!
       - TZ=America/New_York
@@ -138,8 +107,6 @@ services:
       FHIR_DATASOURCE_USERNAME: "clinlims"
       FHIR_DATASOURCE_PASSWORD: ${OE_DB_PASSWORD}
       FHIR_SERVER_ADRESS: "http://fhir.openelis.org:8080/fhir/"
-
-    logging: *local-logging
     volumes:
       - "${OPENELIS_TRUST_STORE:-key_trust-store-volume}:/etc/openelis-global"
 
@@ -166,7 +133,6 @@ services:
       web:
     environment:
       - CHOKIDAR_USEPOLLING=true
-    logging: *local-logging
     tty: true
 
   autoheal:
@@ -179,7 +145,6 @@ services:
     environment:
       AUTOHEAL_CONTAINER_LABEL: all
       TZ: America/New_York
-    logging: *local-logging
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
 
