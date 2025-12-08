@@ -28,7 +28,7 @@ services:
       KC_OVERRIDE: 'false'
       KC_LOG_CONSOLE_OUTPUT: json
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://0.0.0.0:9000/health/ready"]
+      test: ["CMD-SHELL", "{ printf 'HEAD /health/ready HTTP/1.0\\r\\n\\r\\n' >&0; grep 'HTTP/1.0 200'; } 0<>/dev/tcp/localhost/9000"]
       interval: 15s
       timeout: 3s
       retries: 5
