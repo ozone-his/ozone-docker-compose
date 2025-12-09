@@ -1,2 +1,2 @@
-FROM mekomsolutions/eip-client:2.3.0
+FROM mekomsolutions/eip-client
 ADD binaries/eip-openmrs-senaite /eip-client/routes
