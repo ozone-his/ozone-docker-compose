@@ -1,7 +1,7 @@
 tasks:
   - name: Run Ozone FOSS
     init: scripts/mvnw clean package
-  - command: source target/go-to-scripts-dir.sh && ./start-demo.sh 1.0.0-alpha.15 # Replace by the version of your choice
+  - command: source target/go-to-scripts-dir.sh && ./start-demo.sh 1.0.0-SNAPSHOT # Replace by the version of your choice
 ports:
   - name: OpenMRS
     description: OpenMRS 3
