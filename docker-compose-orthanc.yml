@@ -3,7 +3,7 @@ services:
     command: /run/secrets/
     secrets:
       - orthanc.json # CAUTION: This is an experimental implementation, not for production use.
-    image: mekomsolutions/orthanc
+    image: mekomsolutions/orthanc:1.0-0.1.0
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.orthanc.loadbalancer.server.port=8042"
@@ -57,7 +57,7 @@ services:
       - EIP_FHIR_USERNAME=${OPENMRS_USER}
       - EIP_FHIR_PASSWORD=${OPENMRS_PASSWORD}
       - ORTHANC_PUBLIC_URL=${SERVER_SCHEME}://${ORTHANC_HOSTNAME}
-    image: mekomsolutions/eip-client
+    image: mekomsolutions/eip-client:2.3.0
     networks:
       web:
       ozone:
