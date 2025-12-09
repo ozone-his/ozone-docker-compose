@@ -63,7 +63,7 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
       timeout: 5s
-    image: openmrs/openmrs-reference-application-3-frontend:${O3_DOCKER_IMAGE_TAG:-nightly}
+    image: openmrs/openmrs-reference-application-3-frontend:3.5.0
     labels:
       traefik.enable: "true"
       traefik.http.routers.frontend.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs/spa/`)"

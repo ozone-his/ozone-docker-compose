@@ -12,7 +12,7 @@ services:
       - ADDONS=${ODOO_ADDONS}
       - INITIALIZER_DATA_FILES_PATH=/mnt/odoo_config
       - INITIALIZER_CONFIG_FILE_PATH=/mnt/odoo_config/initializer_config.json
-    image: mekomsolutions/odoo
+    image: mekomsolutions/odoo:17-1.0.0
     labels:
       traefik.enable: true
       # https
@@ -100,7 +100,7 @@ services:
       - EIP_ODOO_FHIR_PASSWORD=${ODOO_PASSWORD}
       - EIP_PRODUCT_SYNC_INITIAL_DELAY=${EIP_PRODUCT_SYNC_INITIAL_DELAY}
       - EIP_PRODUCT_SYNC_DELAY=${EIP_PRODUCT_SYNC_DELAY}
-    image: mekomsolutions/eip-client
+    image: mekomsolutions/eip-client:2.3.0
     networks:
       ozone:
         aliases:
@@ -122,7 +122,7 @@ services:
       - ODOO_PORT=8069
       - ODOO_DATABASE=${ODOO_DATABASE}
       - EIP_ODOO_DRUGS_CATEGORY_EXT_ID=${EIP_ODOO_DRUGS_CATEGORY_EXT_ID}
-    image: mekomsolutions/fhir-odoo
+    image: mekomsolutions/fhir-odoo:1.0.0
     labels:
       traefik.enable: "true"
       traefik.http.routers.fhir-erp.rule: "Host(`${FHIR_ODOO_HOSTNAME}`)"
