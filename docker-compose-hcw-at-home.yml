@@ -54,7 +54,7 @@ services:
           - mongo
 
   patient:
-    image: docker.io/iabsis/hcw-patient:5.3.24
+    image: docker.io/iabsis/hcw-patient:5.3.27
     ports:
       - "4000:8080"#4080 for ssl
     environment:
@@ -69,7 +69,7 @@ services:
           - patient
 
   doctor:
-    image: docker.io/iabsis/hcw-doctor:5.3.37
+    image: docker.io/iabsis/hcw-doctor:5.3.39
     ports:
       - "4001:8081"#4081 for ssl
     environment:
@@ -86,7 +86,7 @@ services:
     #  - ./nginx_doc.conf:/etc/nginx/conf.d/default.conf
 
   admin:
-    image: docker.io/iabsis/hcw-admin:5.3.13
+    image: docker.io/iabsis/hcw-admin:5.3.14
     ports:
       - "8002:8082"
     environment:
@@ -101,7 +101,7 @@ services:
           - admin
 
   backend:
-    image: docker.io/iabsis/hcw-backend:5.3.49
+    image: docker.io/iabsis/hcw-backend:5.3.52
     ports:
       - "1337:1337"
     environment:
@@ -119,9 +119,10 @@ services:
       #- MAIL_SMTP_PASSWORD=
       - LOGIN_METHOD=password
       - DOCTOR_URL=http://localhost:4001
-      - MEDIASOUP_URL=https://localhost:3443
+      - MEDIASOUP_URL=https://mediasoup:3443
       #- MEDIASOUP_USER=abcd
       #- MEDIASOUP_SECRET=1234
+      - SHOW_DOCTOR_PRIVATE_NOTE=true
       - BRANDING=Ozone@Home
       - ACCESSIBILITY_MODE=false
       - ATTACHMENTS_DIR=/data/attachments
@@ -174,7 +175,7 @@ services:
       EIP_FHIR_SERVER_URL: http://openmrs:8080/openmrs/ws/fhir2/R4
       EIP_FHIR_USERNAME: ${OPENMRS_USER}
       EIP_FHIR_PASSWORD: ${OPENMRS_PASSWORD}
-      #LOG_LEVEL: DEBUG
+      LOG_LEVEL: ${EIP_HCW_LOG_LEVEL:-INFO}
       DEBEZIUM_EVENT_READER_INITIAL_DELAY: ${EIP_HCW_DEBEZIUM_EVENT_READER_INITIAL_DELAY}
       DEBEZIUM_EVENT_READER_DELAY: ${EIP_HCW_DEBEZIUM_EVENT_READER_DELAY}
       DEBEZIUM_EVENT_RETRY_INITIAL_DELAY: ${EIP_HCW_DEBEZIUM_EVENT_RETRY_INITIAL_DELAY}
