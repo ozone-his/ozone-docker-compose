@@ -106,9 +106,10 @@ services:
       FHIR_DATASOURCE_URL: "jdbc:postgresql://db.openelis.org:5432/clinlims?currentSchema=clinlims"
       FHIR_DATASOURCE_USERNAME: "clinlims"
       FHIR_DATASOURCE_PASSWORD: ${OE_DB_PASSWORD}
-      FHIR_SERVER_ADRESS: "http://fhir.openelis.org:8080/fhir/"
+      FHIR_SERVER_ADRESS: "http://${FHIR_OPENELIS_HOSTNAME}/fhir/"
     volumes:
       - "${OPENELIS_TRUST_STORE:-key_trust-store-volume}:/etc/openelis-global"
+      - "./openelis/tomcat/hapi_server.xml:/opt/bitnami/tomcat/conf/server.xml"
 
   proxy:
     image: nginx:1.15-alpine
