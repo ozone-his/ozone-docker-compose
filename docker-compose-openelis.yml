@@ -42,7 +42,6 @@ services:
       - db.openelis.org
       - certs
       - env-substitution
-      - keycloak
     restart: always
     networks:
       ozone:
@@ -50,9 +49,7 @@ services:
     environment:
       - DEFAULT_PW=adminADMIN!
       - TZ=America/New_York
-      # Config variables loaded through Tomacat server.xml
       - CATALINA_OPTS= -Ddatasource.url=jdbc:postgresql://db.openelis.org:5432/clinlims -Ddatasource.username=clinlims -Ddatasource.password=${OE_DB_PASSWORD} -Doe.ssl.truststorepath=${SSL_TRUSTSTORE_PATH} -Doe.ssl.truststorepassword=${SSL_TRUSTSTORE_PASSWORD} -Doe.ssl.keystorepath=${SSL_KEYSTORE_PATH} -Doe.ssl.keystorepassword=${SSL_KEYSTORE_PASSWORD}
-      # Env variables passed to the common properties file
       - SSL_KEYSTORE_PATH
       - SSL_KEYSTORE_PASSWORD
       - SSL_TRUSTSTORE_PATH
