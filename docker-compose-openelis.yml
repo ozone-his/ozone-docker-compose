@@ -1,6 +1,5 @@
 services:
   certs:
-    container_name: oe-certs
     image: itechuw/certgen:main
     platform: linux/amd64
     restart: on-failure
@@ -15,8 +14,7 @@ services:
       - "${OPENELIS_CERTS:-certs-vol}:/etc/ssl/certs/"
 
   db.openelis.org:
-    container_name: openelisglobal-database
-    image: itechuw/openelis-global-2-database:develop
+    image: itechuw/openelis-global-2-database:3.2.1.1
     platform: linux/amd64
     ports:
       - "15432:5432"
@@ -38,7 +36,7 @@ services:
       retries: 10
 
   oe.openelis.org:
-    image: itechuw/openelis-global-2:develop
+    image: itechuw/openelis-global-2:3.2.1.1
     platform: linux/amd64
     depends_on:
       - db.openelis.org
