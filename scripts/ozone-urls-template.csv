@@ -6,6 +6,6 @@ SENAITE,${SERVER_SCHEME}://${SENAITE_HOSTNAME},admin,password,senaite
 Odoo,${SERVER_SCHEME}://${ODOO_HOSTNAME},admin,admin,odoo
 ERPNext,${SERVER_SCHEME}://${ERPNEXT_HOSTNAME},administrator,password,erpnext
 Orthanc,${SERVER_SCHEME}://${ORTHANC_HOSTNAME},orthanc,orthanc,orthanc
-OpenELIS,${SERVER_SCHEME}://${OPENELIS_HOSTNAME},admin,password,openelis
+OpenELIS,${SERVER_SCHEME}://${OPENELIS_HOSTNAME},admin,adminADMIN!,openelis
 FHIR OpenELIS,${SERVER_SCHEME}://${FHIR_OPENELIS_HOSTNAME},admin,password,openelis
 Keycloak,${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME},admin,password,keycloak

@@ -46,7 +46,9 @@ function exportPaths () {
     export ORTHANC_CONFIG_PATH=$DISTRO_PATH/configs/orthanc/initializer_config
     export BAHMNI_OPENMRS_MODULES_PATH=$DISTRO_PATH/binaries/bahmniemr/modules
     export BAHMNI_CONFIG_OVERRIDE_PATH=$DISTRO_PATH/configs/bahmniemr
-    export OPENELIS_CONFIG_PATH=$DISTRO_PATH/binaries/openelis/volumes
+    export OPENELIS_CONFIG_PATH=$DISTRO_PATH/binaries/openelis/configs
+    export OPENELIS_BINARIES_PATH=$DISTRO_PATH/binaries/openelis
+    export OPENELIS_PROPERTIES_PATH=$DISTRO_PATH/configs/openelis/properties
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
@@ -72,6 +74,8 @@ function exportPaths () {
     echo "→ BAHMNI_OPENMRS_MODULES_PATH=$BAHMNI_OPENMRS_MODULES_PATH"
     echo "→ BAHMNI_CONFIG_OVERRIDE_PATH=$BAHMNI_CONFIG_OVERRIDE_PATH"
     echo "→ OPENELIS_CONFIG_PATH=$OPENELIS_CONFIG_PATH"
+    echo "→ OPENELIS_BINARIES_PATH=$OPENELIS_BINARIES_PATH"
+    echo "→ OPENELIS_PROPERTIES_PATH=$OPENELIS_PROPERTIES_PATH"
 }
 
 function setDockerComposeCLIOptions () {
@@ -189,6 +193,8 @@ function setNginxHostnames {
     export FHIR_ODOO_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8083"
     export KEYCLOAK_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8084"
     export ORTHANC_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8889"
+    export OPENELIS_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
+    export FHIR_OPENELIS_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:9092"
     export BAHMNI_EMR_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
 
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
@@ -199,7 +205,8 @@ function setNginxHostnames {
     echo "→ KEYCLOAK_HOSTNAME=$KEYCLOAK_HOSTNAME"
     echo "→ ORTHANC_HOSTNAME=$ORTHANC_HOSTNAME"
     echo "→ BAHMNI_EMR_HOSTNAME=$BAHMNI_EMR_HOSTNAME"
-
+    echo "→ OPENELIS_HOSTNAME=$OPENELIS_HOSTNAME"
+    echo "→ FHIR_OPENELIS_HOSTNAME=$FHIR_OPENELIS_HOSTNAME"
 }
 
 function setGitpodHostnames {
