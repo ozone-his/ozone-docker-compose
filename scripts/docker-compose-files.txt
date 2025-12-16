@@ -11,4 +11,3 @@ docker-compose-eip-odoo-openmrs.yml
 docker-compose-eip-odoo-openmrs-sso.yml
 docker-compose-eip-openmrs-senaite.yml
 docker-compose-eip-openmrs-senaite-sso.yml
-docker-compose-openelis.yml
