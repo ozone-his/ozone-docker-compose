@@ -2,11 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, dev ]
+    branches: [ main ]
   release:
-    types: [published]
+    types: [ published ]
 
 jobs:
   validate:
@@ -18,7 +18,7 @@ jobs:
       NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
 
   publish:
-    if: ${{ (github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' )) || github.event_name == 'release' }}
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event_name == 'release' }}
     needs: validate
     uses: mekomsolutions/shared-github-workflow/.github/workflows/maven-publish.yml@main
     secrets:
