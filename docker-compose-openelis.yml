@@ -132,13 +132,6 @@ services:
       - CHOKIDAR_USEPOLLING=true
     tty: true
 
-  env-substitution:
-    environment:
-      - OPENELIS_PUBLIC_URL=${SERVER_SCHEME}://${OPENELIS_HOSTNAME}
-      - OPENELIS_FHIR_PUBLIC_URL=${SERVER_SCHEME}://${FHIR_OPENELIS_HOSTNAME}
-      - OPENELIS_HOSTNAME=${OPENELIS_HOSTNAME}
-      - ENABLE_SSO=${ENABLE_SSO}
-
 secrets:
   common.properties:
     file: "${OPENELIS_CONFIG_PATH}/properties/common.properties"
