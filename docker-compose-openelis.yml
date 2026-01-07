@@ -72,7 +72,7 @@ services:
       - db.openelis.org
       - certs
     ports:
-      - "9092:8080"
+      - "${OPENELIS_FHIR_PORT:-9095}:8080"
     networks:
       ozone:
       web:
