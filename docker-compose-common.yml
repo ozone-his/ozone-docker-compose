@@ -24,6 +24,7 @@ services:
       - --server-id=2
       - --sync-binlog=1
       - --binlog-annotate-row-events=0
+      - --max_allowed_packet=${MYSQL_MAX_ALLOWED_PACKET}
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
     healthcheck:
