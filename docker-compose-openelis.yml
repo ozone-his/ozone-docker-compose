@@ -14,7 +14,7 @@ services:
       - "${OPENELIS_CERTS:-certs-vol}:/etc/ssl/certs/"
 
   oe.openelis.org:
-    image: itechuw/openelis-global-2:3.2.1.1
+    image: itechuw/openelis-global-2:3.2.1.2
     platform: linux/amd64
     depends_on:
       - postgresql
@@ -44,7 +44,7 @@ services:
       - source: common.properties
 
   fhir.openelis.org:
-    image: itechuw/openelis-global-2-fhir:3.2.1.1
+    image: itechuw/openelis-global-2-fhir:3.2.1.2
     platform: linux/amd64
     depends_on:
       - postgresql
@@ -100,7 +100,7 @@ services:
       traefik.http.services.openelis.loadbalancer.server.port: 80
 
   frontend.openelis.org:
-    image: itechuw/openelis-global-2-frontend:3.2.1.1
+    image: itechuw/openelis-global-2-frontend:3.2.1.2
     platform: linux/amd64
     networks:
       ozone:
