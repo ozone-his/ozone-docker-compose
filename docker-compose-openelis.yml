@@ -39,6 +39,9 @@ services:
       - "${OPENELIS_CONFIG_PATH}/analyzer/analyzer-test-map.csv:/var/lib/openelis-global/analyzer/analyzer-test-map.csv"
       - "${OPENELIS_CONFIG_PATH}/odoo/odoo-test-product-mapping.csv:/var/lib/openelis-global/odoo/odoo-test-product-mapping.csv"
       - "${OPENELIS_CONFIG_PATH}/ocl:/var/lib/openelis-global/ocl"
+      - "${OPENELIS_CONFIG_PATH}/programs/:/var/lib/openelis-global/programs"
+      - "${OPENELIS_CONFIG_PATH}/configuration:/var/lib/openelis-global/configuration"
+      - "${OPENELIS_CONFIG_PATH}/menu/menu_config.json:/var/lib/openelis-global/menu/menu_config.json"
       - "${OPENELIS_LUCENE_INDEX:-lucene_index-vol}:/var/lib/lucene_index"
     secrets:
       - source: common.properties
