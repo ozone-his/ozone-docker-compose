@@ -8,7 +8,7 @@ services:
       EIP_ODOO_FHIR_PASSWORD: ${ODOO_PASSWORD}
       EIP_OPENELIS_URL: http://fhir.openelis.org:8080
       EIP_SUBSCRIPTION_ENDPOINT: ${EIP_ODOO_FHIR_SERVER_URL}/odoo/fhir/R4
-      EIP_SYNC_TASK_LAST_RUN_TS_FILE: /eip-client/sync_timestamps.txt
+      EIP_SYNC_TASK_LAST_RUN_TS_FILE: /eip-client/data
       EIP_SYNC_TASK_TS_OVERLAP: ${EIP_SYNC_TASK_TS_OVERLAP}
       EIP_LOG_LEVEL: ${EIP_ODOO_OPENELIS_LOG_LEVEL:-INFO}
       EIP_SYNC_TASK_INITIAL_DELAY: ${EIP_SYNC_TASK_INITIAL_DELAY}
@@ -20,7 +20,7 @@ services:
         condition: service_started
     volumes:
       - "${EIP_ODOO_OPENELIS_ROUTES_PATH}:/eip-client/routes"
-      - "${EIP_SYNC_TASK_LAST_RUN_TS_FILE}:/eip-client/sync_timestamps.txt"
+      - "${EIP_ODOO_OPENELIS_DATA_DIR}:/eip-client/data"
     networks:
       web:
       ozone:
