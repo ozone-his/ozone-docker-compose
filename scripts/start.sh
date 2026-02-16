@@ -27,19 +27,11 @@ else
     setNginxHostnames
 fi
 
+# Set the demo patients props
 if [ "$DEMO" == "true" ]; then
-    # Set the demo patients props
     echo "$INFO DEMO=true, setting the number of demo patients..."
     export NUMBER_OF_DEMO_PATIENTS=50
     echo "→ NUMBER_OF_DEMO_PATIENTS=$NUMBER_OF_DEMO_PATIENTS"
-    # Create the directory to store sync timestamp file for eip-odoo-openelis service
-    while read -r service; do
-        if [ "$service" == 'eip-odoo-openelis' ]; then
-            echo "Found eip-odoo-openelis service, configuring directory to store sync timestamp file"
-            export EIP_ODOO_OPENELIS_DATA_DIR=$DISTRO_PATH/data/eip_odoo_openelis
-            break
-        fi
-    done < /tmp/defined_services.txt
 fi
 
 setupProjectName

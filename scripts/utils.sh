@@ -50,6 +50,7 @@ function exportPaths () {
     export OPENELIS_BINARIES_PATH=$DISTRO_PATH/binaries/openelis
     export OPENELIS_PROPERTIES_PATH=$DISTRO_PATH/configs/openelis/properties
     export EIP_ODOO_OPENELIS_ROUTES_PATH=$DISTRO_PATH/binaries/eip-odoo-openelis
+    export EIP_ODOO_OPENELIS_DATA_DIR=$DISTRO_PATH/data/eip_odoo_openelis
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
