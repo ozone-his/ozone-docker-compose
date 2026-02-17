@@ -50,7 +50,7 @@ function exportPaths () {
     export OPENELIS_BINARIES_PATH=$DISTRO_PATH/binaries/openelis
     export OPENELIS_PROPERTIES_PATH=$DISTRO_PATH/configs/openelis/properties
     export EIP_ODOO_OPENELIS_ROUTES_PATH=$DISTRO_PATH/binaries/eip-odoo-openelis
-    export EIP_SYNC_TASK_LAST_RUN_TS_FILE=$DISTRO_PATH/odoo_openelis_sync_ts.txt
+    export EIP_ODOO_OPENELIS_DATA_DIR=$DISTRO_PATH/data/eip_odoo_openelis
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
@@ -79,7 +79,7 @@ function exportPaths () {
     echo "→ OPENELIS_BINARIES_PATH=$OPENELIS_BINARIES_PATH"
     echo "→ OPENELIS_PROPERTIES_PATH=$OPENELIS_PROPERTIES_PATH"
     echo "→ EIP_ODOO_OPENELIS_ROUTES_PATH=$EIP_ODOO_OPENELIS_ROUTES_PATH"
-    echo "→ EIP_SYNC_TASK_LAST_RUN_TS_FILE=$EIP_SYNC_TASK_LAST_RUN_TS_FILE"
+    echo "→ EIP_ODOO_OPENELIS_DATA_DIR=$EIP_ODOO_OPENELIS_DATA_DIR"
 }
 
 function setDockerComposeCLIOptions () {
