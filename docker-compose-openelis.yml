@@ -57,9 +57,9 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.fhir.rule=Host(`${FHIR_OPENELIS_HOSTNAME}`)"
-      - "traefik.http.routers.fhir.entrypoints=websecure"
-      - "traefik.http.services.fhir.loadbalancer.server.port=8080"
+      - "traefik.http.routers.`${OPENELIS_FHIR_TRAEFIK_LABEL}`.rule=Host(`${FHIR_OPENELIS_HOSTNAME}`)"
+      - "traefik.http.routers.`${OPENELIS_FHIR_TRAEFIK_LABEL}`.entrypoints=websecure"
+      - "traefik.http.services.`${OPENELIS_FHIR_TRAEFIK_LABEL}`.loadbalancer.server.port=8080"
     environment:
       TZ: America/New_York
       JAVA_OPTS: "-Djavax.net.ssl.trustStore=${SSL_TRUSTSTORE_PATH}
@@ -95,9 +95,9 @@ services:
       - oe.openelis.org
     labels:
       traefik.enable: "true"
-      traefik.http.routers.openelis.rule: "Host(`${OPENELIS_HOSTNAME}`)"
-      traefik.http.routers.openelis.entrypoints: "websecure"
-      traefik.http.services.openelis.loadbalancer.server.port: 80
+      traefik.http.routers.`${OPENELIS_TRAEFIK_LABEL}`.rule: "Host(`${OPENELIS_HOSTNAME}`)"
+      traefik.http.routers.`${OPENELIS_TRAEFIK_LABEL}`.entrypoints: "websecure"
+      traefik.http.services.`${OPENELIS_TRAEFIK_LABEL}`.loadbalancer.server.port: 80
 
   frontend.openelis.org:
     image: itechuw/openelis-global-2-frontend:3.2.1.2
@@ -111,8 +111,12 @@ services:
 
   env-substitution:
     environment:
-      - OPENELIS_FHIR_PUBLIC_URL=${SERVER_SCHEME}://${FHIR_OPENELIS_HOSTNAME}
+      - OPENELIS_FHIR_SERVER_PUBLIC_URL=${SERVER_SCHEME}://${FHIR_OPENELIS_HOSTNAME}
+      - OPENELIS_FHIR_SERVER_USERNAME=${OPENELIS_FHIR_SERVER_USERNAME}
+      - OPENELIS_FHIR_SERVER_PASSWORD=${OPENELIS_FHIR_SERVER_PASSWORD}
       - ENABLE_SSO=${ENABLE_SSO}
+      - OPENELIS_CLIENT_ID=${OPENELIS_CLIENT_ID:-openelis}
+      - KEYCLOAK_PUBLIC_URL=${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
 
   postgresql:
     environment:
