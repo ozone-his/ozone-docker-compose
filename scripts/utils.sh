@@ -198,7 +198,7 @@ function setNginxHostnames {
     export KEYCLOAK_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8084"
     export ORTHANC_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8889"
     export OPENELIS_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
-    export FHIR_OPENELIS_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:9092"
+    export FHIR_OPENELIS_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:9095"
     export BAHMNI_EMR_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
 
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
