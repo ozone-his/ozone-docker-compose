@@ -32,7 +32,7 @@ services:
     networks:
       - ozone
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-3306}:3306"
     restart: unless-stopped
     volumes:
       - "${MYSQL_DATADIR:-mysql-data}:/var/lib/mysql"
@@ -55,7 +55,7 @@ services:
     networks:
       - ozone
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     restart: unless-stopped
     volumes:
       - "${POSTGRES_DATADIR:-postgresql-data}:/var/lib/postgresql/data"

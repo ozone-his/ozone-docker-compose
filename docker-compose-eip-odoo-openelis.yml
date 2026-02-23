@@ -20,9 +20,11 @@ services:
         condition: service_started
     volumes:
       - "${EIP_ODOO_OPENELIS_ROUTES_PATH}:/eip-client/routes"
-      - "${EIP_ODOO_OPENELIS_DATA_DIR}:/eip-client/data"
+      - "${EIP_ODOO_OPENELIS_DATA_DIR:-eip-odoo-openelis-data}:/eip-client/data"
     networks:
       web:
       ozone:
         aliases:
           - eip-odoo-openelis
+volumes:
+  eip-odoo-openelis-data: ~
