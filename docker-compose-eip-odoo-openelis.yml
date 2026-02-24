@@ -3,7 +3,7 @@ services:
   eip-odoo-openelis:
     image: mekomsolutions/eip-client
     environment:
-      EIP_ODOO_FHIR_URL: ${ODOO_FHIR_SERVER_URL}
+      EIP_ODOO_FHIR_URL: ${EIP_ODOO_FHIR_SERVER_URL}
       EIP_ODOO_FHIR_USERNAME: ${ODOO_USER}
       EIP_ODOO_FHIR_PASSWORD: ${ODOO_PASSWORD}
       EIP_OPENELIS_FHIR_URL: ${EIP_OPENELIS_FHIR_URL:-http://fhir.openelis.org:8080}
