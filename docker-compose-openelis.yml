@@ -51,6 +51,7 @@ services:
       - certs
     ports:
       - "${OPENELIS_FHIR_PORT:-9095}:8080"
+      - "${OPENELIS_FHIR_SSL_PORT:-9443}:8443"
     networks:
       ozone:
       web:
