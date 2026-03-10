@@ -26,7 +26,7 @@ services:
       web:
     environment:
       DEFAULT_PW: ${OPENELIS_DEFAULT_PASSWORD}
-      TZ: America/New_York
+      TZ: ${TZ:-UTC}
       CATALINA_OPTS: "-Ddatasource.url=jdbc:postgresql://${OPENELIS_DB_HOST}:5432/${OPENELIS_DB_NAME} -Ddatasource.username=${OPENELIS_DB_USER} -Ddatasource.password=${OPENELIS_DB_PASSWORD} -Doe.ssl.truststorepath=${SSL_TRUSTSTORE_PATH} -Doe.ssl.truststorepassword=${SSL_TRUSTSTORE_PASSWORD} -Doe.ssl.keystorepath=${SSL_KEYSTORE_PATH} -Doe.ssl.keystorepassword=${SSL_KEYSTORE_PASSWORD}"
       SSL_KEYSTORE_PATH: ${SSL_KEYSTORE_PATH}
       SSL_KEYSTORE_PASSWORD: ${SSL_KEYSTORE_PASSWORD}
@@ -61,7 +61,7 @@ services:
       - "traefik.http.routers.${OPENELIS_FHIR_TRAEFIK_LABEL}.entrypoints=websecure"
       - "traefik.http.services.${OPENELIS_FHIR_TRAEFIK_LABEL}.loadbalancer.server.port=8080"
     environment:
-      TZ: America/New_York
+      TZ: ${TZ:-UTC}
       JAVA_OPTS: "-Djavax.net.ssl.trustStore=${SSL_TRUSTSTORE_PATH}
                       -Djavax.net.ssl.trustStorePassword=${SSL_TRUSTSTORE_PASSWORD}
                       -Djavax.net.ssl.trustStoreType=pkcs12
