@@ -73,7 +73,7 @@ services:
       FHIR_DATASOURCE_URL: "jdbc:postgresql://${OPENELIS_DB_HOST}:5432/${OPENELIS_DB_NAME}?currentSchema=${OPENELIS_DB_SCHEMA}"
       FHIR_DATASOURCE_USERNAME: ${OPENELIS_DB_USER}
       FHIR_DATASOURCE_PASSWORD: ${OPENELIS_DB_PASSWORD}
-      FHIR_SERVER_ADRESS: "${SERVER_SCHEME:-http}://${FHIR_OPENELIS_HOSTNAME}/fhir/"
+      FHIR_SERVER_ADRESS: "${FHIR_SERVER_SCHEME:-http}://${FHIR_OPENELIS_HOSTNAME}/fhir/"
     volumes:
       - "${OPENELIS_TRUST_STORE:-key_trust-store-volume}:/etc/openelis-global"
       - "./openelis/tomcat/hapi_server.xml:/opt/bitnami/tomcat/conf/server.xml"
