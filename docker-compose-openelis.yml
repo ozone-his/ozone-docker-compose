@@ -32,6 +32,8 @@ services:
       SSL_KEYSTORE_PASSWORD: ${SSL_KEYSTORE_PASSWORD}
       SSL_TRUSTSTORE_PATH: ${SSL_TRUSTSTORE_PATH}
       SSL_TRUSTSTORE_PASSWORD: ${SSL_TRUSTSTORE_PASSWORD}
+      OEG_FACILITY_ID: ${OEG_FACILITY_ID}
+      OPENELIS_FHIR_STORE_URL: ${OPENELIS_FHIR_STORE_URL}
     volumes:
       - "${OPENELIS_TRUST_STORE:-key_trust-store-volume}:/etc/openelis-global"
       - "${OPENELIS_CONFIG_PATH}/plugins/:/var/lib/openelis-global/plugins"
@@ -118,6 +120,8 @@ services:
       - ENABLE_SSO=${ENABLE_SSO}
       - OPENELIS_CLIENT_ID=${OPENELIS_CLIENT_ID:-openelis}
       - KEYCLOAK_PUBLIC_URL=${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      - OEG_FACILITY_ID=${OEG_FACILITY_ID}
+      - OPENELIS_FHIR_STORE_URL=${OPENELIS_FHIR_STORE_URL}
 
   postgresql:
     environment:
