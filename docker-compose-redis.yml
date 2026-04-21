@@ -2,6 +2,8 @@ services:
   redis:
     image: redis:7.4-alpine
     restart: always
+    ports:
+      - "6379:6379"
     volumes:
       - "${REDIS_DATA_DIR:-redis_data}:/data"
     command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
