@@ -1,0 +1,42 @@
+services:
+  redis:
+    image: redis:7.4-alpine
+    restart: always
+    volumes:
+      - "${REDIS_DATA_DIR:-redis_data}:/data"
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    networks:
+      ozone:
+        aliases:
+          - redis
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    restart: always
+    ports:
+      - "5540:5540"
+    volumes:
+      - "${REDIS_INSIGHT_DATA_DIR:-redis_insight_data}:/data"
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - RI_APP_REDIS_DB0_HOST=${REDIS_HOST:-redis}
+      - RI_APP_REDIS_DB0_PORT=${REDIS_PORT:-6379}
+      - RI_APP_REDIS_DB0_PASSWORD=${REDIS_PASSWORD:-password}
+      - RI_APP_REDIS_DB0_NAME=Main-Cache
+    networks:
+      web:
+      ozone:
+        aliases:
+          - redis-insight
+
+volumes:
+  redis_data: ~
+  redis_insight_data: ~
