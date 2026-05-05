@@ -29,6 +29,12 @@ services:
       redis:
         condition: service_healthy
     environment:
+      # Newer RedisInsight builds use RI_REDIS_* for bootstrap auto-connect.
+      - RI_REDIS_HOST=${REDIS_HOST:-redis}
+      - RI_REDIS_PORT=${REDIS_PORT:-6379}
+      - RI_REDIS_PASSWORD=${REDIS_PASSWORD:-password}
+      - RI_REDIS_USERNAME=${REDIS_USERNAME:-default}
+      - RI_REDIS_ALIAS=Main-Cache
       - RI_APP_REDIS_DB0_HOST=${REDIS_HOST:-redis}
       - RI_APP_REDIS_DB0_PORT=${REDIS_PORT:-6379}
       - RI_APP_REDIS_DB0_PASSWORD=${REDIS_PASSWORD:-password}
