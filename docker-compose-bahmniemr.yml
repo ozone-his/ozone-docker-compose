@@ -144,6 +144,14 @@ services:
       traefik.http.routers.bahmni.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && (PathPrefix(`/bahmni`) || PathPrefix(`/person-management`))"
       traefik.http.routers.bahmni.entrypoints: "websecure"
       traefik.http.services.bahmni.loadbalancer.server.port: 8091
+
+      traefik.http.middlewares.frontend-stripprefix.stripprefix.prefixes: /bahmni/home
+      traefik.http.middlewares.frontend-stripprefix.stripprefix.forceslash: false
+      traefik.http.middlewares.home-redirectregex.redirectregex.regex: https://${BAHMNI_EMR_HOSTNAME}/bahmni
+      traefik.http.middlewares.home-redirectregex.redirectregex.replacement: https://${BAHMNI_EMR_HOSTNAME}/bahmni/home
+      traefik.http.middlewares.root-redirectregex.redirectregex.regex: https://${BAHMNI_EMR_HOSTNAME}
+      traefik.http.middlewares.root-redirectregex.redirectregex.replacement: https://${BAHMNI_EMR_HOSTNAME}/bahmni/home
+      traefik.http.middlewares.gzip.compress: true
     networks:
       ozone:
       web:
