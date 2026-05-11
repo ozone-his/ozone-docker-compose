@@ -76,7 +76,7 @@ services:
       start_period: 180s
     labels:
       traefik.enable: "true"
-      traefik.http.routers.bahmni-openmrs.rule: "Host(`${BAHMNI_HOSTNAME}`) && PathPrefix(`/openmrs`)"
+      traefik.http.routers.bahmni-openmrs.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && PathPrefix(`/openmrs`)"
       traefik.http.routers.bahmni-openmrs.entrypoints: "websecure"
       traefik.http.services.bahmni-openmrs.loadbalancer.server.port: 8080
     networks:
@@ -141,9 +141,17 @@ services:
     restart: unless-stopped
     labels:
       traefik.enable: "true"
-      traefik.http.routers.bahmni.rule: "Host(`${BAHMNI_HOSTNAME}`) && (PathPrefix(`/bahmni`) || PathPrefix(`/person-management`))"
+      traefik.http.routers.bahmni.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && (PathPrefix(`/bahmni`) || PathPrefix(`/person-management`))"
       traefik.http.routers.bahmni.entrypoints: "websecure"
       traefik.http.services.bahmni.loadbalancer.server.port: 8091
+
+      traefik.http.middlewares.frontend-stripprefix.stripprefix.prefixes: /bahmni/home
+      traefik.http.middlewares.frontend-stripprefix.stripprefix.forceslash: false
+      traefik.http.middlewares.home-redirectregex.redirectregex.regex: https://${BAHMNI_EMR_HOSTNAME}/bahmni
+      traefik.http.middlewares.home-redirectregex.redirectregex.replacement: https://${BAHMNI_EMR_HOSTNAME}/bahmni/home
+      traefik.http.middlewares.root-redirectregex.redirectregex.regex: https://${BAHMNI_EMR_HOSTNAME}
+      traefik.http.middlewares.root-redirectregex.redirectregex.replacement: https://${BAHMNI_EMR_HOSTNAME}/bahmni/home
+      traefik.http.middlewares.gzip.compress: true
     networks:
       ozone:
       web:
@@ -158,7 +166,7 @@ services:
     restart: unless-stopped
     labels:
       traefik.enable: "true"
-      traefik.http.routers.bahmni-implementer-interface.rule: "Host(`${BAHMNI_HOSTNAME}`) && PathPrefix(`/implementer-interface`)"
+      traefik.http.routers.bahmni-implementer-interface.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && PathPrefix(`/implementer-interface`)"
       traefik.http.routers.bahmni-implementer-interface.entrypoints: "websecure"
       traefik.http.services.bahmni-implementer-interface.loadbalancer.server.port: 80
     networks:
@@ -196,7 +204,7 @@ services:
     restart: unless-stopped
     labels:
       traefik.enable: "true"
-      traefik.http.routers.bahmni-reports.rule: "Host(`${BAHMNI_HOSTNAME}`) && PathPrefix(`/bahmnireports`)"
+      traefik.http.routers.bahmni-reports.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && PathPrefix(`/bahmnireports`)"
       traefik.http.routers.bahmni-reports.entrypoints: "websecure"
       traefik.http.services.bahmni-reports.loadbalancer.server.port: 8051
     networks:
@@ -234,7 +242,7 @@ services:
     restart: unless-stopped
     labels:
       traefik.enable: "true"
-      traefik.http.routers.bahmni-patient-documents.rule: "Host(`${BAHMNI_HOSTNAME}`) && (PathPrefix(`/document_images`) || PathPrefix(`/uploaded_results`) || PathPrefix(`/uploaded-files`))"
+      traefik.http.routers.bahmni-patient-documents.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && (PathPrefix(`/document_images`) || PathPrefix(`/uploaded_results`) || PathPrefix(`/uploaded-files`))"
       traefik.http.routers.bahmni-patient-documents.entrypoints: "websecure"
       traefik.http.services.bahmni-patient-documents.loadbalancer.server.port: 80
     networks:
@@ -248,7 +256,7 @@ services:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
     labels:
       traefik.enable: "true"
-      traefik.http.routers.bahmni-appointments.rule: "Host(`${BAHMNI_HOSTNAME}`) && PathPrefix(`/appointments`)"
+      traefik.http.routers.bahmni-appointments.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && PathPrefix(`/appointments`)"
       traefik.http.routers.bahmni-appointments.entrypoints: "websecure"
       traefik.http.services.bahmni-appointments.loadbalancer.server.port: 80
     networks:
@@ -280,7 +288,7 @@ services:
     logging: *log-config
     labels:
       traefik.enable: "true"
-      traefik.http.routers.bahmni-ipd.rule: "Host(`${BAHMNI_HOSTNAME}`) && PathPrefix(`/ipd`)"
+      traefik.http.routers.bahmni-ipd.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && PathPrefix(`/ipd`)"
       traefik.http.routers.bahmni-ipd.entrypoints: "websecure"
       traefik.http.services.bahmni-ipd.loadbalancer.server.port: 80
     networks:
