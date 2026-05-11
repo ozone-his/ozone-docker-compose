@@ -141,7 +141,7 @@ services:
     restart: unless-stopped
     labels:
       traefik.enable: "true"
-      traefik.http.routers.bahmni.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && (PathPrefix(`/bahmni`) || PathPrefix(`/person-management`))"
+      traefik.http.routers.bahmni.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && (PathPrefix(`/bahmni`) || PathPrefix(`/person-management`) || PathPrefix(`/cgi-bin`))"
       traefik.http.routers.bahmni.entrypoints: "websecure"
       traefik.http.services.bahmni.loadbalancer.server.port: 8091
 
