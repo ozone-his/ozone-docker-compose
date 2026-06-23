@@ -111,6 +111,7 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     tty: true
+    restart: unless-stopped
 
   env-substitution:
     environment:
