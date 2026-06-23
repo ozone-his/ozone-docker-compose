@@ -176,6 +176,7 @@ function setTraefikHostnames {
     export ORTHANC_HOSTNAME="pacs.docker.localhost"
     export OPENELIS_HOSTNAME="openelis.docker.localhost"
     export FHIR_OPENELIS_HOSTNAME="fhir-openelis.docker.localhost"
+    export BAHMNI_EMR_HOSTNAME="bahmni.docker.localhost"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
@@ -185,6 +186,7 @@ function setTraefikHostnames {
     echo "→ ORTHANC_HOSTNAME=$ORTHANC_HOSTNAME"
     echo "→ OPENELIS_HOSTNAME=$OPENELIS_HOSTNAME"
     echo "→ FHIR_OPENELIS_HOSTNAME=$FHIR_OPENELIS_HOSTNAME"
+    echo "→ BAHMNI_EMR_HOSTNAME=$BAHMNI_EMR_HOSTNAME"
 
 }
 

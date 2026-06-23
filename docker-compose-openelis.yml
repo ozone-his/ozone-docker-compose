@@ -14,7 +14,7 @@ services:
       - "${OPENELIS_CERTS:-certs-vol}:/etc/ssl/certs/"
 
   oe.openelis.org:
-    image: itechuw/openelis-global-2:3.2.1.2
+    image: itechuw/openelis-global-2:3.2.1.6
     platform: linux/amd64
     depends_on:
       - postgresql
@@ -26,16 +26,18 @@ services:
       web:
     environment:
       DEFAULT_PW: ${OPENELIS_DEFAULT_PASSWORD}
-      TZ: America/New_York
+      TZ: ${TZ:-UTC}
       CATALINA_OPTS: "-Ddatasource.url=jdbc:postgresql://${OPENELIS_DB_HOST}:5432/${OPENELIS_DB_NAME} -Ddatasource.username=${OPENELIS_DB_USER} -Ddatasource.password=${OPENELIS_DB_PASSWORD} -Doe.ssl.truststorepath=${SSL_TRUSTSTORE_PATH} -Doe.ssl.truststorepassword=${SSL_TRUSTSTORE_PASSWORD} -Doe.ssl.keystorepath=${SSL_KEYSTORE_PATH} -Doe.ssl.keystorepassword=${SSL_KEYSTORE_PASSWORD}"
       SSL_KEYSTORE_PATH: ${SSL_KEYSTORE_PATH}
       SSL_KEYSTORE_PASSWORD: ${SSL_KEYSTORE_PASSWORD}
       SSL_TRUSTSTORE_PATH: ${SSL_TRUSTSTORE_PATH}
       SSL_TRUSTSTORE_PASSWORD: ${SSL_TRUSTSTORE_PASSWORD}
+      OEG_FACILITY_ID: ${OEG_FACILITY_ID}
+      OPENELIS_FHIR_STORE_URL: ${OPENELIS_FHIR_STORE_URL}
     volumes:
       - "${OPENELIS_TRUST_STORE:-key_trust-store-volume}:/etc/openelis-global"
       - "${OPENELIS_CONFIG_PATH}/plugins/:/var/lib/openelis-global/plugins"
-      - "${OPENELIS_CONFIG_PATH}/properties/SystemConfiguration.properties:/var/lib/openelis-global/properties/SystemConfiguration.properties"
+      - "${OPENELIS_CONFIG_PATH}/properties:/var/lib/openelis-global/properties"
       - "${OPENELIS_CONFIG_PATH}/analyzer/analyzer-test-map.csv:/var/lib/openelis-global/analyzer/analyzer-test-map.csv"
       - "${OPENELIS_CONFIG_PATH}/odoo/odoo-test-product-mapping.csv:/var/lib/openelis-global/odoo/odoo-test-product-mapping.csv"
       - "${OPENELIS_CONFIG_PATH}/ocl:/var/lib/openelis-global/ocl"
@@ -44,13 +46,14 @@ services:
       - source: common.properties
 
   fhir.openelis.org:
-    image: itechuw/openelis-global-2-fhir:3.2.1.2
+    image: itechuw/openelis-global-2-fhir:3.2.1.6
     platform: linux/amd64
     depends_on:
       - postgresql
       - certs
     ports:
       - "${OPENELIS_FHIR_PORT:-9095}:8080"
+      - "${OPENELIS_FHIR_SSL_PORT:-9443}:8443"
     networks:
       ozone:
       web:
@@ -61,7 +64,7 @@ services:
       - "traefik.http.routers.${OPENELIS_FHIR_TRAEFIK_LABEL}.entrypoints=websecure"
       - "traefik.http.services.${OPENELIS_FHIR_TRAEFIK_LABEL}.loadbalancer.server.port=8080"
     environment:
-      TZ: America/New_York
+      TZ: ${TZ:-UTC}
       JAVA_OPTS: "-Djavax.net.ssl.trustStore=${SSL_TRUSTSTORE_PATH}
                       -Djavax.net.ssl.trustStorePassword=${SSL_TRUSTSTORE_PASSWORD}
                       -Djavax.net.ssl.trustStoreType=pkcs12
@@ -72,7 +75,7 @@ services:
       FHIR_DATASOURCE_URL: "jdbc:postgresql://${OPENELIS_DB_HOST}:5432/${OPENELIS_DB_NAME}?currentSchema=${OPENELIS_DB_SCHEMA}"
       FHIR_DATASOURCE_USERNAME: ${OPENELIS_DB_USER}
       FHIR_DATASOURCE_PASSWORD: ${OPENELIS_DB_PASSWORD}
-      FHIR_SERVER_ADRESS: "http://${FHIR_OPENELIS_HOSTNAME}/fhir/"
+      FHIR_SERVER_ADRESS: "${FHIR_SERVER_ADRESS:-http://fhir.openelis.org:8080}/fhir/"
     volumes:
       - "${OPENELIS_TRUST_STORE:-key_trust-store-volume}:/etc/openelis-global"
       - "./openelis/tomcat/hapi_server.xml:/opt/bitnami/tomcat/conf/server.xml"
@@ -100,7 +103,7 @@ services:
       - "traefik.http.services.${OPENELIS_TRAEFIK_LABEL}.loadbalancer.server.port=80"
 
   frontend.openelis.org:
-    image: itechuw/openelis-global-2-frontend:3.2.1.2
+    image: itechuw/openelis-global-2-frontend:3.2.1.6
     platform: linux/amd64
     networks:
       ozone:
@@ -108,6 +111,7 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     tty: true
+    restart: unless-stopped
 
   env-substitution:
     environment:
@@ -117,6 +121,8 @@ services:
       - ENABLE_SSO=${ENABLE_SSO}
       - OPENELIS_CLIENT_ID=${OPENELIS_CLIENT_ID:-openelis}
       - KEYCLOAK_PUBLIC_URL=${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      - OEG_FACILITY_ID=${OEG_FACILITY_ID}
+      - OPENELIS_FHIR_STORE_URL=${OPENELIS_FHIR_STORE_URL}
 
   postgresql:
     environment:

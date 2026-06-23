@@ -17,6 +17,18 @@ services:
         condition: service_completed_successfully
     profiles:
       - senaite-restore
+  oe.openelis.org:
+    depends_on:
+      restore:
+        condition: service_completed_successfully
+    profiles:
+      - openelis-restore
+  fhir.openelis.org:
+    depends_on:
+      restore:
+        condition: service_completed_successfully
+    profiles:
+      - openelis-fhir-restore
   keycloak:
     depends_on:
       restore:
@@ -28,6 +40,11 @@ services:
       restore:
         condition: service_completed_successfully
   restore:
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
     image: mekomsolutions/restic-compose-backup-restore
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
