@@ -21,9 +21,9 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/health/started" ]
       interval: 10s
       timeout: 5s
-      retries: 48
+      retries: 100
       start_period: 120s
-    image: openmrs/openmrs-core:2.7.7-amazoncorretto-17
+    image: openmrs/openmrs-reference-application-3-backend:${O3_DOCKER_IMAGE_TAG:-nightly}
     labels:
       traefik.enable: "true"
       traefik.http.routers.openmrs.rule: "Host(`${O3_HOSTNAME}`) && PathPrefix(`/openmrs`)"
