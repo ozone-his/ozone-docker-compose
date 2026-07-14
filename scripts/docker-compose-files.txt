@@ -6,6 +6,7 @@ docker-compose-openmrs.yml
 docker-compose-openmrs-sso.yml
 docker-compose-senaite.yml
 docker-compose-senaite-sso.yml
+docker-compose-redis.yml
 docker-compose-backup.yml
 docker-compose-eip-odoo-openmrs.yml
 docker-compose-eip-odoo-openmrs-sso.yml

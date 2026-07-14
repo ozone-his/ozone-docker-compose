@@ -71,6 +71,10 @@ services:
       - ODOO_PORT=8069
       - ODOO_DATABASE=${ODOO_DATABASE}
       - EIP_ODOO_DRUGS_CATEGORY_EXT_ID=${EIP_ODOO_DRUGS_CATEGORY_EXT_ID}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - FHIR_ODOO_LOCK_REDIS_ENABLED=true
     image: mekomsolutions/fhir-odoo
     labels:
       traefik.enable: "true"
