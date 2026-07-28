@@ -112,6 +112,11 @@ function setDockerComposeCLIOptions () {
         export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../docker-compose-restore-sso.yml"
     fi
 
+    # Publish host ports on selected apps for an external proxy (profiles: *-external-port)
+    if [[ "${COMPOSE_PROFILES}" == *"-external-port"* ]]; then
+        export dockerComposeFilesCLIOptions="$dockerComposeFilesCLIOptions -f ../docker-compose-external-ports.yml"
+    fi
+
     # Set the default env file
     export dockerComposeEnvFilePath="../.env"
 

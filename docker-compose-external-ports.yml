@@ -1,0 +1,26 @@
+services:
+  openmrs:
+    profiles:
+      - openmrs-external-port
+    ports:
+      - "${OPENMRS_PUBLIC_PORT:-8080}:8080"
+  odoo:
+    profiles:
+      - odoo-external-port
+    ports:
+      - "${ODOO_PUBLIC_PORT:-8069}:8069"
+  senaite:
+    profiles:
+      - senaite-external-port
+    ports:
+      - "${SENAITE_PUBLIC_PORT:-8081}:8080"
+  keycloak:
+    profiles:
+      - keycloak-external-port
+    ports:
+      - "${KEYCLOAK_PUBLIC_PORT:-8084}:8080"
+  oe.openelis.org:
+    profiles:
+      - openelis-external-port
+    ports:
+      - "${OPENELIS_PUBLIC_PORT:-8090}:8080"
