@@ -24,3 +24,9 @@ services:
       - openelis-external-port
     ports:
       - "${OPENELIS_PUBLIC_PORT:-8090}:8080"
+      - "${OPENELIS_SSL_PUBLIC_PORT:-8443}:8443"
+  frontend.openelis.org:
+    profiles:
+      - openelis-external-port
+    ports:
+      - "${OPENELIS_FRONTEND_PUBLIC_PORT:-8092}:80"
