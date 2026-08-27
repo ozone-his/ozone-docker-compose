@@ -24,7 +24,7 @@ services:
       - openelis-external-port
     ports:
       - "${OPENELIS_PUBLIC_PORT:-8090}:8080"
-  fhir.openmrs.org:
+  fhir-odoo:
     profiles:
       - fhir-external-port
     ports:
