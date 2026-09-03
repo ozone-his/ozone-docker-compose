@@ -3,10 +3,10 @@
 # storage and secret configuration, otherwise sessions, uploads and background
 # tasks silently disagree with each other.
 x-backend-env: &backend-env
-  DJANGOSECRET_KEY: ${DJANGOSECRET_KEY:-changeme}
+  DJANGOSECRET_KEY: ${DJANGOSECRET_KEY:-}
   DEBUG: ${DEBUG:-False}
   # Hostnames the backend is allowed to answer for. "*" is fine locally only.
-  ALLOWED_HOSTS: ${ALLOWED_HOSTS:-*}
+  ALLOWED_HOSTS: ${ALLOWED_HOSTS:-}
   # Origins allowed to post to the Django admin, scheme included.
   CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-http://127.0.0.1:8082,http://localhost:8082}
   # Extra browser origins allowed to call the API. The frontends are served
@@ -16,15 +16,15 @@ x-backend-env: &backend-env
   DEFAULT_TIME_ZONE: ${DEFAULT_TIME_ZONE:-UTC}
 
   ## Database - PostgreSQL is mandatory, tenants are schemas
-  DATABASE_NAME: ${DATABASE_NAME:-hcw}
-  DATABASE_USER: ${DATABASE_USER:-hcw}
-  DATABASE_PASSWORD: ${DATABASE_PASSWORD:-hcw}
-  DATABASE_HOST: ${DATABASE_HOST:-db}
-  DATABASE_PORT: ${DATABASE_PORT:-5432}
+  DATABASE_NAME: ${DATABASE_NAME}
+  DATABASE_USER: ${DATABASE_USER}
+  DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+  DATABASE_HOST: ${DATABASE_HOST}
+  DATABASE_PORT: ${DATABASE_PORT}
 
   ## Redis - Celery broker, cache and websocket channel layer
-  REDIS_HOST: ${REDIS_HOST:-redis}
-  REDIS_PORT: ${REDIS_PORT:-6379}
+  REDIS_HOST: ${REDIS_HOST}
+  REDIS_PORT: ${REDIS_PORT}
 
   ## Uploads - absolute path shared by the api and the worker through the same
   ## volume. Unused as soon as the S3 block below is filled in.
@@ -32,7 +32,7 @@ x-backend-env: &backend-env
 
   ## Email - required to invite patients and to reset passwords
   EMAIL_HOST: ${EMAIL_HOST:-}
-  EMAIL_PORT: ${EMAIL_PORT:-25}
+  EMAIL_PORT: ${EMAIL_PORT:-}
   EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
   EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
   # Any non-empty value enables them, "False" included: leave empty to disable.
@@ -47,19 +47,19 @@ x-backend-env: &backend-env
   S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
   S3_ACCESS_KEY: ${S3_ACCESS_KEY:-}
   S3_SECRET_KEY: ${S3_SECRET_KEY:-}
-  S3_REGION: ${S3_REGION:-us-east-1}
+  S3_REGION: ${S3_REGION:-}
   # MinIO/Ceph buckets that are not a DNS subdomain need "path".
-  S3_ADDRESSING_STYLE: ${S3_ADDRESSING_STYLE:-auto}
+  S3_ADDRESSING_STYLE: ${S3_ADDRESSING_STYLE:-}
 
   ## Tokens
   # Access token lifetime in MINUTES, refresh token lifetime in days.
-  ACCESS_TOKEN_LIFETIME: ${ACCESS_TOKEN_LIFETIME:-3600}
-  REFRESH_TOKEN_LIFETIME_DAYS: ${REFRESH_TOKEN_LIFETIME_DAYS:-1}
+  ACCESS_TOKEN_LIFETIME: ${ACCESS_TOKEN_LIFETIME:-}
+  REFRESH_TOKEN_LIFETIME_DAYS: ${REFRESH_TOKEN_LIFETIME_DAYS:-}
 
   ## Browser push notifications
   WEBPUSH_VAPID_PUBLIC_KEY: ${WEBPUSH_VAPID_PUBLIC_KEY:-}
   WEBPUSH_VAPID_PRIVATE_KEY: ${WEBPUSH_VAPID_PRIVATE_KEY:-}
-  WEBPUSH_VAPID_CLAIMS_EMAIL: ${WEBPUSH_VAPID_CLAIMS_EMAIL:-mailto:admin@hcw-at-home.com}
+  WEBPUSH_VAPID_CLAIMS_EMAIL: ${WEBPUSH_VAPID_CLAIMS_EMAIL:-}
   # Native mobile push (FCM): uncomment and mount the service account file on
   # api and celery, e.g. ./firebase.json:/etc/hcw/firebase.json:ro
   # GOOGLE_APPLICATION_CREDENTIALS: /etc/hcw/firebase.json
@@ -69,7 +69,7 @@ x-backend-env: &backend-env
   MAINTENANCE: ${MAINTENANCE:-False}
 
   ## Live transcription, only used when enabled per tenant in the admin
-  WHISPER_LIVE_URL: ${WHISPER_LIVE_URL:-ws://127.0.0.1:9090}
+  WHISPER_LIVE_URL: ${WHISPER_LIVE_URL:-}
   WHISPER_LIVE_API_KEY: ${WHISPER_LIVE_API_KEY:-}
 
 x-backend-image: &backend-image docker.io/iabsis/hcw6-backend:${TAG:-latest}
