@@ -3,12 +3,12 @@
 # storage and secret configuration, otherwise sessions, uploads and background
 # tasks silently disagree with each other.
 x-backend-env: &backend-env
-  DJANGOSECRET_KEY: ${DJANGOSECRET_KEY:-}
+  DJANGOSECRET_KEY: ${HCW_DJANGOSECRET_KEY:-}
   DEBUG: ${DEBUG:-False}
   # Hostnames the backend is allowed to answer for. "*" is fine locally only.
-  ALLOWED_HOSTS: ${ALLOWED_HOSTS:-}
+  ALLOWED_HOSTS: ${HCW_ALLOWED_HOSTS:-}
   # Origins allowed to post to the Django admin, scheme included.
-  CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-http://127.0.0.1:8082,http://localhost:8082}
+  CSRF_TRUSTED_ORIGINS: ${HCW_HOSTNAME:-}
   # Extra browser origins allowed to call the API. The frontends are served
   # behind their own Nginx proxy, so they need nothing here.
   CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
@@ -16,11 +16,11 @@ x-backend-env: &backend-env
   DEFAULT_TIME_ZONE: ${DEFAULT_TIME_ZONE:-UTC}
 
   ## Database - PostgreSQL is mandatory, tenants are schemas
-  DATABASE_NAME: ${DATABASE_NAME}
-  DATABASE_USER: ${DATABASE_USER}
-  DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-  DATABASE_HOST: ${DATABASE_HOST}
-  DATABASE_PORT: ${DATABASE_PORT}
+  DATABASE_NAME: ${HCW_DB_NAME}
+  DATABASE_USER: ${HCW_DB_USER}
+  DATABASE_PASSWORD: ${HCW_DB_PASSWORD}
+  DATABASE_HOST: ${POSTGRES_DB_HOST}
+  DATABASE_PORT: ${POSTGRES_DB_PORT}
 
   ## Redis - Celery broker, cache and websocket channel layer
   REDIS_HOST: ${REDIS_HOST}
@@ -31,15 +31,15 @@ x-backend-env: &backend-env
   MEDIA_ROOT: ${MEDIA_ROOT:-/var/lib/hcw/uploads}
 
   ## Email - required to invite patients and to reset passwords
-  EMAIL_HOST: ${EMAIL_HOST:-}
-  EMAIL_PORT: ${EMAIL_PORT:-}
-  EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
-  EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+  EMAIL_HOST: ${HCW_EMAIL_HOST:-}
+  EMAIL_PORT: ${HCW_EMAIL_PORT:-}
+  EMAIL_HOST_USER: ${HCW_EMAIL_HOST_USER:-}
+  EMAIL_HOST_PASSWORD: ${HCW_EMAIL_HOST_PASSWORD:-}
   # Any non-empty value enables them, "False" included: leave empty to disable.
   # 587 -> TLS, 465 -> SSL, they are mutually exclusive.
-  EMAIL_USE_TLS: ${EMAIL_USE_TLS:-}
-  EMAIL_USE_SSL: ${EMAIL_USE_SSL:-}
-  DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-}
+  EMAIL_USE_TLS: ${HCW_EMAIL_USE_TLS:-}
+  EMAIL_USE_SSL: ${HCW_EMAIL_USE_SSL:-}
+  DEFAULT_FROM_EMAIL: ${HCW_DEFAULT_FROM_EMAIL:-}
 
   ## Object storage - set the four first ones together or none of them, a
   ## partial configuration aborts startup on purpose
@@ -72,7 +72,7 @@ x-backend-env: &backend-env
   WHISPER_LIVE_URL: ${WHISPER_LIVE_URL:-}
   WHISPER_LIVE_API_KEY: ${WHISPER_LIVE_API_KEY:-}
 
-x-backend-image: &backend-image docker.io/iabsis/hcw6-backend:${TAG:-latest}
+x-backend-image: &backend-image docker.io/iabsis/hcw6-backend:${HCW_TAG:-latest}
 
 x-backend-depends: &backend-depends
   db:
@@ -118,18 +118,18 @@ services:
       SUPERUSER_EMAIL: ${SUPERUSER_EMAIL:-admin@example.com}
       SUPERUSER_PASSWORD: ${SUPERUSER_PASSWORD:-admin}
       # LiveKit media server, skipped when the three values are empty
-      LIVEKIT_URL: ${LIVEKIT_URL:-}
-      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-}
-      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-}
+      LIVEKIT_URL: ${HCW_LIVEKIT_URL:-}
+      LIVEKIT_API_KEY: ${HCW_LIVEKIT_API_KEY:-}
+      LIVEKIT_API_SECRET: ${HCW_LIVEKIT_API_SECRET:-}
       # Sender of the email messaging provider, falls back to EMAIL_HOST_USER
       MESSAGING_FROM_EMAIL: ${MESSAGING_FROM_EMAIL:-}
       # Keycloak / OpenID Connect, skipped when client id or server url is empty
       SSO_PROVIDER_ID: ${SSO_PROVIDER_ID:-openid}
       SSO_NAME: ${SSO_NAME:-Keycloak}
-      SSO_CLIENT_ID: ${SSO_CLIENT_ID:-}
-      SSO_CLIENT_SECRET: ${SSO_CLIENT_SECRET:-}
-      SSO_SERVER_URL: ${SSO_SERVER_URL:-}
-      SSO_DISABLE_PASSWORD_LOGIN: ${SSO_DISABLE_PASSWORD_LOGIN:-false}
+      SSO_CLIENT_ID: ${HCW_CLIENT_UUID:-}
+      SSO_CLIENT_SECRET: ${HCW_CLIENT_SECRET:-}
+      SSO_SERVER_URL: ${HCW_SSO_SERVER_URL:-}
+      SSO_DISABLE_PASSWORD_LOGIN: ${HCW_SSO_DISABLE_PASSWORD_LOGIN:-false}
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -158,7 +158,7 @@ services:
     build:
       context: backend
       target: admin
-    image: docker.io/iabsis/hcw6-admin:${TAG:-latest}
+    image: docker.io/iabsis/hcw6-admin:${HCW_TAG:-latest}
     restart: always
     environment:
       BACKEND_URL: ${BACKEND_URL:-http://api:8000}
@@ -212,7 +212,7 @@ services:
     build:
       context: patient
       target: patient
-    image: docker.io/iabsis/hcw6-patient:${TAG:-latest}
+    image: docker.io/iabsis/hcw6-patient:${HCW_TAG:-latest}
     restart: always
     environment:
       BACKEND_URL: ${BACKEND_URL:-http://api:8000}
@@ -233,7 +233,7 @@ services:
     build:
       context: practitioner
       target: practitioner
-    image: docker.io/iabsis/hcw6-practitioner:${TAG:-latest}
+    image: docker.io/iabsis/hcw6-practitioner:${HCW_TAG:-latest}
     restart: always
     environment:
       BACKEND_URL: ${BACKEND_URL:-http://api:8000}
