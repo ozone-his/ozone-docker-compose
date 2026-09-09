@@ -250,7 +250,7 @@ services:
       web:
 
   appointments:
-    image: bahmni/appointments:1.1.1
+    image: bahmni/appointments:1.2.0
     restart: unless-stopped
     # volumes:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
