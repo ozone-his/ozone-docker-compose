@@ -20,7 +20,7 @@ services:
     command: ["sh", "-c", "rm -rf /etc/bahmni_config/masterdata/configuration && cp -r /usr/local/bahmni_config_override/frontend/* /etc/bahmni_config/openmrs && ./start.sh"]
 
   openmrs:
-    image: bahmni/openmrs:1.2.0-1205
+    image: bahmni/openmrs:1.2.0-rc
     environment:
       TZ: ${TIMEZONE}
       OMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
@@ -132,7 +132,7 @@ services:
     logging: *log-config
 
   bahmni-web:
-    image: bahmni/bahmni-web:2.0.0-968
+    image: bahmni/bahmni-web:1.3.0-rc
     volumes:
       - "${BAHMNI_CONFIG_VOLUME:?}:/usr/local/apache2/htdocs/bahmni_config/:ro"
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
