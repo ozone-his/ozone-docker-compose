@@ -53,8 +53,8 @@ x-backend-env: &backend-env
 
   ## Tokens
   # Access token lifetime in MINUTES, refresh token lifetime in days.
-  ACCESS_TOKEN_LIFETIME: ${ACCESS_TOKEN_LIFETIME:-}
-  REFRESH_TOKEN_LIFETIME_DAYS: ${REFRESH_TOKEN_LIFETIME_DAYS:-}
+  ACCESS_TOKEN_LIFETIME: ${ACCESS_TOKEN_LIFETIME:-3600}
+  REFRESH_TOKEN_LIFETIME_DAYS: ${REFRESH_TOKEN_LIFETIME_DAYS:-1}
 
   ## Browser push notifications
   WEBPUSH_VAPID_PUBLIC_KEY: ${WEBPUSH_VAPID_PUBLIC_KEY:-}
@@ -75,7 +75,7 @@ x-backend-env: &backend-env
 x-backend-image: &backend-image docker.io/iabsis/hcw6-backend:${HCW_TAG:-latest}
 
 x-backend-depends: &backend-depends
-  db:
+  postgresql:
     condition: service_healthy
   redis:
     condition: service_healthy
@@ -100,6 +100,9 @@ services:
       <<: *backend-env
     depends_on: *backend-depends
     restart: "no"
+    networks:
+      web:
+      ozone:
 
   provision:
     image: *backend-image
@@ -134,6 +137,9 @@ services:
       migrate:
         condition: service_completed_successfully
     restart: "no"
+    networks:
+      web:
+      ozone:
 
   api:
     build:
@@ -153,6 +159,11 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+    networks:
+      web:
+      ozone:
+        aliases:
+          - api
 
   admin:
     build:
@@ -174,6 +185,9 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    networks:
+      web:
+      ozone:
 
   celery:
     entrypoint: celery -A core.celery worker --loglevel=info
@@ -191,6 +205,9 @@ services:
       timeout: 20s
       retries: 3
       start_period: 60s
+    networks:
+      web:
+      ozone:
 
   scheduler:
     entrypoint: celery -A core beat --loglevel=info
@@ -207,6 +224,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    networks:
+      web:
+      ozone:
 
   patient:
     build:
@@ -228,6 +248,9 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    networks:
+      web:
+      ozone:
 
   practitioner:
     build:
@@ -249,3 +272,21 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    networks:
+      web:
+      ozone:
+
+  livekit:
+    image: livekit/livekit-server:v1.8
+    command: --config /etc/livekit.yaml
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+    volumes:
+      - "${HCW_CONFIG_PATH}/livekit.yaml:/etc/livekit.yaml:ro"
+    networks:
+      web:
+      ozone:
+        aliases:
+          - livekit
