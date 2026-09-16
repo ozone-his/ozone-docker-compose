@@ -8,6 +8,7 @@ rtc:
   use_external_ip: true
 redis:
   address: redis:6379
+  password: password
 keys:
   ozoneAdmin: 19d2de15-f7ef-44a2-abd3-a2c59a825bd2
 turn:
