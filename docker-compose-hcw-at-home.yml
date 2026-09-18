@@ -142,9 +142,6 @@ services:
       ozone:
 
   api:
-    build:
-      context: backend
-      target: api
     image: *backend-image
     restart: always
     environment:
@@ -166,9 +163,6 @@ services:
           - api
 
   admin:
-    build:
-      context: backend
-      target: admin
     image: docker.io/iabsis/hcw6-admin:${HCW_TAG:-latest}
     restart: always
     environment:
@@ -229,9 +223,6 @@ services:
       ozone:
 
   patient:
-    build:
-      context: patient
-      target: patient
     image: docker.io/iabsis/hcw6-patient:${HCW_TAG:-latest}
     restart: always
     environment:
@@ -253,9 +244,6 @@ services:
       ozone:
 
   practitioner:
-    build:
-      context: practitioner
-      target: practitioner
     image: docker.io/iabsis/hcw6-practitioner:${HCW_TAG:-latest}
     restart: always
     environment:
