@@ -115,8 +115,8 @@ services:
       TENANT_PRIMARY_DOMAIN: ${TENANT_PRIMARY_DOMAIN:-localhost}
       TENANT_PATIENT_DOMAIN: ${TENANT_PATIENT_DOMAIN:-}
       TENANT_ADMIN_DOMAIN: ${TENANT_ADMIN_DOMAIN:-}
-      PRACTITIONER_BASE_URL: ${PRACTITIONER_BASE_URL:-http://localhost:8080}
-      PATIENT_BASE_URL: ${PATIENT_BASE_URL:-http://localhost:8081}
+      PRACTITIONER_BASE_URL: ${HCW_PRACTITIONER_BASE_URL}
+      PATIENT_BASE_URL: ${HCW_PATIENT_BASE_URL}
       # Superuser, change the password before any real deployment
       SUPERUSER_EMAIL: ${SUPERUSER_EMAIL:-admin@example.com}
       SUPERUSER_PASSWORD: ${SUPERUSER_PASSWORD:-admin}
@@ -166,7 +166,7 @@ services:
     image: docker.io/iabsis/hcw6-admin:${HCW_TAG:-latest}
     restart: always
     environment:
-      BACKEND_URL: ${BACKEND_URL:-http://api:8000}
+      BACKEND_URL: http://api:8000
     depends_on:
       api:
         condition: service_healthy
@@ -226,12 +226,12 @@ services:
     image: docker.io/iabsis/hcw6-patient:${HCW_TAG:-latest}
     restart: always
     environment:
-      BACKEND_URL: ${BACKEND_URL:-http://api:8000}
+      BACKEND_URL: http://api:8000
     depends_on:
       api:
         condition: service_healthy
     ports:
-      - "${PATIENT_PORT:-8081}:8081"
+      - "${HCW_PATIENT_PORT:-8087}:8081"
     healthcheck:
       # Serves the SPA locally, no backend call involved
       test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8081/"]
@@ -247,12 +247,12 @@ services:
     image: docker.io/iabsis/hcw6-practitioner:${HCW_TAG:-latest}
     restart: always
     environment:
-      BACKEND_URL: ${BACKEND_URL:-http://api:8000}
+      BACKEND_URL: http://api:8000
     depends_on:
       api:
         condition: service_healthy
     ports:
-      - "${PRACTITIONER_PORT:-8080}:8080"
+      - "${HCW_PRACTITIONER_PORT:-8086}:8080"
     healthcheck:
       # Serves the SPA locally, no backend call involved
       test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8080/"]
