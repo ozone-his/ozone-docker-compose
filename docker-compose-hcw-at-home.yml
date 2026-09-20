@@ -101,8 +101,8 @@ services:
     depends_on: *backend-depends
     restart: "no"
     networks:
-      web:
-      ozone:
+      - web
+      - ozone
 
   provision:
     image: *backend-image
@@ -138,8 +138,8 @@ services:
         condition: service_completed_successfully
     restart: "no"
     networks:
-      web:
-      ozone:
+      - web
+      - ozone
 
   api:
     image: *backend-image
@@ -180,8 +180,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      web:
-      ozone:
+      - web
+      - ozone
 
   celery:
     entrypoint: celery -A core.celery worker --loglevel=info
@@ -200,8 +200,8 @@ services:
       retries: 3
       start_period: 60s
     networks:
-      web:
-      ozone:
+      - web
+      - ozone
 
   scheduler:
     entrypoint: celery -A core beat --loglevel=info
@@ -219,8 +219,8 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      web:
-      ozone:
+      - web
+      - ozone
 
   patient:
     image: docker.io/iabsis/hcw6-patient:${HCW_TAG:-latest}
@@ -240,8 +240,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      web:
-      ozone:
+      - web
+      - ozone
 
   practitioner:
     image: docker.io/iabsis/hcw6-practitioner:${HCW_TAG:-latest}
@@ -261,8 +261,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      web:
-      ozone:
+      - web
+      - ozone
 
   livekit:
     image: livekit/livekit-server:v1.8
