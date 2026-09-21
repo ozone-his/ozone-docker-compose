@@ -26,13 +26,15 @@ services:
       - -ec
       - |
         test -s /openmrs/module-overrides/fhir2-omod-2.5.2-SNAPSHOT.jar
-        test -s /openmrs/module-overrides/fhir2Extension-omod-2.0.0-c2c-496.jar
-        test -s /openmrs/module-overrides/webservices.rest-omod-3.3.0.jar
-        rm -f /openmrs/data/modules/fhir2-omod*
-        rm -f /openmrs/data/modules/fhir2Extension*
-        rm -f /openmrs/data/modules/webservices.rest*
+        rm -f /openmrs/data/modules/fhir2-*
         cp /openmrs/module-overrides/fhir2-omod-2.5.2-SNAPSHOT.jar /openmrs/data/modules/fhir2-omod-2.5.2-SNAPSHOT.omod
+        
+        test -s /openmrs/module-overrides/fhir2Extension-omod-2.0.0-c2c-496.jar
+        rm -f /openmrs/data/modules/fhir2Extension*
         cp /openmrs/module-overrides/fhir2Extension-omod-2.0.0-c2c-496.jar /openmrs/data/modules/fhir2Extension-omod-2.0.0-c2c-496.omod
+        
+        test -s /openmrs/module-overrides/webservices.rest-omod-3.3.0.jar
+        rm -f /openmrs/data/modules/webservices.rest*
         cp /openmrs/module-overrides/webservices.rest-omod-3.3.0.jar /openmrs/data/modules/webservices.rest-omod-3.3.0.omod
         exec ./bahmni_startup.sh
     environment:
