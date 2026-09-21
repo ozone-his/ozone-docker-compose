@@ -21,6 +21,14 @@ services:
 
   openmrs:
     image: bahmni/openmrs:1.2.0-rc #Replace 1.2.0-rc with 1.2.0 image when released
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        test -s /openmrs/module-overrides/webservices.rest-omod-3.3.0.jar
+        rm -f /openmrs/data/modules/webservices.rest*
+        cp /openmrs/module-overrides/webservices.rest-omod-3.3.0.jar /openmrs/data/modules/webservices.rest-omod-3.3.0.omod
+        exec ./bahmni_startup.sh
     environment:
       TZ: ${TIMEZONE}
       OMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
