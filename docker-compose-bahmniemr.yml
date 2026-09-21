@@ -25,8 +25,14 @@ services:
       - /bin/sh
       - -ec
       - |
+        test -s /openmrs/module-overrides/fhir2-omod-2.5.2-SNAPSHOT.jar
+        test -s /openmrs/module-overrides/fhir2Extension-omod-2.0.0-c2c-496.jar
         test -s /openmrs/module-overrides/webservices.rest-omod-3.3.0.jar
+        rm -f /openmrs/data/modules/fhir2-omod*
+        rm -f /openmrs/data/modules/fhir2Extension*
         rm -f /openmrs/data/modules/webservices.rest*
+        cp /openmrs/module-overrides/fhir2-omod-2.5.2-SNAPSHOT.jar /openmrs/data/modules/fhir2-omod-2.5.2-SNAPSHOT.omod
+        cp /openmrs/module-overrides/fhir2Extension-omod-2.0.0-c2c-496.jar /openmrs/data/modules/fhir2Extension-omod-2.0.0-c2c-496.omod
         cp /openmrs/module-overrides/webservices.rest-omod-3.3.0.jar /openmrs/data/modules/webservices.rest-omod-3.3.0.omod
         exec ./bahmni_startup.sh
     environment:
@@ -65,6 +71,8 @@ services:
       - "${BAHMNI_CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       - "bahmni-lab-results:/home/bahmni/uploaded_results"
       - "bahmni-uploaded-files:/home/bahmni/uploaded-files"
+      - "${BAHMNI_OPENMRS_MODULES_PATH:?}/fhir2-omod-2.5.2-SNAPSHOT.jar:/openmrs/module-overrides/fhir2-omod-2.5.2-SNAPSHOT.jar:ro"
+      - "${BAHMNI_OPENMRS_MODULES_PATH:?}/fhir2Extension-omod-2.0.0-c2c-496.jar:/openmrs/module-overrides/fhir2Extension-omod-2.0.0-c2c-496.jar:ro"
       - "${BAHMNI_OPENMRS_MODULES_PATH:?}/webservices.rest-omod-3.3.0.jar:/openmrs/module-overrides/webservices.rest-omod-3.3.0.jar:ro"
       - 'bahmni-patient-images:/home/bahmni/patient_images'
       - 'bahmni-document-images:/home/bahmni/document_images'
