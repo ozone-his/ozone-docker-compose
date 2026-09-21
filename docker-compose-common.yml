@@ -24,7 +24,8 @@ services:
       - --server-id=2
       - --sync-binlog=1
       - --binlog-annotate-row-events=0
-      - --max-connections=${MYSQL_MAX_CONNECTIONS}
+      - --max-connections=${MYSQL_MAX_CONNECTIONS:-200}
+      - --innodb-buffer-pool-size=${MYSQL_INNODB_BUFFER_POOL_SIZE:-2G}
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
     healthcheck:
