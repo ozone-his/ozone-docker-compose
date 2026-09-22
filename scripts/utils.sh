@@ -51,6 +51,8 @@ function exportPaths () {
     export OPENELIS_PROPERTIES_PATH=$DISTRO_PATH/configs/openelis/properties
     export EIP_ODOO_OPENELIS_ROUTES_PATH=$DISTRO_PATH/binaries/eip-odoo-openelis
     export EIP_ODOO_OPENELIS_DATA_DIR=$DISTRO_PATH/data/eip_odoo_openelis
+    export EIP_HCW_OPENMRS_ROUTES_PATH=$DISTRO_PATH/binaries/eip-hcwathome-openmrs
+    export HCW_CONFIG_PATH=$DISTRO_PATH/configs/hcw
 
     echo "→ OPENMRS_CONFIG_PATH=$OPENMRS_CONFIG_PATH"
     echo "→ OPENMRS_PROPERTIES_PATH=$OPENMRS_PROPERTIES_PATH"
@@ -80,6 +82,7 @@ function exportPaths () {
     echo "→ OPENELIS_PROPERTIES_PATH=$OPENELIS_PROPERTIES_PATH"
     echo "→ EIP_ODOO_OPENELIS_ROUTES_PATH=$EIP_ODOO_OPENELIS_ROUTES_PATH"
     echo "→ EIP_ODOO_OPENELIS_DATA_DIR=$EIP_ODOO_OPENELIS_DATA_DIR"
+    echo "→ HCW_CONFIG_PATH=$HCW_CONFIG_PATH"
 }
 
 function setDockerComposeCLIOptions () {
@@ -181,6 +184,7 @@ function setTraefikHostnames {
     export OPENELIS_HOSTNAME="openelis.docker.localhost"
     export FHIR_OPENELIS_HOSTNAME="fhir-openelis.docker.localhost"
     export BAHMNI_EMR_HOSTNAME="bahmni.docker.localhost"
+    export HCW_HOSTNAME="hcw.docker.localhost"
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
     echo "→ SENAITE_HOSTNAME=$SENAITE_HOSTNAME"
@@ -191,6 +195,7 @@ function setTraefikHostnames {
     echo "→ OPENELIS_HOSTNAME=$OPENELIS_HOSTNAME"
     echo "→ FHIR_OPENELIS_HOSTNAME=$FHIR_OPENELIS_HOSTNAME"
     echo "→ BAHMNI_EMR_HOSTNAME=$BAHMNI_EMR_HOSTNAME"
+    echo "→ HCW_HOSTNAME=$HCW_HOSTNAME"
 
 }
 
@@ -207,6 +212,7 @@ function setNginxHostnames {
     export OPENELIS_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
     export FHIR_OPENELIS_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:9095"
     export BAHMNI_EMR_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
+    export HCW_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8085"
 
     echo "→ O3_HOSTNAME=$O3_HOSTNAME"
     echo "→ ODOO_HOSTNAME=$ODOO_HOSTNAME"
@@ -218,6 +224,7 @@ function setNginxHostnames {
     echo "→ BAHMNI_EMR_HOSTNAME=$BAHMNI_EMR_HOSTNAME"
     echo "→ OPENELIS_HOSTNAME=$OPENELIS_HOSTNAME"
     echo "→ FHIR_OPENELIS_HOSTNAME=$FHIR_OPENELIS_HOSTNAME"
+    echo "→ HCW_HOSTNAME=$HCW_HOSTNAME"
 }
 
 function setGitpodHostnames {

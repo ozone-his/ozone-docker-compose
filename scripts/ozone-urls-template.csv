@@ -9,3 +9,4 @@ Orthanc,${SERVER_SCHEME}://${ORTHANC_HOSTNAME},orthanc,orthanc,orthanc
 OpenELIS,${SERVER_SCHEME}://${OPENELIS_HOSTNAME},admin,adminADMIN!,openelis
 FHIR OpenELIS,${SERVER_SCHEME}://${FHIR_OPENELIS_HOSTNAME},admin,password,openelis
 Keycloak,${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME},admin,password,keycloak
+HCW@Home,${SERVER_SCHEME}://${HCW_HOSTNAME},admin@example.com,admin
