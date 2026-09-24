@@ -1,7 +1,63 @@
 #!/usr/bin/env bash
 set -e
 
+# Read script arguments
+#
+# Default: all services off
+ENABLE_SSO=false
+DEMO=false
+ENABLE_LOGGING=false
+
+usage() {
+  cat <<EOF
+Usage: $0 [options]
+
+Options:
+  -s        Enable Single Sign-On
+  -d        Enable demo data creation service
+  -l        Enable logging service
+  -h        Show this help message and exit
+
+Examples:
+  $0 -s -l         # Enable Single Sign-On and Logging
+  $0 -d            # Enable Demo only
+EOF
+  exit 0
+}
+
 source utils.sh
+
+while getopts "sdlh" opt; do
+  case ${opt} in
+    s ) ENABLE_SSO=true ;;      # Enable SSO if -s is used
+    d ) DEMO=true ;;     # Enable Demo if -d is used
+    l ) ENABLE_LOGGING=true ;;  # Enable Logging if -l is used
+    h ) usage ;;
+    \? )
+      echo "Invalid option: -$OPTARG" >&2
+      usage
+      ;;
+  esac
+done
+
+# Enable services based on options
+if [ "$ENABLE_SSO" = true ]; then
+  echo "${INFO} 🔐 SSO service enabled"
+else
+  echo "${INFO} 🚫 SSO service disabled"
+fi
+
+if [ "$DEMO" = true ]; then
+  echo "${INFO} 🏥 Demo service enabled"
+else
+  echo "${INFO} 🚫 Demo service disabled"
+fi
+
+if [ "$ENABLE_LOGGING" = true ]; then
+  echo "${INFO} 📝 Logging service enabled"
+else
+  echo "${INFO} 🚫 Logging service disabled"
+fi
 
 # Set CLI options
 setDockerComposeCLIOptions
