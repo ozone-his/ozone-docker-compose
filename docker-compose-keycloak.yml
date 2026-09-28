@@ -1,7 +1,7 @@
 services:
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.4.5
+    image: quay.io/keycloak/keycloak:26.7.1
     restart: unless-stopped
     entrypoint: [ "/bin/bash", "-c" ]
     command: >
