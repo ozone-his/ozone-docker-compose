@@ -1,0 +1,53 @@
+services:
+
+  keycloak:
+    profiles: ["sso", "keycloak"]
+    image: quay.io/keycloak/keycloak:26.4.5
+    restart: unless-stopped
+    entrypoint: [ "/bin/bash", "-c" ]
+    command: >
+      "/opt/keycloak/bin/kc.sh build --health-enabled=true --metrics-enabled=true &&
+       /opt/keycloak/bin/kc.sh start --optimized --import-realm"
+    volumes:
+      - ${KEYCLOAK_CONFIG_PATH}/realms:/opt/keycloak/data/import
+      - ${KEYCLOAK_CONFIG_PATH}/themes:/opt/keycloak/themes
+    environment:
+      KC_HOSTNAME: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      KC_HOSTNAME_ADMIN: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+      KC_HOSTNAME_STRICT: 'false'
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: 'true'
+      KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: true
+      KC_HTTP_ENABLED: true
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgresql:5432/${KEYCLOAK_DB}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+      KC_DIR: /opt/keycloak/data/import
+      KC_OVERRIDE: 'false'
+      KC_LOG_CONSOLE_OUTPUT: json
+    healthcheck:
+      test: ["CMD-SHELL", "{ printf 'HEAD /health/ready HTTP/1.0\\r\\n\\r\\n' >&0; grep 'HTTP/1.0 200'; } 0<>/dev/tcp/localhost/9000"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
+    depends_on:
+      postgresql:
+        condition: service_started
+      env-substitution:
+        condition: service_completed_successfully
+    networks:
+      ozone:
+      web:
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.keycloak.rule: "Host(`${KEYCLOAK_HOSTNAME}`)"
+      traefik.http.routers.keycloak.entrypoints: "websecure"
+      traefik.http.services.keycloak.loadbalancer.server.port: 8080
+
+volumes:
+  keycloak-realm: ~

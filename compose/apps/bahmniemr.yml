@@ -1,0 +1,328 @@
+x-network: &ozone-network "ozone"
+
+x-default-logging: &default
+  {}
+
+x-log-config: &log-config
+  <<: *default
+
+services:
+
+  bahmni-config:
+    profiles: ["bahmniemr"]
+    image: bahmni/standard-config:1.0.0
+    volumes:
+      - '${BAHMNI_CONFIG_VOLUME:-bahmni-config}:/usr/local/bahmni_config'
+      - '${BAHMNI_CONFIG_OVERRIDE_PATH:-bahmni-config-override}:/usr/local/bahmni_config_override'
+    logging: *log-config
+    restart: unless-stopped
+    networks:
+      ozone:
+    command: ["sh", "-c", "rm -rf /etc/bahmni_config/masterdata/configuration && cp -r /usr/local/bahmni_config_override/frontend/* /etc/bahmni_config/openmrs && ./start.sh"]
+
+  # The Bahmni EMR's OpenMRS backend is named bahmni-openmrs to coexist in one
+  # compose model with the O3 openmrs app (all apps are included unconditionally);
+  # the 'openmrs' network alias keeps hostname-based access working.
+  bahmni-openmrs:
+    profiles: ["bahmniemr"]
+    image: bahmni/openmrs:1.2.0
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        test -s /openmrs/module-overrides/fhir2-omod-2.5.2.jar
+        rm -f /openmrs/data/modules/fhir2-*
+        cp /openmrs/module-overrides/fhir2-omod-2.5.2.jar /openmrs/data/modules/fhir2-omod-2.5.2.omod
+        
+        test -s /openmrs/module-overrides/fhir2Extension-omod-2.0.0-c2c-496.jar
+        rm -f /openmrs/data/modules/fhir2Extension*
+        cp /openmrs/module-overrides/fhir2Extension-omod-2.0.0-c2c-496.jar /openmrs/data/modules/fhir2Extension-omod-2.0.0-c2c-496.omod
+        
+        test -s /openmrs/module-overrides/webservices.rest-omod-3.3.0.jar
+        rm -f /openmrs/data/modules/webservices.rest*
+        cp /openmrs/module-overrides/webservices.rest-omod-3.3.0.jar /openmrs/data/modules/webservices.rest-omod-3.3.0.omod
+        exec ./bahmni_startup.sh
+    environment:
+      TZ: ${TIMEZONE}
+      OMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
+      OMRS_DB_HOSTNAME: ${OPENMRS_DB_HOST:?}
+      OMRS_DB_USERNAME: ${OPENMRS_DB_USER:?}
+      OMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
+      OMRS_CREATE_TABLES: ${OPENMRS_DB_CREATE_TABLES}
+      OMRS_AUTO_UPDATE_DATABASE: ${OPENMRS_DB_AUTO_UPDATE}
+      OMRS_MODULE_WEB_ADMIN: ${OPENMRS_MODULE_WEB_ADMIN}
+      # OMRS_DEV_DEBUG_PORT: ${OMRS_DEV_DEBUG_PORT}
+      OMRS_JAVA_SERVER_OPTS: ${OMRS_JAVA_SERVER_OPTS}
+      OMRS_JAVA_MEMORY_OPTS: ${OMRS_JAVA_MEMORY_OPTS}
+      SEND_MAIL: ${SEND_MAIL}
+      MAIL_TRANSPORT_PROTOCOL: ${MAIL_TRANSPORT_PROTOCOL}
+      MAIL_SMTP_HOST: ${MAIL_SMTP_HOST}
+      MAIL_SMTP_PORT: ${MAIL_SMTP_PORT}
+      MAIL_SMTP_AUTH: ${MAIL_SMTP_AUTH}
+      MAIL_SMTP_STARTTLS_ENABLE: ${MAIL_SMTP_STARTTLS_ENABLE}
+      MAIL_SMTP_SSL_ENABLE: ${MAIL_SMTP_SSL_ENABLE}
+      MAIL_DEBUG: ${MAIL_DEBUG}
+      MAIL_FROM: ${MAIL_FROM}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      OMRS_DOCKER_ENV: ${OPENMRS_DOCKER_ENV}
+      OMRS_C3P0_MAX_SIZE: ${OMRS_C3P0_MAX_SIZE}
+      WEIGHT_CONCEPT_UUID: ${WEIGHT_CONCEPT_UUID}
+      HEIGHT_CONCEPT_UUID: ${HEIGHT_CONCEPT_UUID}
+      OMRS_DB_EXTRA_ARGS: ${OMRS_DB_EXTRA_ARGS}
+      LUCENE_MATCH_TYPE: ${LUCENE_MATCH_TYPE}
+      DOCUMENT_MAX_SIZE_MB: ${DOCUMENT_MAX_SIZE_MB}
+    #ports:
+      # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
+    volumes:
+      - "${BAHMNI_CONFIG_VOLUME:-bahmni-config}:/etc/bahmni_config/:ro"
+      - "bahmni-lab-results:/home/bahmni/uploaded_results"
+      - "bahmni-uploaded-files:/home/bahmni/uploaded-files"
+      - "${BAHMNI_OPENMRS_MODULES_PATH:?}/fhir2-omod-2.5.2.jar:/openmrs/module-overrides/fhir2-omod-2.5.2.jar:ro"
+      - "${BAHMNI_OPENMRS_MODULES_PATH:?}/fhir2Extension-omod-2.0.0-c2c-496.jar:/openmrs/module-overrides/fhir2Extension-omod-2.0.0-c2c-496.jar:ro"
+      - "${BAHMNI_OPENMRS_MODULES_PATH:?}/webservices.rest-omod-3.3.0.jar:/openmrs/module-overrides/webservices.rest-omod-3.3.0.jar:ro"
+      - 'bahmni-patient-images:/home/bahmni/patient_images'
+      - 'bahmni-document-images:/home/bahmni/document_images'
+      - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
+      - "${BAHMNI_CONFIG_OVERRIDE_PATH:-openmrs-config}/initializer:/openmrs/distribution/openmrs_config/"
+      - 'configuration_checksums:/openmrs/data/configuration_checksums'
+      - 'sms-token:/openmrs/data/sms-token'
+    depends_on:
+      - mysql
+    logging: *log-config
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/index.htm" ]
+      interval: 10s
+      timeout: 5s
+      retries: 360
+      start_period: 180s
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.bahmni-openmrs.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && PathPrefix(`/openmrs`)"
+      traefik.http.routers.bahmni-openmrs.entrypoints: "websecure"
+      traefik.http.services.bahmni-openmrs.loadbalancer.server.port: 8080
+    networks:
+      ozone:
+        aliases:
+          - openmrs
+      web:
+
+  # Bahmni EIP routes
+  eip-bahmni:
+    profiles: ["bahmniemr"]
+    depends_on:
+      env-substitution:
+        condition: service_completed_successfully
+      bahmni-openmrs:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+    environment:
+      - EIP_PROFILE=prod
+      - EIP_DB_NAME_BAHMNI=${EIP_DB_NAME_BAHMNI}      - EIP_DB_USER_BAHMNI=${EIP_DB_USER_BAHMNI}
+      - EIP_DB_PASSWORD_BAHMNI=${EIP_DB_PASSWORD_BAHMNI}
+      - MYSQL_ADMIN_USER=root
+      - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - OPENMRS_DB_HOST=${OPENMRS_DB_HOST}
+      - OPENMRS_DB_PORT=${OPENMRS_DB_PORT}
+      - OPENMRS_DB_NAME=${OPENMRS_DB_NAME}
+      - OPENMRS_DB_USER=${OPENMRS_DB_USER}
+      - OPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD}
+      - BAHMNI_TEST_ORDER_TYPE_UUID=${EIP_TEST_ORDER_TYPE_UUID}
+    image: mekomsolutions/eip-client:sha-b2f32ae
+    networks:
+      ozone:
+    restart: unless-stopped
+    volumes:
+      - "${BAHMNI_CONFIG_OVERRIDE_PATH:-bahmni-eip}/eip/routes:/routes"
+      - "${BAHMNI_CONFIG_OVERRIDE_PATH:-bahmni-eip}/eip/config:/config"
+      - eip-home-bahmni:/eip-home
+
+  bahmni-web:
+    profiles: ["bahmniemr"]
+    image: bahmni/bahmni-web:1.3.0
+    volumes:
+      - "${BAHMNI_CONFIG_VOLUME:-bahmni-config}:/usr/local/apache2/htdocs/bahmni_config/:ro"
+    #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
+    #   - "${BAHMNI_APPS_PATH:?}/ui/node_modules/@bower_components/:/usr/local/apache2/htdocs/bahmni/components"
+    logging: *log-config
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.bahmni.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && (PathPrefix(`/bahmni`) || PathPrefix(`/person-management`) || PathPrefix(`/cgi-bin`))"
+      traefik.http.routers.bahmni.entrypoints: "websecure"
+      traefik.http.services.bahmni.loadbalancer.server.port: 8091
+
+      traefik.http.middlewares.frontend-stripprefix.stripprefix.prefixes: /bahmni/home
+      traefik.http.middlewares.frontend-stripprefix.stripprefix.forceslash: false
+      traefik.http.middlewares.home-redirectregex.redirectregex.regex: https://${BAHMNI_EMR_HOSTNAME}/bahmni
+      traefik.http.middlewares.home-redirectregex.redirectregex.replacement: https://${BAHMNI_EMR_HOSTNAME}/bahmni/home
+      traefik.http.middlewares.root-redirectregex.redirectregex.regex: https://${BAHMNI_EMR_HOSTNAME}
+      traefik.http.middlewares.root-redirectregex.redirectregex.replacement: https://${BAHMNI_EMR_HOSTNAME}/bahmni/home
+      traefik.http.middlewares.gzip.compress: true
+    networks:
+      ozone:
+      web:
+
+  implementer-interface:
+    profiles: ["bahmniemr"]
+    image: bahmni/implementer-interface:1.1.1
+    #volumes:
+    #  - "${IMPLEMENTER_INTERFACE_CODE_PATH:?}/dist:/usr/local/apache2/htdocs/implementer_interface"
+    depends_on:
+      - bahmni-openmrs
+    logging: *log-config
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.bahmni-implementer-interface.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && PathPrefix(`/implementer-interface`)"
+      traefik.http.routers.bahmni-implementer-interface.entrypoints: "websecure"
+      traefik.http.services.bahmni-implementer-interface.loadbalancer.server.port: 80
+    networks:
+      ozone:
+      web:
+
+  reports:
+    profiles: ["bahmniemr"]
+    image: bahmni/reports:1.1.0
+    environment:
+      TZ: ${TIMEZONE}
+      OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
+      OPENMRS_DB_USERNAME: root
+      OPENMRS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
+      OPENMRS_HOST: ${OPENMRS_HOST:?}
+      OPENMRS_PORT: ${OPENMRS_PORT:?}
+      REPORTS_DB_SERVER: reportsdb
+      REPORTS_DB_NAME: ${REPORTS_DB_NAME:?}
+      REPORTS_DB_USERNAME: ${REPORTS_DB_USERNAME:?}
+      REPORTS_DB_PASSWORD: ${REPORTS_DB_PASSWORD:?}
+      ODOO_DB_SERVER: ${POSTGRES_DB_HOST:?}
+      ODOO_DB_NAME: ${ODOO_DATABASE:?}
+      ODOO_DB_USERNAME: ${ODOO_DB_USER:?}
+      ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD:?}
+      ICD10_LITE_INDICATOR: ${ICD10_LITE_INDICATOR}
+    volumes:
+      - "${BAHMNI_CONFIG_VOLUME:-bahmni-config}:/etc/bahmni_config/:ro"
+      - "bahmni-queued-reports:/home/bahmni/reports"
+    # - "../snomed-resources/icd10-extensions-1.0.0-SNAPSHOT.jar:/var/run/bahmni-reports/bahmni-reports/WEB-INF/lib/icd10-extensions-1.0.0-SNAPSHOT.jar:ro"
+    depends_on:
+      - reportsdb
+      - mysql
+      - bahmni-web
+    logging: *log-config
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.bahmni-reports.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && PathPrefix(`/bahmnireports`)"
+      traefik.http.routers.bahmni-reports.entrypoints: "websecure"
+      traefik.http.services.bahmni-reports.loadbalancer.server.port: 8051
+    networks:
+      ozone:
+      web:
+
+  reportsdb:
+    profiles: ["bahmniemr"]
+    platform: linux/amd64
+    image: mysql:8.0
+    environment:
+      TZ: ${TIMEZONE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
+      MYSQL_DATABASE: ${REPORTS_DB_NAME:?}
+      MYSQL_USER: ${REPORTS_DB_USERNAME:?}
+      MYSQL_PASSWORD: ${REPORTS_DB_PASSWORD:?}
+    volumes:
+      - 'reportsdbdata:/var/lib/mysql'
+    logging: *log-config
+    restart: unless-stopped
+    networks:
+      ozone:
+
+  patient-documents:
+    profiles: ["bahmniemr"]
+    image: bahmni/patient-documents:1.1.1
+    volumes:
+      - 'bahmni-document-images:/usr/share/nginx/html/document_images'
+      - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
+      - "bahmni-uploaded-files:/usr/share/nginx/html/uploaded-files"
+    environment:
+      TZ: ${TIMEZONE}
+      OPENMRS_HOST: ${OPENMRS_HOST:?}
+    depends_on:
+      - bahmni-openmrs
+    logging: *log-config
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.bahmni-patient-documents.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && (PathPrefix(`/document_images`) || PathPrefix(`/uploaded_results`) || PathPrefix(`/uploaded-files`))"
+      traefik.http.routers.bahmni-patient-documents.entrypoints: "websecure"
+      traefik.http.services.bahmni-patient-documents.loadbalancer.server.port: 80
+    networks:
+      ozone:
+      web:
+
+  appointments:
+    profiles: ["bahmniemr"]
+    image: bahmni/appointments:1.2.0
+    restart: unless-stopped
+    # volumes:
+    # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.bahmni-appointments.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && PathPrefix(`/appointments`)"
+      traefik.http.routers.bahmni-appointments.entrypoints: "websecure"
+      traefik.http.services.bahmni-appointments.loadbalancer.server.port: 80
+    networks:
+      ozone:
+      web:
+
+  sms-service:
+    profiles: ["bahmniemr"]
+    image: bahmni/sms-service:1.1.0
+    restart: unless-stopped
+    environment:
+      TZ: ${TIMEZONE}
+      SMS_TOKEN: ${SMS_TOKEN}
+      SMS_ORIGINATOR: ${SMS_ORIGINATOR}
+      SMS_PROVIDER_API: ${SMS_PROVIDER_API}
+      SMS_OPENMRS_HOST: ${OPENMRS_HOST:?}
+      SMS_OPENMRS_PORT: ${OPENMRS_PORT:?}
+      SMS_COUNTRY_CODE: ${SMS_COUNTRY_CODE}
+    volumes:
+      - 'sms-token:/opt/tokens'
+    networks:
+      ozone:
+
+  ipd:
+    profiles: ["bahmniemr"]
+    image: bahmni/microfrontend-ipd:1.0.0
+    container_name: ipd
+    restart: unless-stopped
+    # volumes:
+    #   - "${IPD_PATH:?}/dist/federation/:/usr/local/apache2/htdocs/ipd"
+    logging: *log-config
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.bahmni-ipd.rule: "Host(`${BAHMNI_EMR_HOSTNAME}`) && PathPrefix(`/ipd`)"
+      traefik.http.routers.bahmni-ipd.entrypoints: "websecure"
+      traefik.http.services.bahmni-ipd.loadbalancer.server.port: 80
+    networks:
+      ozone:
+      web:
+
+volumes:
+  eip-home-bahmni:
+  openmrs-data:
+  openmrsdbdata:
+  bahmni-config-override: ~
+  bahmni-patient-images:
+  bahmni-document-images:
+  bahmni-clinical-forms:
+  bahmni-config:
+  bahmni-lab-results:
+  bahmni-uploaded-files:
+  configuration_checksums:
+  sms-token:
+  bahmni-queued-reports:
+  reportsdbdata:

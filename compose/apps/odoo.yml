@@ -1,0 +1,100 @@
+services:
+
+  # Odoo
+  odoo:
+    profiles: ["odoo"]
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      - HOST=${POSTGRES_DB_HOST}
+      - USER=${ODOO_DB_USER}
+      - PASSWORD=${ODOO_DB_PASSWORD}
+      - ADDONS=${ODOO_ADDONS}
+      - INITIALIZER_DATA_FILES_PATH=/mnt/odoo_config
+      - INITIALIZER_CONFIG_FILE_PATH=/mnt/odoo_config/initializer_config.json
+    image: mekomsolutions/odoo
+    labels:
+      traefik.enable: true
+      # https
+      traefik.http.routers.odoo-https.rule: Host(`${ODOO_HOSTNAME}`)
+      traefik.http.routers.odoo-https.entrypoints: websecure
+      traefik.http.routers.odoo-https.service: odoo
+      traefik.http.routers.odoo-https.middlewares: gzip,sslheader,limit
+      #----------------------------- routes for: odoo/web/database || odoo/website/info  -----------------------------
+      # https 
+      traefik.http.routers.odoo-db-https.rule: Host(`${ODOO_HOSTNAME}`) && (PathPrefix(`/web/database`) || PathPrefix(`/website/info`))
+      traefik.http.routers.odoo-db-https.entrypoints: websecure
+      traefik.http.routers.odoo-db-https.service: odoo
+      traefik.http.routers.odoo-db-https.middlewares: gzip,sslheader,limit
+      traefik.http.services.odoo-db-https.loadbalancer.server.port: 8069
+      #---------------------------------------- routes for: odoo/longpolling ------------------------------------------------
+      # https 
+      traefik.http.routers.odoo-im-https.rule: Host(`${ODOO_HOSTNAME}`) && (PathPrefix(`/longpolling`))
+      traefik.http.routers.odoo-im-https.entrypoints: websecure
+      traefik.http.routers.odoo-im-https.service: odoo-im
+      traefik.http.routers.odoo-im-https.middlewares: gzip,sslheader,limit
+
+      #====================================================== services ===========================================================
+      traefik.http.services.odoo.loadbalancer.server.port: 8069
+      traefik.http.services.odoo-im.loadbalancer.server.port: 8072
+
+      #===================================================== middlewares =========================================================
+      traefik.http.middlewares.gzip.compress: true
+      traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto: https
+      traefik.http.middlewares.limit.buffering.memRequestBodyBytes: 20971520
+      traefik.http.middlewares.limit.buffering.maxRequestBodyBytes: 20971520
+
+      #=====================================================backup================================================================
+      restic-compose-backup.volumes: true
+      restic-compose-backup.volumes.include: "${ODOO_FILESTORE:-odoo-filestore},${ODOO_CONFIG_CHECKSUMS_PATH:-odoo-checksums}"
+    networks:
+      ozone:
+        aliases:
+         - odoo
+      web:
+    restart: unless-stopped
+    volumes:
+      - "${ODOO_FILESTORE:-odoo-filestore}:/var/lib/odoo/filestore"
+      - "${ODOO_EXTRA_ADDONS:-odoo-extra-addons}:/mnt/extra-addons"
+      - "${ODOO_CONFIG_PATH:-odoo-config}:/mnt/odoo_config"
+      - "${ODOO_CONFIG_FILE_PATH:-odoo-config}:/etc/properties/odoo.conf"
+      - "${ODOO_CONFIG_CHECKSUMS_PATH:-odoo-checksums}:/mnt/checksums"
+    
+  fhir-odoo:
+    profiles: ["odoo"]
+    depends_on:
+      env-substitution:
+        condition: service_completed_successfully
+      odoo:
+        condition: service_started
+    environment:
+      - ODOO_HOST=http://odoo
+      - ODOO_PORT=8069
+      - ODOO_DATABASE=${ODOO_DATABASE}
+      - EIP_ODOO_DRUGS_CATEGORY_EXT_ID=${EIP_ODOO_DRUGS_CATEGORY_EXT_ID}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - FHIR_ODOO_LOCK_REDIS_ENABLED=true
+    image: mekomsolutions/fhir-odoo
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.fhir-erp.rule: "Host(`${FHIR_ODOO_HOSTNAME}`)"
+      traefik.http.routers.fhir-erp.entrypoints: "websecure"
+      traefik.http.services.fhir-erp.loadbalancer.server.port: 8080
+    networks:
+      web:
+      ozone:
+        aliases:
+          - fhir-erp
+          - fhir-odoo
+          - odoo-fhir-facade
+    restart: unless-stopped
+
+volumes:
+  odoo-checksums: ~
+  odoo-config: ~
+  odoo-extra-addons: ~
+  odoo-filestore: ~
+  odoo-web-data: ~

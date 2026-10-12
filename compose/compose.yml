@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------------------
+# Ozone distro entry compose file.
+#
+# Every module whose services are profile-gated is included unconditionally;
+# what runs is decided purely by COMPOSE_PROFILES (see configs/catalog.yml).
+#
+# NOT included here, on purpose: files that override other services'
+# definitions (compose cannot merge such fragments conditionally). They are
+# appended as extra -f files by ozonectl when their condition is active:
+#   sso/openmrs.yml, sso/odoo.yml, sso/senaite.yml  (per-app SSO overrides)
+#   sso/erpnext.yml, sso/orthanc.yml               (per-integration SSO overrides)
+#   support/restore.yml, sso/restore.yml           (restore mode)
+#   apps/bahmniemr-senaite-override.yml            (bahmniemr + senaite)
+# ---------------------------------------------------------------------------
+include:
+  # Base
+  - other/common.yml
+  - other/databases.yml
+  - other/redis.yml
+
+  # Apps (profile: app name)
+  - apps/openmrs.yml
+  - apps/bahmniemr.yml
+  - apps/senaite.yml
+  - apps/odoo.yml
+  - apps/erpnext.yml
+  - apps/openelis.yml
+  - apps/orthanc.yml
+
+  # Integrations (profile: integration name)
+  - integrations/eip-erpnext-openmrs.yml
+  - integrations/eip-openmrs-senaite.yml
+  - integrations/eip-odoo-openmrs.yml
+  - integrations/eip-openmrs-orthanc.yml
+  - integrations/eip-odoo-openelis.yml
+
+  # SSO (profile: sso)
+  - sso/keycloak.yml
+
+  # Backup (profile: backup)
+  - support/backup.yml

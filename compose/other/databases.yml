@@ -1,0 +1,110 @@
+services:
+  mysql:
+    profiles:
+      - openmrs
+      - bahmniemr
+      - erpnext
+      - eip-openmrs-senaite
+      - eip-odoo-openmrs
+      - eip-erpnext-openmrs
+      - eip-openmrs-orthanc
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+      - --skip-innodb-read-only-compressed
+      - --log-bin=mysqld-bin
+      - --binlog-format=ROW
+      - --server-id=2
+      - --sync-binlog=1
+      - --binlog-annotate-row-events=0
+      - --max-connections=${MYSQL_MAX_CONNECTIONS:-200}
+      - --innodb-buffer-pool-size=${MYSQL_INNODB_BUFFER_POOL_SIZE:-2G}
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      DB_INIT_LIST: ${DB_INIT_LIST:-}
+      # Database credentials consumed by the init scripts in data/mysql/*.
+      # All values are provided by the generated .env.
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
+      OPENMRS_DB_USER: ${OPENMRS_DB_USER}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
+      EIP_DB_NAME_BAHMNI: ${EIP_DB_NAME_BAHMNI}
+      EIP_DB_USER_BAHMNI: ${EIP_DB_USER_BAHMNI}
+      EIP_DB_PASSWORD_BAHMNI: ${EIP_DB_PASSWORD_BAHMNI}
+      EIP_DB_NAME_ODOO: ${EIP_DB_NAME_ODOO}
+      EIP_DB_USER_ODOO: ${EIP_DB_USER_ODOO}
+      EIP_DB_PASSWORD_ODOO: ${EIP_DB_PASSWORD_ODOO}
+      EIP_DB_NAME_SENAITE: ${EIP_DB_NAME_SENAITE}
+      EIP_DB_USER_SENAITE: ${EIP_DB_USER_SENAITE}
+      EIP_DB_PASSWORD_SENAITE: ${EIP_DB_PASSWORD_SENAITE}
+      EIP_DB_NAME_ERPNEXT: ${EIP_DB_NAME_ERPNEXT}
+      EIP_DB_USER_ERPNEXT: ${EIP_DB_USER_ERPNEXT}
+      EIP_DB_PASSWORD_ERPNEXT: ${EIP_DB_PASSWORD_ERPNEXT}
+      EIP_DB_NAME_ORTHANC: ${EIP_DB_NAME_ORTHANC}
+      EIP_DB_USER_ORTHANC: ${EIP_DB_USER_ORTHANC}
+      EIP_DB_PASSWORD_ORTHANC: ${EIP_DB_PASSWORD_ORTHANC}
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping --protocol=tcp -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    image: mariadb:10.11
+    networks:
+      - ozone
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    restart: unless-stopped
+    volumes:
+      - "${MYSQL_DATADIR:-mysql-data}:/var/lib/mysql"
+      # The whole data tree is mounted; which DBs are initialized is decided
+      # by DB_INIT_LIST (see configs/catalog.yml), not by what is mounted.
+      - "${SQL_SCRIPTS_PATH}/mysql:/docker-entrypoint-initdb.d/db"
+      - "${SQL_SCRIPTS_PATH}/mysql/create_db.sh:/docker-entrypoint-initdb.d/create_db.sh"
+    labels:
+      restic-compose-backup.mariadb: true
+
+  postgresql:
+    profiles: ["senaite", "odoo", "openelis", "sso"]
+    command: postgres -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10 -c max_connections=200 -c max_slot_wal_keep_size=2GB
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_INIT_LIST: ${DB_INIT_LIST:-}
+      # Database credentials consumed by the init scripts in data/postgresql/*.
+      # All values are provided by the generated .env.
+      ODOO_DB_NAME: ${ODOO_DATABASE}
+      ODOO_DB_USER: ${ODOO_DB_USER}
+      ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD}
+      SENAITE_DB_NAME: ${SENAITE_DB_NAME}
+      SENAITE_DB_USER: ${SENAITE_DB_USER}
+      SENAITE_DB_PASSWORD: ${SENAITE_DB_PASSWORD}
+      OPENELIS_DB_NAME: ${OPENELIS_DB_NAME}
+      OPENELIS_DB_SCHEMA: ${OPENELIS_DB_SCHEMA}
+      OPENELIS_DB_USER: ${OPENELIS_DB_USER}
+      OPENELIS_DB_PASSWORD: ${OPENELIS_DB_PASSWORD}
+      OPENELIS_DB_ADMIN_PASSWORD: ${OPENELIS_DB_ADMIN_PASSWORD}
+      KEYCLOAK_DB: ${KEYCLOAK_DB}
+      KEYCLOAK_DB_SCHEMA: ${KEYCLOAK_DB_SCHEMA}
+      KEYCLOAK_DB_USER: ${KEYCLOAK_DB_USER}
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    image: postgres:13
+    networks:
+      - ozone
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    restart: unless-stopped
+    volumes:
+      - "${POSTGRES_DATADIR:-postgresql-data}:/var/lib/postgresql/data"
+      # The whole data tree is mounted; which DBs are initialized is decided
+      # by DB_INIT_LIST (see configs/catalog.yml), not by what is mounted.
+      - "${SQL_SCRIPTS_PATH}/postgresql:/docker-entrypoint-initdb.d/db"
+      - "${SQL_SCRIPTS_PATH}/postgresql/create_db.sh:/docker-entrypoint-initdb.d/create_db.sh"
+    labels:
+      restic-compose-backup.postgres: true

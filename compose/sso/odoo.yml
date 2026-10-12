@@ -1,0 +1,4 @@
+services:
+  odoo:
+    environment:
+      - ADDONS=${ODOO_ADDONS},auth_oidc,auth_oauth_autologin,sso_user_roles

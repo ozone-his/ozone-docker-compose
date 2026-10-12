@@ -1,0 +1,13 @@
+services:
+  grafana-agent:
+    image: grafana/agent:latest
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log:/var/log:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - ./logging/agent-config.yaml:/etc/grafana-agent/config.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - LOKI_URL=${LOKI_URL:-http://host.docker.internal:3100/loki/api/v1/push}
+    entrypoint: ["/bin/grafana-agent", "-config.expand-env", "--config.file=/etc/grafana-agent/config.yaml"]
+    restart: unless-stopped

@@ -1,0 +1,56 @@
+services:
+  openmrs:
+    hostnames:
+      O3_HOSTNAME: ${HOST_NAME}
+    datadirs:
+      OPENMRS_CONFIG_CHECKSUMS_PATH:
+    configs:
+      NUMBER_OF_DEMO_PATIENTS: 
+  bahmniemr:
+    hostnames:
+      BAHMNI_EMR_HOSTNAME: ${HOST_NAME}
+  odoo:
+    hostnames:
+      ODOO_HOSTNAME: ${HOST_NAME}:8069
+      FHIR_ODOO_HOSTNAME: ${HOST_NAME}:8083
+    datadirs:
+      ODOO_FILESTORE: 
+      ODOO_CONFIG_CHECKSUMS_PATH: 
+  senaite:
+    hostnames:
+      SENAITE_HOSTNAME: ${HOST_NAME}:8081
+  erpnext:
+    hostnames:
+      ERPNEXT_HOSTNAME: ${HOST_NAME}:8082
+  superset:
+    hostnames:
+      SUPERSET_HOSTNAME: ${HOST_NAME}:8088
+  keycloak:
+    hostnames:
+      KEYCLOAK_HOSTNAME: ${HOST_NAME}:8084
+  orthanc:
+    hostnames:
+      ORTHANC_HOSTNAME: ${HOST_NAME}:8889
+  openelis:
+    hostnames:
+      OPENELIS_HOSTNAME: ${HOST_NAME}:8090
+      OPENELIS_FHIR_HOSTNAME: ${HOST_NAME}:8091
+    datadirs:
+      OPENELIS_TRUST_STORE: 
+      OPENELIS_KEYS: 
+      OPENELIS_CERTS: 
+      OPENELIS_LUCENE_INDEX: 
+  redis:
+    datadirs:
+      REDIS_DATA_DIR:
+      REDIS_INSIGHT_DATA_DIR:
+  databases:
+    datadirs:
+      MYSQL_DATADIR: 
+      POSTGRES_DATADIR: 
+
+extra:
+  TIMEZONE: UTC
+  GITPOD_ENV: false
+  CLIENT_MAX_BODY_SIZE: 10M
+

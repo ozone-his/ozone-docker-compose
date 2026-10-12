@@ -1,0 +1,269 @@
+services:
+  openmrs:
+    configs:
+      # OpenMRS backend
+      OPENMRS_HOST: openmrs
+      OPENMRS_PORT: 8080
+      OPENMRS_DB_SQL_MODES: 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'
+      OPENMRS_DB_CREATE_TABLES: 'true'
+      OPENMRS_DB_AUTO_UPDATE: 'true'
+      OPENMRS_MODULE_WEB_ADMIN: 'false'
+      OMRS_JAVA_SERVER_OPTS: ''
+      OMRS_JAVA_MEMORY_OPTS: ''
+      OPENMRS_UPLOAD_FILES_PATH: ./openmrs-uploads
+      BAHMNI_OPENMRS_MODULES_PATH: 
+      OPENMRS_DB_TYPE: mysql
+      OMRS_C3P0_MAX_SIZE: 50
+      OPENMRS_DOCKER_ENV: 'true'
+      OMRS_DB_EXTRA_ARGS: "&zeroDateTimeBehavior: convertToNull"
+      LUCENE_MATCH_TYPE: "START"
+      DOCUMENT_MAX_SIZE_MB: 
+      # OpenMRS database
+      OPENMRS_DB_USER: openmrs
+      OPENMRS_DB_PASSWORD: password
+      OPENMRS_USER: admin
+      OPENMRS_PASSWORD: Admin123
+      OPENMRS_DB_HOST: mysql
+      OPENMRS_DB_PORT: 3306
+      OPENMRS_DB_NAME: openmrs
+
+      OPENMRS_PUBLIC_PORT: 
+      # OpenMRS frontend and backend Docker image tag
+      O3_DOCKER_IMAGE_TAG: 3.7.1
+    paths:
+    sso:
+      OPENMRS_CLIENT_UUID: 14b6083d-2d3c-4fb1-a75d-0f5af17be198
+      OPENMRS_CLIENT_SECRET: AYmNV4AEHA0Tlxwa
+
+  bahmniemr:
+    configs:
+      # Mail Config Properties Environment Variables
+      MAIL_TRANSPORT_PROTOCOL: smtps
+      MAIL_SMTP_AUTH: true
+      MAIL_SMTP_STARTTLS_ENABLE: true
+      MAIL_SMTP_SSL_ENABLE: true
+      MAIL_DEBUG: false
+      SEND_MAIL: false
+      MAIL_FROM: 
+      MAIL_SMTP_HOST: 
+      MAIL_SMTP_PORT: 
+      MAIL_USER: 
+      MAIL_PASSWORD:
+      # Bahmni Reports Environment Variables
+      REPORTS_DB_NAME: bahmni_reports
+      REPORTS_DB_USERNAME: reports-user
+      REPORTS_DB_PASSWORD: password
+      # OpenMRS backend
+      OPENMRS_HOST: openmrs
+      OPENMRS_PORT: 8080
+      OPENMRS_DB_SQL_MODES: 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'
+      OPENMRS_DB_CREATE_TABLES: 'true'
+      OPENMRS_DB_AUTO_UPDATE: 'true'
+      OPENMRS_MODULE_WEB_ADMIN: 'false'
+      OMRS_JAVA_SERVER_OPTS: ''
+      OMRS_JAVA_MEMORY_OPTS: ''
+      OPENMRS_UPLOAD_FILES_PATH: ./openmrs-uploads
+      BAHMNI_OPENMRS_MODULES_PATH: 
+      OPENMRS_DB_TYPE: mysql
+      OMRS_C3P0_MAX_SIZE: 50
+      OPENMRS_DOCKER_ENV: 'true'
+      OMRS_DB_EXTRA_ARGS: "&zeroDateTimeBehavior: convertToNull"
+      LUCENE_MATCH_TYPE: "START"
+      DOCUMENT_MAX_SIZE_MB: 
+      #SMS-service Environment Variables
+      SMS_TOKEN: 
+      SMS_ORIGINATOR: 
+      SMS_PROVIDER_API: "https://api.d7networks.com/messages/v1/send"
+      SMS_COUNTRY_CODE: 
+      # SNOMED-ICD10 Reporting
+      ICD10_LITE_INDICATOR: true
+      # OpenMRS database
+      OPENMRS_DB_USER: openmrs
+      OPENMRS_DB_PASSWORD: password
+      OPENMRS_USER: admin
+      OPENMRS_PASSWORD: Admin123
+      OPENMRS_DB_HOST: mysql
+      OPENMRS_DB_PORT: 3306
+      OPENMRS_DB_NAME: openmrs
+      
+      OPENMRS_PUBLIC_PORT: 
+    paths:
+  
+  senaite:
+    configs:
+      SITE: senaite
+      SENAITE_ADMIN_USER: admin
+      SENAITE_ADMIN_PASSWORD: password
+      SENAITE_DB_NAME: senaite
+      SENAITE_DB_USER: senaite
+      SENAITE_DB_PASSWORD: password
+      SENAITE_DB_HOST: postgresql
+      SENAITE_PUBLIC_PORT: 
+    paths:
+    sso:
+      SENAITE_CLIENT_UUID: 3b8672bf-b239-46e5-b0b6-8ba71a4bf5ac
+      SENAITE_CLIENT_SECRET: Vdi1xIgJiUcrF4dx
+  
+  odoo:
+    configs:
+      ODOO_DB_USER: odoo
+      ODOO_DB_PASSWORD: password
+      ODOO_USER: admin
+      ODOO_PASSWORD: admin
+      ODOO_PUBLIC_PORT: 
+      ODOO_MASTER_PASSWORD: password
+      ODOO_INITIALIZER_DATA_FILES_PATH: 
+      ODOO_CONFIG_PATH: 
+      ODOO_INITIALIZER_CONFIG_FILE_PATH: 
+      ODOO_DATABASE: odoo
+    paths:
+    sso:
+      ODOO_CLIENT_UUID: 70a0e2fd-2bb2-4417-9fc6-22cdca1bb5be
+      ODOO_CLIENT_SECRET: z3epa8rE66tUIZz6
+
+  erpnext:
+    configs:
+      ERPNEXT_USER: administrator
+      ERPNEXT_PASSWORD: password
+      ERPNEXT_DB_NAME: erpnext
+    paths:
+  
+  orthanc:
+    configs:
+    paths:
+  
+  openelis:
+    configs:
+      # OpenELIS Global
+      OPENELIS_DB_HOST: postgresql
+      OPENELIS_DB_SCHEMA: clinlims
+      OPENELIS_DB_NAME: clinlims
+      OPENELIS_DB_USER: clinlims
+      OPENELIS_DB_PASSWORD: password
+      OPENELIS_DEFAULT_PASSWORD: adminADMIN!
+      OPENELIS_DB_ADMIN_PASSWORD: adminPassword
+      # OpenELIS FHIR Server
+      OPENELIS_FHIR_SERVER_USERNAME: admin
+      OPENELIS_FHIR_SERVER_PASSWORD: adminADMIN!
+      OPENELIS_TRAEFIK_LABEL: openelis
+      OPENELIS_FHIR_TRAEFIK_LABEL: fhir
+      OPENELIS_PUBLIC_PORT: 
+
+      SSL_TRUSTSTORE_PATH: /etc/openelis-global/truststore
+      SSL_TRUSTSTORE_PASSWORD: tspass
+      SSL_KEYSTORE_PATH: /etc/openelis-global/keystore
+      SSL_KEYSTORE_PASSWORD: kspass
+    paths:
+  
+  keycloak:
+    configs:
+      KEYCLOAK_DB_USER: keycloak
+      KEYCLOAK_DB_PASSWORD: keycloak
+      KEYCLOAK_DB: keycloak
+      KEYCLOAK_DB_SCHEMA: keycloak
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_INTERNAL_HOST_URL: http://keycloak:8080
+      KEYCLOAK_ADMIN_SA_CLIENT_SECRET: 5HuMNB6gwHd0fY2L
+      
+      # Superset client is always configured for now
+      SUPERSET_CLIENT_ENABLED: false
+      SUPERSET_CLIENT_UUID: 891b980a-9edb-4c72-a63d-1f8e488d6ad4
+      SUPERSET_CLIENT_SECRET: znZK8dvk7hLOpwfU
+
+  eip:
+  # TODO Needs to be split per EIP service
+    configs:
+      EIP_TEST_ORDER_TYPE_UUID: 
+      EIP_ODOO_DRUGS_CATEGORY_EXT_ID: categ_products_drug_orders
+      EIP_ODOO_FHIR_SERVER_URL: http://fhir-odoo:8080
+      EIP_PRODUCT_SYNC_INITIAL_DELAY: 60000
+      EIP_PRODUCT_SYNC_DELAY: 86400000
+
+      # EIP client SENAITE
+      EIP_DB_NAME_SENAITE: openmrs_eip_mgt_senaite
+      EIP_DB_USER_SENAITE: openmrs_eip_mgt_senaite
+      EIP_DB_PASSWORD_SENAITE: password
+      DB_EVENT_DESTINATIONS_SENAITE: direct:openmrs-to-senaite-event-listener
+
+      # EIP client Odoo
+      EIP_DB_NAME_ODOO: openmrs_eip_mgt_odoo
+      EIP_DB_USER_ODOO: openmrs_eip_mgt_odoo
+      EIP_DB_PASSWORD_ODOO: password
+      DB_EVENT_DESTINATIONS_ODOO: direct:odoo-event-listener
+      ODOO_CUSTOMER_EXTERNAL_ID: comment
+      ODOO_CUSTOMER_DOB_FIELD: 
+      ODOO_CUSTOMER_WEIGHT_FIELD: 
+
+      # EIP client Orthanc
+      EIP_DB_NAME_ORTHANC: openmrs_eip_mgt_orthanc
+      EIP_DB_USER_ORTHANC: openmrs_eip_mgt_orthanc
+      EIP_DB_PASSWORD_ORTHANC: password
+      DB_EVENT_DESTINATIONS_ORTHANC: direct:orthanc-event-listener
+
+      # EIP client ERPNext
+      EIP_DB_NAME_ERPNEXT: openmrs_eip_mgt_erpnext
+      EIP_DB_USER_ERPNEXT: openmrs_eip_mgt_erpnext
+      EIP_DB_PASSWORD_ERPNEXT: password
+
+      #EIP Odoo OpenELIS
+      EIP_ODOO_OPENELIS_LOG_LEVEL: 
+      EIP_ODOO_OPENELIS_DATA_DIR: 
+      EIP_SYNC_TASK_TS_OVERLAP: 45000
+      EIP_SYNC_TASK_INITIAL_DELAY: 60000
+      EIP_SYNC_TASK_DELAY: 300000
+      EIP_ODOO_OPENELIS_URL: http://eip-odoo-openelis:8080
+
+      # EIP Bahmni
+      EIP_DB_NAME_BAHMNI: openmrs_eip_mgt_bahmni
+      EIP_DB_USER_BAHMNI: openmrs_eip_mgt_bahmni
+      EIP_DB_PASSWORD_BAHMNI: password
+      
+    sso:
+      OAUTH_CLIENT_ID: eip
+      OAUTH_CLIENT_SECRET: h9PQzv6zWnVl1yxnhdfZulnW7FPqPlci
+      OAUTH_CLIENT_SCOPE: openid
+      OAUTH_ACCESS_TOKEN_URL: http://keycloak:8080/realms/ozone/protocol/openid-connect/token
+
+  redis:
+    configs:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password
+  
+  backup:
+    configs:
+      RESTIC_REPOSITORY: /restic_data
+      RESTIC_PASSWORD: password
+      RESTIC_KEEP_DAILY: 7
+      RESTIC_KEEP_WEEKLY: 4
+      RESTIC_KEEP_MONTHLY: 12
+      RESTIC_KEEP_YEARLY: 3
+      CRON_SCHEDULE: '*/5 * * * *'
+      LOG_LEVEL: info
+      # Amazon S3 access (Provide if RESTIC_REPOSITORY points to an S3 bucket)
+      AWS_DEFAULT_REGION: eu-west-1
+      AWS_ACCESS_KEY_ID: 
+      AWS_SECRET_ACCESS_KEY: 
+      BACKUP_PATH:
+  
+  restore:
+    configs:
+      RESTIC_REPOSITORY: /restic_data
+      RESTIC_PASSWORD: password
+      # The snapshot to restore from
+      RESTIC_RESTORE_SNAPSHOT: latest
+      LOG_LEVEL: info
+      # Amazon S3 access (Provide if RESTIC_REPOSITORY points to an S3 bucket)
+      AWS_DEFAULT_REGION: eu-west-1
+      AWS_ACCESS_KEY_ID: 
+      AWS_SECRET_ACCESS_KEY: 
+      BACKUP_PATH:
+  
+  databases:
+    configs:
+      MYSQL_ROOT_PASSWORD: 3cY8Kve4lGey
+      MYSQL_MAX_CONNECTIONS: 500
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB_HOST: postgresql

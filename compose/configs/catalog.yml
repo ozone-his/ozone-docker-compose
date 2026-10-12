@@ -1,0 +1,122 @@
+# ---------------------------------------------------------------------------
+# Catalog: the single source of truth for how a distro assembles.
+# Consumed by ozonectl; the docker compose files stay plain compose files.
+#
+# Evaluation rules (mechanical, no name-based inference):
+#   1. base.compose is always included, in order.
+#   2. For every selected app: include its `compose` file; when SSO is
+#      enabled also include its `sso` file; when restore is enabled activate
+#      its `restore-profiles`.
+#   3. For every integration whose `requires` is a subset of the selected
+#      apps: include its `compose` files, activate its `profiles`; when
+#      SSO is enabled also include its `sso` files. Declaration order applies.
+#   4. For every active mode: include its `compose` files, activate its
+#      `profiles`. When both sso and restore are active, also apply the
+#      `restore-compose` and `restore-profiles` of the sso mode.
+#   5. db-init names of everything active are concatenated, in the order they
+#      appear below, into the single DB_INIT_LIST env var. Each database
+#      container only processes the names present in its own data tree
+#      (data/mysql/<name>, data/postgresql/<name>) — the engine is a property
+#      of the data directory, not of this catalog.
+# ---------------------------------------------------------------------------
+
+# Base compose files, always included, in this order.
+base:
+  compose:
+    - other/common.yml
+    - other/databases.yml
+    - other/redis.yml
+
+# Deployable apps. The app name is also its compose profile.
+#   compose:          included when the app is selected
+#   sso:              included when the app is selected and sso is enabled
+#   restore-profiles: activated when restore is enabled and app is selected
+#   db-init:          database init dirs (data/<engine>/<dir>) for this app
+apps:
+  openmrs:
+    compose: apps/openmrs.yml
+    sso: sso/openmrs.yml
+    restore-profiles: [openmrs-restore]
+    db-init: [openmrs]
+  bahmniemr:
+    compose: apps/bahmniemr.yml
+    db-init: [eip-bahmni]
+  senaite:
+    compose: apps/senaite.yml
+    sso: sso/senaite.yml
+    restore-profiles: [senaite-restore]
+    db-init: [senaite]
+  odoo:
+    compose: apps/odoo.yml
+    sso: sso/odoo.yml
+    restore-profiles: [odoo-restore]
+    db-init: [odoo]
+  erpnext:
+    compose: apps/erpnext.yml
+  openelis:
+    compose: apps/openelis.yml
+    restore-profiles: [openelis-restore, openelis-fhir-restore]
+    db-init: [openelis]
+  orthanc:
+    compose: apps/orthanc.yml
+
+# Integrations: activated when `requires` is a subset of the selected
+# apps. Declaration order = compose file inclusion order.
+#   requires:         the app pair that activates the integration
+#   compose:          included when the integration activates
+#   sso:              included when the integration activates and sso is enabled
+#   profiles:         activated when the integration activates
+#   db-init:          database init dirs activated with the integration
+integrations:
+  - name: eip-erpnext-openmrs
+    requires: [openmrs, erpnext]
+    compose: [integrations/eip-erpnext-openmrs.yml]
+    sso: [sso/erpnext.yml]
+    profiles: [eip-erpnext-openmrs]
+    db-init: [eip-erpnext-openmrs]
+  - name: eip-openmrs-senaite
+    requires: [openmrs, senaite]
+    compose: [integrations/eip-openmrs-senaite.yml]
+    profiles: [eip-openmrs-senaite]
+    db-init: [eip-openmrs-senaite]
+  - name: eip-odoo-openmrs
+    requires: [openmrs, odoo]
+    compose: [integrations/eip-odoo-openmrs.yml]
+    profiles: [eip-odoo-openmrs]
+    db-init: [eip-odoo-openmrs]
+  - name: eip-openmrs-orthanc
+    requires: [openmrs, orthanc]
+    compose: [integrations/eip-openmrs-orthanc.yml]
+    sso: [sso/orthanc.yml]
+    profiles: [eip-openmrs-orthanc]
+    db-init: [eip-openmrs-orthanc]
+  - name: eip-odoo-openelis
+    requires: [odoo, openelis]
+    compose: [integrations/eip-odoo-openelis.yml]
+    profiles: [eip-odoo-openelis]
+  - name: bahmniemr-senaite
+    requires: [bahmniemr, senaite]
+    compose: [apps/bahmniemr-senaite-override.yml]
+    profiles: []
+
+# Modes: switchable at assembly time.
+#   compose:          included when the mode is enabled
+#   profiles:         activated when the mode is enabled
+#   db-init:          database init dirs activated with the mode
+#   restore-compose:  (sso) included when restore is also enabled
+#   restore-profiles: (sso) activated when restore is also enabled
+modes:
+  sso:
+    compose: [sso/keycloak.yml]
+    profiles: [sso]
+    db-init: [keycloak]
+    restore-compose: [sso/restore.yml]
+    restore-profiles: [keycloak-restore]
+  backup:
+    compose: [support/backup.yml]
+    profiles: [backup]
+  restore:
+    # backup is included with restore: support/restore.yml wires the backup
+    # service to wait for the restore service to complete.
+    compose: [support/restore.yml, support/backup.yml]
+    profiles: [backup]

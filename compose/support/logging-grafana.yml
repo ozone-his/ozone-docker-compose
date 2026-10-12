@@ -1,0 +1,28 @@
+services:
+  grafana:
+    image: grafana/grafana:10.2.3
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD:-admin}
+    depends_on:
+      - loki
+    volumes:
+      - ${GRAFANA_DATA_DIR:-grafana-data}:/var/lib/grafana
+      - ./logging/grafana/provisioning:/etc/grafana/provisioning:ro
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.grafana.rule: "Host(`${GRAFANA_DOMAIN}`)"
+      traefik.http.routers.grafana.tls.certresolver: "le"
+      traefik.http.services.grafana.loadbalancer.server.port: "3000"
+    networks:
+      web:
+      logging:
+
+volumes:
+  grafana-data:
+
+networks:
+  logging:
+  web:
+   external: true
