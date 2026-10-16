@@ -1,4 +1,4 @@
-FROM mariadb:10.8
+FROM mariadb:10.11
 ADD data/mysql/create_db.sh /docker-entrypoint-initdb.d/create_db.sh
 ADD data/mysql/eip-odoo-openmrs /docker-entrypoint-initdb.d/db/eip-odoo-openmrs
 ADD data/mysql/openmrs /docker-entrypoint-initdb.d/db/openmrs
