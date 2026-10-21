@@ -1,14 +1,6 @@
 server:
   log_level: info
 
-metrics:
-  global:
-    remote_write:
-      - url: ${LOKI_URL}
-        basic_auth:
-          username: ${LOKI_USERNAME}
-          password: ${LOKI_PASSWORD}
-
 logs:
   configs:
     - name: default

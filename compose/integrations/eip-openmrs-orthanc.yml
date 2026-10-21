@@ -2,7 +2,6 @@ services:
 
   # Orthanc - OpenMRS integration service
   eip-openmrs-orthanc:
-    profiles: ["eip-openmrs-orthanc"]
     depends_on:
       env-substitution:
         condition: service_completed_successfully

@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------------------
+# Standalone Ozone logging server: Loki (log store) + Grafana (dashboard).
+#
+# This is NOT part of the modular compose project under compose/: it runs on
+# its own host, separately from any Ozone deployment. Ozone deployments that
+# ship their logs here run the logging-agent mode with LOKI_URL pointing at
+# this server's Loki endpoint.
+#
+# Run:    docker compose up -d
+# Override any value with a standard .env file next to this file, e.g.:
+#   GF_SECURITY_ADMIN_PASSWORD=s3cret
+# ---------------------------------------------------------------------------
+
+services:
+
+  loki:
+    image: grafana/loki:3.0.0
+    command: -config.file=/etc/loki/loki.yaml
+    ports:
+      - "${LOKI_PUBLIC_PORT:-3100}:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/loki.yaml
+      - loki-data:/loki
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.2.3
+    depends_on:
+      - loki
+    ports:
+      - "${GRAFANA_PUBLIC_PORT:-3000}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    restart: unless-stopped
+
+volumes:
+  loki-data:
+  grafana-data:

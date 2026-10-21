@@ -41,15 +41,20 @@ services:
         condition: service_completed_successfully
   restore:
     depends_on:
+      # Wait for the database servers that are actually part of the
+      # deployment; required:false skips engines that are not enabled
+      # (e.g. postgresql on an openmrs-only selection).
       mysql:
         condition: service_healthy
+        required: false
       postgresql:
         condition: service_healthy
+        required: false
     image: mekomsolutions/restic-compose-backup-restore
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       # Map local restic repository
-      - ${BACKUP_PATH:-./restic_data}:/restic_data
+      - ${BACKUP_PATH:-restic_data}:/restic_data
     environment:
       RESTIC_REPOSITORY: ${RESTIC_REPOSITORY}
       RESTIC_PASSWORD: ${RESTIC_PASSWORD}

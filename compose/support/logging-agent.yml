@@ -1,13 +1,18 @@
 services:
+
+  # Log collector. Discovers running containers through the Docker socket,
+  # so only the services of the current deployment are collected. Pushes to
+  # a remote Loki (LOKI_URL, deployment-provided); the logging server itself
+  # runs standalone, see logging-server/.
   grafana-agent:
     image: grafana/agent:latest
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/log:/var/log:ro
       - /etc/machine-id:/etc/machine-id:ro
-      - ./logging/agent-config.yaml:/etc/grafana-agent/config.yaml:ro
+      - ./support/resources/logging/agent-config.yaml:/etc/grafana-agent/config.yaml:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
-      - LOKI_URL=${LOKI_URL:-http://host.docker.internal:3100/loki/api/v1/push}
+      - LOKI_URL=${LOKI_URL:?LOKI_URL must be provided when logging-agent is enabled}
     entrypoint: ["/bin/grafana-agent", "-config.expand-env", "--config.file=/etc/grafana-agent/config.yaml"]
     restart: unless-stopped

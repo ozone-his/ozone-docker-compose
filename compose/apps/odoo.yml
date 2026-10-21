@@ -2,7 +2,6 @@ services:
 
   # Odoo
   odoo:
-    profiles: ["odoo"]
     depends_on:
       postgresql:
         condition: service_healthy
@@ -62,7 +61,6 @@ services:
       - "${ODOO_CONFIG_CHECKSUMS_PATH:-odoo-checksums}:/mnt/checksums"
     
   fhir-odoo:
-    profiles: ["odoo"]
     depends_on:
       env-substitution:
         condition: service_completed_successfully

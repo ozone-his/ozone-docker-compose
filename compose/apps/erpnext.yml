@@ -15,16 +15,13 @@ x-erpnext-volumes: &erpnext-volumes
     - erpnext-sites:/home/frappe/frappe-bench/sites
     - erpnext-logs:/home/frappe/frappe-bench/logs
 
-x-erpnext-profiles: &erpnext-profiles
-  profiles: ["erpnext"]
-
 services:
   erpnext-backend:
-    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks, *erpnext-profiles ]
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     restart: unless-stopped
 
   erpnext-configurator:
-    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks, *erpnext-profiles ]
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - >
         ls -1 apps > sites/apps.txt;
@@ -45,7 +42,7 @@ services:
       SOCKETIO_PORT: "9000"
 
   erpnext-init:
-    <<: [ *erpnext-image, *ozone-networks, *erpnext-profiles ]
+    <<: [ *erpnext-image, *ozone-networks ]
     command:
       - >
         wait-for-it -t 120 mysql:3306;
@@ -105,7 +102,7 @@ services:
       - "${ERPNEXT_SCRIPTS_PATH}:/opt/erpnext/scripts"
 
   erpnext:
-    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks, *erpnext-profiles ]
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - nginx-entrypoint.sh
     depends_on:
@@ -134,7 +131,7 @@ services:
       traefik.http.services.erpnext.loadbalancer.server.port: 8080
 
   erpnext-queue-long:
-    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks, *erpnext-profiles ]
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - bench
       - worker
@@ -143,7 +140,7 @@ services:
     restart: on-failure
 
   erpnext-queue-short:
-    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks, *erpnext-profiles ]
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - bench
       - worker
@@ -152,26 +149,26 @@ services:
     restart: on-failure
 
   erpnext-redis-queue:
-    <<: [ *redis-image, *ozone-networks, *erpnext-profiles ]
+    <<: [ *redis-image, *ozone-networks ]
     restart: on-failure
     volumes:
       - erpnext-redis-queue-data:/data
 
   erpnext-redis-cache:
-    <<: [ *redis-image, *ozone-networks, *erpnext-profiles ]
+    <<: [ *redis-image, *ozone-networks ]
     restart: on-failure
     volumes:
       - erpnext-redis-cache-data:/data
 
   erpnext-scheduler:
-    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks, *erpnext-profiles ]
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - bench
       - schedule
     restart: on-failure
 
   erpnext-websocket:
-    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks, *erpnext-profiles ]
+    <<: [ *erpnext-image, *erpnext-volumes, *ozone-networks ]
     command:
       - node
       - /home/frappe/frappe-bench/apps/frappe/socketio.js

@@ -1,6 +1,5 @@
 services:
   orthanc:
-    profiles: ["orthanc"]
     command: /run/secrets/
     secrets:
       - orthanc.json # CAUTION: This is an experimental implementation, not for production use.
@@ -23,8 +22,6 @@ services:
       ozone:
         aliases:
          - orthanc
-    ports:
-    - "8889:8042"
 
 secrets:
   orthanc.json:

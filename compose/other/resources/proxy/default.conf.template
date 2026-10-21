@@ -32,15 +32,6 @@ map $GITPOD_ENV $forwarded_proto {
     default  $scheme;
 }
 
-upstream frontend {
-  # always assume the frontend will be available
-  server frontend max_fails=0;
-}
-
-upstream backend {
-  server openmrs:8080 max_fails=0;
-}
-
 server {
   listen       80;
 
@@ -93,12 +84,15 @@ server {
   }
 
   location /openmrs/spa/ {
-    proxy_pass http://frontend/;
+    set $ozone_frontend frontend;
+    rewrite ^/openmrs/spa/(.*)$ /$1 break;
+    proxy_pass http://$ozone_frontend;
     proxy_redirect http://$host/ /openmrs/spa/;
   }
 
   location /openmrs {
-    proxy_pass http://backend;
+    set $ozone_backend openmrs:8080;
+    proxy_pass http://$ozone_backend;
     set $reporting_session "";
     if ($http_cookie ~* "JSESSIONID=([^;]+)") {
         set $reporting_session $1;

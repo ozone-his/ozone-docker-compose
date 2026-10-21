@@ -54,7 +54,3 @@ services:
       - SUPERSET_CLIENT_ENABLED=${SUPERSET_CLIENT_ENABLED}
       - OPENELIS_PUBLIC_URL=${SERVER_SCHEME}://${OPENELIS_HOSTNAME}
       - OPENELIS_HOSTNAME=${OPENELIS_HOSTNAME}
-
-volumes:
-  mysql-data: ~
-  postgresql-data: ~

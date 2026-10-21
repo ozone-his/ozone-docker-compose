@@ -2,7 +2,6 @@ services:
 
   # SENAITE
   senaite:
-    profiles: ["senaite"]
     depends_on: 
       env-substitution:
         condition: service_completed_successfully

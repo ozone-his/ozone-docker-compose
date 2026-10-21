@@ -1,0 +1,17 @@
+services:
+
+  # Keycloak demo users seeding, added to demo-data when the demo and sso
+  # modes are both enabled.
+  demo-data:
+    environment:
+      OPENMRS_OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID}
+      OPENMRS_OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
+      KEYCLOAK_SERVER_URL: ${KEYCLOAK_INTERNAL_HOST_URL}
+      KEYCLOAK_DEMO_DATA_REALM: ozone
+      KEYCLOAK_USERS_JSON_PATH: /app/keycloak/users.json
+      KEYCLOAK_USER_CREATION_ENABLED: "true"
+      KEYCLOAK_DEMO_DATA_CLIENT_ID: keycloak-admin-sa
+      KEYCLOAK_DEMO_DATA_CLIENT_SECRET: ${KEYCLOAK_ADMIN_SA_CLIENT_SECRET}
+      KEYCLOAK_HEALTHCHECK_ENDPOINT: http://keycloak:9000/health/ready
+    volumes:
+      - ${KEYCLOAK_CONFIG_PATH}/demo:/app/keycloak

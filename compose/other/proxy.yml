@@ -1,0 +1,26 @@
+services:
+
+  # Ozone's default reverse proxy. The nginx image templates
+  # /etc/nginx/templates at startup with the environment below; backends are
+  # resolved at request time, so the proxy starts for any app selection.
+  proxy:
+    image: nginx:1.25-alpine
+    restart: unless-stopped
+    environment:
+      - PROXY_CLIENT_MAX_BODY_SIZE=${PROXY_CLIENT_MAX_BODY_SIZE:-10m}
+      - FRAME_ANCESTORS=${FRAME_ANCESTORS:-}
+      - GITPOD_ENV=${GITPOD_ENV:-false}
+    volumes:
+      - ./other/resources/proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./other/resources/proxy/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./other/resources/proxy/systemdate.sh:/usr/local/bahmni/cgi-bin/systemdate:ro
+    ports:
+      - "${PROXY_PUBLIC_PORT:-80}:80"
+      - "8069:8069"
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+      - "8084:8084"
+    networks:
+      - ozone
+      - web

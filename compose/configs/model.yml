@@ -1,0 +1,252 @@
+# ---------------------------------------------------------------------------
+# Model: Everything that can run, and the rules of combination
+#
+# A service runs because its compose file is on the -f chain that ozonectl
+# assembles from this model and the distro's selection.yml. There are no
+# profiles for whole modules: inclusion is the selection mechanism.
+#
+# Profiles are used ONLY inside additive fragments that rewire other
+# services' definitions (the restore gates in support/restore.yml and
+# sso/restore.yml); the manifest activates them when their condition holds.
+#
+# Relative bind-mount paths in every compose file resolve against the
+# compose project directory (compose/), which ozonectl pins with
+# --project-directory. Resource files live in
+# compose/<module-dir>/resources/<owner>/.
+# ---------------------------------------------------------------------------
+
+# Unconditional base of every chain: creates the networks and runs the
+# one-off env-substitution service.
+base:
+  compose: [other/init.yml]
+
+# Database servers. A server's compose file joins the chain when any
+# selected app, integration or mode declares the matching engine in its
+# `db:` attribute.
+database-services:
+  mysql: other/mysql.yml
+  postgresql: other/postgresql.yml
+  redis: other/redis.yml
+
+# Deployable apps.
+#   compose:          on the chain when the app is selected
+#   sso:              appended as -f when the app is selected and sso is enabled
+#   restore-profiles: activated when restore is enabled and the app is selected
+#   db-init:          database init dirs (data/<engine>/<dir>) for this app
+#   db:               database services the app requires (see database-services)
+#   url:              the service's public URL, a template over declared vars;
+#                    printed by ozonectl for the selected apps
+#   credentials:      var names of the app's default login, printed by
+#                    ozonectl for the selected apps
+apps:
+  openmrs:
+    compose: [apps/openmrs.yml]
+    sso: sso/openmrs.yml
+    restore-profiles: [openmrs-restore]
+    db-init: [openmrs]
+    db: mysql
+    url: ${SERVER_SCHEME}://${O3_HOSTNAME}/openmrs
+    credentials: [OPENMRS_USER, OPENMRS_PASSWORD]
+  bahmniemr:
+    compose: [apps/bahmniemr.yml]
+    db-init: [eip-bahmni]
+    db: mysql
+    url: ${SERVER_SCHEME}://${BAHMNI_EMR_HOSTNAME}/bahmni
+    credentials: [OPENMRS_USER, OPENMRS_PASSWORD]
+  senaite:
+    compose: [apps/senaite.yml]
+    sso: sso/senaite.yml
+    restore-profiles: [senaite-restore]
+    db-init: [senaite]
+    db: postgresql
+    url: ${SERVER_SCHEME}://${SENAITE_HOSTNAME}
+    credentials: [SENAITE_ADMIN_USER, SENAITE_ADMIN_PASSWORD]
+  odoo:
+    compose: [apps/odoo.yml]
+    sso: sso/odoo.yml
+    restore-profiles: [odoo-restore]
+    db-init: [odoo]
+    db: [postgresql, redis]
+    url: ${SERVER_SCHEME}://${ODOO_HOSTNAME}
+    credentials: [ODOO_USER, ODOO_PASSWORD]
+  erpnext:
+    compose: [apps/erpnext.yml]
+    db: mysql
+    url: ${SERVER_SCHEME}://${ERPNEXT_HOSTNAME}
+    credentials: [ERPNEXT_USER, ERPNEXT_PASSWORD]
+  openelis:
+    compose: [apps/openelis.yml]
+    restore-profiles: [openelis-restore, openelis-fhir-restore]
+    db-init: [openelis]
+    db: postgresql
+    url: ${SERVER_SCHEME}://${OPENELIS_HOSTNAME}
+    credentials: [OPENELIS_FHIR_SERVER_USERNAME, OPENELIS_FHIR_SERVER_PASSWORD]
+  orthanc:
+    compose: [apps/orthanc.yml]
+    url: ${SERVER_SCHEME}://${ORTHANC_HOSTNAME}
+
+# App pairs that cannot be selected together; the manifest rejects a
+# selection containing an incompatible pair.
+incompatibilities:
+  - [openmrs, bahmniemr]    # both are OpenMRS distributions
+  - [odoo, erpnext]         # both are ERP backends
+  - [openelis, senaite]     # both are laboratory information systems
+
+# Deployment-provided values. This section declares which knobs a deployment
+# may set and their default templates — the values themselves are never
+# known at build or distro time and are provided through the generated .env
+# (edit a line) or the shell environment at deployment time.
+#   hostnames   hostname templates of the services behind the reverse proxy
+#   configs     additional vars that may need to be set at deployment time
+#   datadirs    host-path overrides for filestore volumes (empty = default)
+deployment:
+  services:
+    openmrs:
+      hostnames:
+        O3_HOSTNAME: ${HOST_NAME}
+      datadirs:
+        OPENMRS_CONFIG_CHECKSUMS_PATH:
+        OPENMRS_COMPLEX_OBS_PATH:
+    bahmniemr:
+      hostnames:
+        BAHMNI_EMR_HOSTNAME: ${HOST_NAME}
+    odoo:
+      hostnames:
+        ODOO_HOSTNAME: ${HOST_NAME}:8069
+        FHIR_ODOO_HOSTNAME: ${HOST_NAME}:8083
+      datadirs:
+        ODOO_FILESTORE:
+        ODOO_CONFIG_CHECKSUMS_PATH:
+    senaite:
+      hostnames:
+        SENAITE_HOSTNAME: ${HOST_NAME}:8081
+      datadirs:
+        SENAITE_BLOBSTORAGE_PATH:
+    erpnext:
+      hostnames:
+        ERPNEXT_HOSTNAME: ${HOST_NAME}:8082
+    superset:
+      # Ozone Analytics is out of the model for now; the hostname stays
+      # declared because the env-substitution service references it.
+      hostnames:
+        SUPERSET_HOSTNAME: ${HOST_NAME}:8088
+    keycloak:
+      hostnames:
+        KEYCLOAK_HOSTNAME: ${HOST_NAME}:8084
+    orthanc:
+      hostnames:
+        ORTHANC_HOSTNAME: ${HOST_NAME}:8889
+    openelis:
+      hostnames:
+        OPENELIS_HOSTNAME: ${HOST_NAME}:8090
+        FHIR_OPENELIS_HOSTNAME: ${HOST_NAME}:8091
+      datadirs:
+        OPENELIS_TRUST_STORE:
+        OPENELIS_KEYS:
+        OPENELIS_CERTS:
+        OPENELIS_LUCENE_INDEX:
+    redis:
+      datadirs:
+        REDIS_DATA_DIR:
+        REDIS_INSIGHT_DATA_DIR:
+    databases:
+      datadirs:
+        MYSQL_DATADIR:
+        POSTGRES_DATADIR:
+    backup:
+      datadirs:
+        # The restic repository location: defaults to the `restic_data` named
+        # volume; override with an absolute host path (or leave to RESTIC_* S3
+        # settings) at deploy time.
+        BACKUP_PATH:
+  extra:
+    TIMEZONE: UTC
+    GITPOD_ENV: false
+
+# Integrations: activate automatically when their `requires` apps are all
+# selected — they are never listed in a distro's selection.
+#   requires:         the app pair that activates the integration
+#   compose:          on the chain when the integration activates
+#   sso:              appended as -f when the integration activates and sso is enabled
+#   db-init:          database init dirs activated with the integration
+#   db:               database services the integration requires (see database-services)
+integrations:
+  eip-erpnext-openmrs:
+    requires: [openmrs, erpnext]
+    compose: [integrations/eip-erpnext-openmrs.yml]
+    sso: [sso/eip-erpnext-openmrs.yml]
+    db-init: [eip-erpnext-openmrs]
+    db: mysql
+  eip-openmrs-senaite:
+    requires: [openmrs, senaite]
+    compose: [integrations/eip-openmrs-senaite.yml]
+    db-init: [eip-openmrs-senaite]
+    db: mysql
+  eip-odoo-openmrs:
+    requires: [openmrs, odoo]
+    compose: [integrations/eip-odoo-openmrs.yml]
+    sso: [sso/eip-odoo-openmrs.yml]
+    db-init: [eip-odoo-openmrs]
+    db: mysql
+  eip-openmrs-orthanc:
+    requires: [openmrs, orthanc]
+    compose: [integrations/eip-openmrs-orthanc.yml]
+    sso: [sso/orthanc.yml]
+    db-init: [eip-openmrs-orthanc]
+    db: mysql
+  eip-odoo-openelis:
+    requires: [odoo, openelis]
+    compose: [integrations/eip-odoo-openelis.yml]
+  bahmniemr-senaite:
+    requires: [bahmniemr, senaite]
+    compose:
+      - integrations/bahmniemr-senaite-override.yml
+      - integrations/eip-openmrs-senaite.yml
+
+# Modes: switchable at assembly time.
+#   compose:          on the chain when the mode is enabled
+#   sso:              appended as -f when the mode is enabled and sso is enabled
+#   db-init:          database init dirs activated with the mode
+#   db:               database services the mode requires (see database-services)
+#   restore-compose:  (sso) appended as -f when restore is also enabled
+#   restore-profiles: (sso) activated when restore is also enabled
+modes:
+  # Ozone's default reverse proxy (nginx). Disabled when an external proxy
+  # (e.g. Traefik) manages the `web` network instead.
+  proxy:
+    compose: [other/proxy.yml]
+
+  # Log collector: tails the Docker socket and pushes to a remote Loki
+  # (LOKI_URL, deployment-provided). The logging server itself (loki +
+  # grafana) is NOT part of this compose project: it runs standalone, see
+  # logging-server/. Excluded by default; enabled when the deployment
+  # ships its logs to a central logging server.
+  logging-agent:
+    compose: [support/logging-agent.yml]
+
+  sso:
+    compose: [sso/keycloak.yml]
+    db-init: [keycloak]
+    db: postgresql
+    restore-compose: [sso/restore.yml]
+    restore-profiles: [keycloak-restore]
+    url: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+    credentials: [KEYCLOAK_USER, KEYCLOAK_PASSWORD]
+
+  backup:
+    compose: [support/backup.yml]
+
+  # Demo data seeding: OpenMRS demo patients, keycloak demo users via the
+  # sso override. Enabled by any distro in its selection.yml (e.g. the
+  # ozone-demo distro), or ad hoc on a running stack.
+  demo-data:
+    compose: [support/demo-data.yml]
+    sso: [sso/demo-data.yml]
+    # The Keycloak users provisioned by the demo-data service, printed by
+    # ozonectl when SSO is also enabled
+    sso-users: ${KEYCLOAK_CONFIG_PATH}/demo/users.json
+
+  restore:
+    # backup is included with restore: support/restore.yml wires the backup
+    # service to wait for the restore service to complete.
+    compose: [support/restore.yml, support/backup.yml]

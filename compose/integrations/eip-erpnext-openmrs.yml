@@ -2,7 +2,6 @@ services:
 
   # ERPNext - OpenMRS integration service
   eip-erpnext-openmrs:
-    profiles: ["eip-erpnext-openmrs"]
     depends_on:
       env-substitution:
         condition: service_completed_successfully

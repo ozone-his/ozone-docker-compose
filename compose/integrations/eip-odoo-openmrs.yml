@@ -2,7 +2,6 @@ services:
 
   # Odoo - OpenMRS integration service
   eip-odoo-openmrs:
-    profiles: ["eip-odoo-openmrs"]
     depends_on:
       env-substitution:
         condition: service_completed_successfully
@@ -13,6 +12,14 @@ services:
       odoo:
         condition: service_started
     environment:
+      # TODO(OZ-1117): The following vars are declared in the distro's
+      # vars.yml (integrations.eip-odoo-openmrs.configs) but are NOT passed
+      # here, so they never reach the container: CONCEPT_COMPLEX_UUID,
+      # OPENMRS_IDENTIFIER_TYPE_UUID, EMR_WEIGHT_CONCEPT,
+      # ODOO_ENABLE_EXTRA_CUSTOMER_FIELDS_ROUTE,
+      # ODOO_ENABLE_EXTRA_QUOTATION_FIELDS_ROUTE, CREATE_CUSTOMER_IF_NOT_EXIST.
+      # Ask the EIP devs whether the route templates still consume them; if so,
+      # add the missing passthroughs.
       - EIP_DB_NAME_ODOO=${EIP_DB_NAME_ODOO}
       - EIP_DB_USER_ODOO=${EIP_DB_USER_ODOO}
       - EIP_DB_PASSWORD_ODOO=${EIP_DB_PASSWORD_ODOO}

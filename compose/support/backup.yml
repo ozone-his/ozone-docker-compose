@@ -1,11 +1,10 @@
 services:
   backup:
-    profiles: ['backup']
     image: mekomsolutions/restic-compose-backup
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       # Map local restic repository
-      - ${BACKUP_PATH:-./restic_data}:/restic_data
+      - ${BACKUP_PATH:-restic_data}:/restic_data
       # Map restic cache
       - restic_cache:/cache
     environment:
@@ -24,3 +23,4 @@ services:
       - ozone
 volumes:
   restic_cache: ~
+  restic_data: ~

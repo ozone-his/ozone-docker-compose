@@ -9,7 +9,7 @@ x-log-config: &log-config
 services:
 
   bahmni-config:
-    profiles: ["bahmniemr"]
+
     image: bahmni/standard-config:1.0.0
     volumes:
       - '${BAHMNI_CONFIG_VOLUME:-bahmni-config}:/usr/local/bahmni_config'
@@ -20,11 +20,7 @@ services:
       ozone:
     command: ["sh", "-c", "rm -rf /etc/bahmni_config/masterdata/configuration && cp -r /usr/local/bahmni_config_override/frontend/* /etc/bahmni_config/openmrs && ./start.sh"]
 
-  # The Bahmni EMR's OpenMRS backend is named bahmni-openmrs to coexist in one
-  # compose model with the O3 openmrs app (all apps are included unconditionally);
-  # the 'openmrs' network alias keeps hostname-based access working.
-  bahmni-openmrs:
-    profiles: ["bahmniemr"]
+  openmrs:
     image: bahmni/openmrs:1.2.0
     command:
       - /bin/sh
@@ -48,32 +44,30 @@ services:
       OMRS_DB_HOSTNAME: ${OPENMRS_DB_HOST:?}
       OMRS_DB_USERNAME: ${OPENMRS_DB_USER:?}
       OMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
-      OMRS_CREATE_TABLES: ${OPENMRS_DB_CREATE_TABLES}
-      OMRS_AUTO_UPDATE_DATABASE: ${OPENMRS_DB_AUTO_UPDATE}
-      OMRS_MODULE_WEB_ADMIN: ${OPENMRS_MODULE_WEB_ADMIN}
+      OMRS_CREATE_TABLES: ${OPENMRS_DB_CREATE_TABLES:-true}
+      OMRS_AUTO_UPDATE_DATABASE: ${OPENMRS_DB_AUTO_UPDATE:-true}
+      OMRS_MODULE_WEB_ADMIN: ${OPENMRS_MODULE_WEB_ADMIN:-false}
       # OMRS_DEV_DEBUG_PORT: ${OMRS_DEV_DEBUG_PORT}
       OMRS_JAVA_SERVER_OPTS: ${OMRS_JAVA_SERVER_OPTS}
       OMRS_JAVA_MEMORY_OPTS: ${OMRS_JAVA_MEMORY_OPTS}
-      SEND_MAIL: ${SEND_MAIL}
-      MAIL_TRANSPORT_PROTOCOL: ${MAIL_TRANSPORT_PROTOCOL}
+      SEND_MAIL: ${SEND_MAIL:-false}
+      MAIL_TRANSPORT_PROTOCOL: ${MAIL_TRANSPORT_PROTOCOL:-smtps}
       MAIL_SMTP_HOST: ${MAIL_SMTP_HOST}
       MAIL_SMTP_PORT: ${MAIL_SMTP_PORT}
-      MAIL_SMTP_AUTH: ${MAIL_SMTP_AUTH}
-      MAIL_SMTP_STARTTLS_ENABLE: ${MAIL_SMTP_STARTTLS_ENABLE}
-      MAIL_SMTP_SSL_ENABLE: ${MAIL_SMTP_SSL_ENABLE}
-      MAIL_DEBUG: ${MAIL_DEBUG}
+      MAIL_SMTP_AUTH: ${MAIL_SMTP_AUTH:-true}
+      MAIL_SMTP_STARTTLS_ENABLE: ${MAIL_SMTP_STARTTLS_ENABLE:-true}
+      MAIL_SMTP_SSL_ENABLE: ${MAIL_SMTP_SSL_ENABLE:-true}
+      MAIL_DEBUG: ${MAIL_DEBUG:-false}
       MAIL_FROM: ${MAIL_FROM}
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-      OMRS_DOCKER_ENV: ${OPENMRS_DOCKER_ENV}
-      OMRS_C3P0_MAX_SIZE: ${OMRS_C3P0_MAX_SIZE}
+      OMRS_DOCKER_ENV: true
+      OMRS_C3P0_MAX_SIZE: ${OMRS_C3P0_MAX_SIZE:-50}
       WEIGHT_CONCEPT_UUID: ${WEIGHT_CONCEPT_UUID}
       HEIGHT_CONCEPT_UUID: ${HEIGHT_CONCEPT_UUID}
-      OMRS_DB_EXTRA_ARGS: ${OMRS_DB_EXTRA_ARGS}
-      LUCENE_MATCH_TYPE: ${LUCENE_MATCH_TYPE}
+      OMRS_DB_EXTRA_ARGS: "&zeroDateTimeBehavior: convertToNull"
+      LUCENE_MATCH_TYPE: "START"
       DOCUMENT_MAX_SIZE_MB: ${DOCUMENT_MAX_SIZE_MB}
-    #ports:
-      # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
     volumes:
       - "${BAHMNI_CONFIG_VOLUME:-bahmni-config}:/etc/bahmni_config/:ro"
       - "bahmni-lab-results:/home/bahmni/uploaded_results"
@@ -106,15 +100,16 @@ services:
       ozone:
         aliases:
           - openmrs
+          - bahmni-openmrs
       web:
 
   # Bahmni EIP routes
   eip-bahmni:
-    profiles: ["bahmniemr"]
+
     depends_on:
       env-substitution:
         condition: service_completed_successfully
-      bahmni-openmrs:
+      openmrs:
         condition: service_healthy
       mysql:
         condition: service_started
@@ -140,7 +135,7 @@ services:
       - eip-home-bahmni:/eip-home
 
   bahmni-web:
-    profiles: ["bahmniemr"]
+
     image: bahmni/bahmni-web:1.3.0
     volumes:
       - "${BAHMNI_CONFIG_VOLUME:-bahmni-config}:/usr/local/apache2/htdocs/bahmni_config/:ro"
@@ -166,12 +161,12 @@ services:
       web:
 
   implementer-interface:
-    profiles: ["bahmniemr"]
+
     image: bahmni/implementer-interface:1.1.1
     #volumes:
     #  - "${IMPLEMENTER_INTERFACE_CODE_PATH:?}/dist:/usr/local/apache2/htdocs/implementer_interface"
     depends_on:
-      - bahmni-openmrs
+      - openmrs
     logging: *log-config
     restart: unless-stopped
     labels:
@@ -184,7 +179,7 @@ services:
       web:
 
   reports:
-    profiles: ["bahmniemr"]
+
     image: bahmni/reports:1.1.0
     environment:
       TZ: ${TIMEZONE}
@@ -192,8 +187,8 @@ services:
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
       OPENMRS_DB_USERNAME: root
       OPENMRS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
-      OPENMRS_HOST: ${OPENMRS_HOST:?}
-      OPENMRS_PORT: ${OPENMRS_PORT:?}
+      OPENMRS_HOST: ${OPENMRS_HOST:-openmrs}
+      OPENMRS_PORT: ${OPENMRS_PORT:-8080}
       REPORTS_DB_SERVER: reportsdb
       REPORTS_DB_NAME: ${REPORTS_DB_NAME:?}
       REPORTS_DB_USERNAME: ${REPORTS_DB_USERNAME:?}
@@ -223,7 +218,7 @@ services:
       web:
 
   reportsdb:
-    profiles: ["bahmniemr"]
+
     platform: linux/amd64
     image: mysql:8.0
     environment:
@@ -240,7 +235,7 @@ services:
       ozone:
 
   patient-documents:
-    profiles: ["bahmniemr"]
+
     image: bahmni/patient-documents:1.1.1
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
@@ -250,7 +245,7 @@ services:
       TZ: ${TIMEZONE}
       OPENMRS_HOST: ${OPENMRS_HOST:?}
     depends_on:
-      - bahmni-openmrs
+      - openmrs
     logging: *log-config
     restart: unless-stopped
     labels:
@@ -263,7 +258,7 @@ services:
       web:
 
   appointments:
-    profiles: ["bahmniemr"]
+
     image: bahmni/appointments:1.2.0
     restart: unless-stopped
     # volumes:
@@ -278,7 +273,7 @@ services:
       web:
 
   sms-service:
-    profiles: ["bahmniemr"]
+
     image: bahmni/sms-service:1.1.0
     restart: unless-stopped
     environment:
@@ -295,7 +290,7 @@ services:
       ozone:
 
   ipd:
-    profiles: ["bahmniemr"]
+
     image: bahmni/microfrontend-ipd:1.0.0
     container_name: ipd
     restart: unless-stopped

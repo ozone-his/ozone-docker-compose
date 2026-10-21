@@ -4,7 +4,10 @@ services:
       KEYCLOAK_URL: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
       OAUTH2_ENABLED: ${ENABLE_SSO}
     volumes:
-      - "${RUN_DOCKER_PATH}/openmrs/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+      # Owned by the openmrs app module (compose/apps/resources/openmrs/).
+      # This file is appended via -f, so relative mounts resolve against the
+      # project directory (compose/), not this file's directory.
+      - "./apps/resources/openmrs/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 
   frontend:
     environment:
