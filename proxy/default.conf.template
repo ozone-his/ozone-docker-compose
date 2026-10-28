@@ -1,6 +1,14 @@
 # This config is used to increase the maximum body size for file uploads
 client_max_body_size ${PROXY_CLIENT_MAX_BODY_SIZE};
 
+# Port of the public URL, taken from the Host header ("example.org:8190" -> 8190). Empty when the
+# Host has no explicit port, in which case Nginx does not send X-Forwarded-Port and the default
+# port of the scheme applies.
+map $http_host $forwarded_port {
+  "~:(?<host_port>[0-9]+)$" $host_port;
+  default "";
+}
+
 map $request_uri $csp_header {
   default "default-src 'self' 'unsafe-inline' 'unsafe-eval'; base-uri 'self'; font-src 'self'; img-src 'self' data:; frame-ancestors 'self' ${FRAME_ANCESTORS};";
   "~^/openmrs/(?:admin|dictionary|module|patientDashboard.form)/" "default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; base-uri 'self'; font-src 'self'; frame-ancestors 'self';";
@@ -48,7 +56,10 @@ server {
   add_header Content-Security-Policy $csp_header;
   add_header X-Content-Type-Options nosniff;
 
-  proxy_set_header      HOST $host;
+  # Keep the port of the public URL so that OpenMRS (e.g. the OAuth2 redirect_uri built by
+  # oauth2login) generates absolute URLs with it when Ozone is not served on port 80/443.
+  proxy_set_header      HOST $http_host;
+  proxy_set_header      X-Forwarded-Port $forwarded_port;
   proxy_set_header      X-Forwarded-Proto $forwarded_proto;
   proxy_set_header      X-Real-IP $forwarded_ip;
   proxy_set_header      X-Forwarded-For $proxy_add_x_forwarded_for;
