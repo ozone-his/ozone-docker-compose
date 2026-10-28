@@ -136,12 +136,14 @@ function setDockerComposeCLIOptions () {
 }
 
 function exportHostIP() {
+    # A preset HOST_IP_ADDRESS (public IP or DNS name) takes precedence over the detected one,
+    # e.g. on cloud VMs where the first local address is a private IP unreachable by browsers.
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux
-        export HOST_IP_ADDRESS=$(hostname -I | awk '{print $1}')
+        export HOST_IP_ADDRESS="${HOST_IP_ADDRESS:-$(hostname -I | awk '{print $1}')}"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         # Mac OSX
-        export HOST_IP_ADDRESS=$(ipconfig getifaddr en0)
+        export HOST_IP_ADDRESS="${HOST_IP_ADDRESS:-$(ipconfig getifaddr en0)}"
     else
         echo "$ERROR Unsupported OS type: $OSTYPE"
         return 1
@@ -197,12 +199,27 @@ function setTraefikHostnames {
 function setNginxHostnames {
     echo "$INFO Exporting Nginx hostnames..."
 
-    export O3_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
-    export ODOO_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8069"
-    export SENAITE_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8081"
-    export ERPNEXT_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8082"
-    export FHIR_ODOO_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8083"
-    export KEYCLOAK_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8084"
+    # The *_PROXY_PORT variables may hold a bind address ("127.0.0.1:18069"): only the port is kept.
+    # Any *_HOSTNAME already set in the environment is kept as is (e.g. when a TLS reverse proxy
+    # in front of Ozone exposes other ports than the ones published by the Nginx proxy).
+    local o3Port="${PROXY_PUBLIC_PORT:-80}"
+    o3Port="${o3Port##*:}"
+    local o3PortSuffix=""
+    if [ "$o3Port" != "80" ]; then
+        o3PortSuffix=":$o3Port"
+    fi
+    local odooPort="${ODOO_PROXY_PORT:-8069}"
+    local senaitePort="${SENAITE_PROXY_PORT:-8081}"
+    local erpnextPort="${ERPNEXT_PROXY_PORT:-8082}"
+    local fhirOdooPort="${FHIR_ODOO_PROXY_PORT:-8083}"
+    local keycloakPort="${KEYCLOAK_PROXY_PORT:-8084}"
+
+    export O3_HOSTNAME="${O3_HOSTNAME:-${HOST_IP_ADDRESS:-localhost}${o3PortSuffix}}"
+    export ODOO_HOSTNAME="${ODOO_HOSTNAME:-${HOST_IP_ADDRESS:-localhost}:${odooPort##*:}}"
+    export SENAITE_HOSTNAME="${SENAITE_HOSTNAME:-${HOST_IP_ADDRESS:-localhost}:${senaitePort##*:}}"
+    export ERPNEXT_HOSTNAME="${ERPNEXT_HOSTNAME:-${HOST_IP_ADDRESS:-localhost}:${erpnextPort##*:}}"
+    export FHIR_ODOO_HOSTNAME="${FHIR_ODOO_HOSTNAME:-${HOST_IP_ADDRESS:-localhost}:${fhirOdooPort##*:}}"
+    export KEYCLOAK_HOSTNAME="${KEYCLOAK_HOSTNAME:-${HOST_IP_ADDRESS:-localhost}:${keycloakPort##*:}}"
     export ORTHANC_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:8889"
     export OPENELIS_HOSTNAME="${HOST_IP_ADDRESS:-localhost}"
     export FHIR_OPENELIS_HOSTNAME="${HOST_IP_ADDRESS:-localhost}:9095"
