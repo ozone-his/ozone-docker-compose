@@ -45,7 +45,7 @@ services:
         condition: service_healthy
       postgresql:
         condition: service_healthy
-    image: mekomsolutions/restic-compose-backup-restore
+    image: mekomsolutions/restic-compose-backup-restore:0.17.1-1.0.0
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       # Map local restic repository
