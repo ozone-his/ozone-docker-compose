@@ -12,7 +12,7 @@ services:
       - ADDONS=${ODOO_ADDONS}
       - INITIALIZER_DATA_FILES_PATH=/mnt/odoo_config
       - INITIALIZER_CONFIG_FILE_PATH=/mnt/odoo_config/initializer_config.json
-    image: mekomsolutions/odoo
+    image: mekomsolutions/odoo:17-1.0.0
     labels:
       traefik.enable: true
       # https
@@ -75,7 +75,7 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - FHIR_ODOO_LOCK_REDIS_ENABLED=true
-    image: mekomsolutions/fhir-odoo
+    image: mekomsolutions/fhir-odoo:1.1.0
     labels:
       traefik.enable: "true"
       traefik.http.routers.fhir-erp.rule: "Host(`${FHIR_ODOO_HOSTNAME}`)"
