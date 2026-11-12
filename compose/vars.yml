@@ -1,10 +1,10 @@
 # ---------------------------------------------------------------------------
 # Vars: deployment-overridable values, organized by ownership.
 #
-# A block declares where a value BELONGS — which app, integration, mode or
-# database it is an attribute of. Any compose file may consume any value via
-# ${VAR} interpolation; consumption never requires a local declaration, and a
-# value is never declared more than once.
+# A block declares where a value BELONGS - which app, integration, addon,
+# operation or database it is an attribute of. Any compose file may consume
+# any value via ${VAR} interpolation; consumption never requires a local
+# declaration, and a value is never declared more than once.
 #
 # Rules:
 #   - Var names are globally unique across all blocks.
@@ -67,6 +67,8 @@ apps:
       EIP_DB_NAME_BAHMNI: openmrs_eip_mgt_bahmni
       EIP_DB_USER_BAHMNI: openmrs_eip_mgt_bahmni
       EIP_DB_PASSWORD_BAHMNI: password
+      # Test order type consumed by the EIP flows
+      EIP_TEST_ORDER_TYPE_UUID:
 
   senaite:
     configs:
@@ -135,7 +137,28 @@ apps:
 
   orthanc: {}
 
-# One block per integration, named after the catalog entry. These hold the
+  keycloak:
+    configs:
+      KEYCLOAK_DB_USER: keycloak
+      KEYCLOAK_DB_PASSWORD: keycloak
+      KEYCLOAK_DB: keycloak
+      KEYCLOAK_DB_SCHEMA: keycloak
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_INTERNAL_HOST_URL: http://keycloak:8080
+      KEYCLOAK_ADMIN_SA_CLIENT_SECRET: 5HuMNB6gwHd0fY2L
+      # Superset client is always configured for now
+      SUPERSET_CLIENT_ENABLED: false
+      SUPERSET_CLIENT_UUID: 891b980a-9edb-4c72-a63d-1f8e488d6ad4
+      SUPERSET_CLIENT_SECRET: znZK8dvk7hLOpwfU
+      # EIP client OAuth credentials, consumed by the SSO overrides of the
+      # eip-* integration services
+      OAUTH_CLIENT_ID: eip
+      OAUTH_CLIENT_SECRET: h9PQzv6zWnVl1yxnhdfZulnW7FPqPlci
+      OAUTH_CLIENT_SCOPE: openid
+      OAUTH_ACCESS_TOKEN_URL: http://keycloak:8080/realms/ozone/protocol/openid-connect/token
+
+# One block per integration, named after the model entry. These hold the
 # values the integration services own (mostly their mgt-database
 # credentials), not the values of the apps they integrate.
 integrations:
@@ -179,8 +202,8 @@ integrations:
       EIP_SYNC_TASK_DELAY: 300000
       EIP_ODOO_OPENELIS_URL: http://eip-odoo-openelis:8080
 
-# One block per switchable mode.
-modes:
+# One block per addon, named after the model entry.
+addons:
   proxy:
     configs:
       # Maximum body size for file uploads through the nginx proxy
@@ -195,28 +218,8 @@ modes:
       # or at deployment time fails the compose command loudly.
       LOKI_URL: ''
 
-  sso:
-    configs:
-      KEYCLOAK_DB_USER: keycloak
-      KEYCLOAK_DB_PASSWORD: keycloak
-      KEYCLOAK_DB: keycloak
-      KEYCLOAK_DB_SCHEMA: keycloak
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: password
-      KEYCLOAK_INTERNAL_HOST_URL: http://keycloak:8080
-      KEYCLOAK_ADMIN_SA_CLIENT_SECRET: 5HuMNB6gwHd0fY2L
-      # Superset client is always configured for now
-      SUPERSET_CLIENT_ENABLED: false
-      SUPERSET_CLIENT_UUID: 891b980a-9edb-4c72-a63d-1f8e488d6ad4
-      SUPERSET_CLIENT_SECRET: znZK8dvk7hLOpwfU
-    sso:
-      # EIP client OAuth credentials, consumed by the SSO overrides of the
-      # eip-* integration services
-      OAUTH_CLIENT_ID: eip
-      OAUTH_CLIENT_SECRET: h9PQzv6zWnVl1yxnhdfZulnW7FPqPlci
-      OAUTH_CLIENT_SCOPE: openid
-      OAUTH_ACCESS_TOKEN_URL: http://keycloak:8080/realms/ozone/protocol/openid-connect/token
-
+# One block per operation, named after the model entry.
+operations:
   backup:
     configs:
       RESTIC_KEEP_DAILY: 7
@@ -230,7 +233,7 @@ modes:
       # The snapshot to restore from
       RESTIC_RESTORE_SNAPSHOT: latest
 
-# The restic repository shared by the backup and restore modes. These values
+# The restic repository shared by the backup and restore operations. These values
 # are declared exactly once here and are always part of the generated .env,
 # so both contexts can never see different repository credentials.
 restic:

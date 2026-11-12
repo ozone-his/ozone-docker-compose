@@ -1,16 +1,16 @@
 # ---------------------------------------------------------------------------
 # Model: Everything that can run, and the rules of combination
 #
-# A service runs because its compose file is on the -f chain that ozonectl
-# assembles from this model and the distro's selection.yml. There are no
-# profiles for whole modules: inclusion is the selection mechanism.
+# A service runs because its compose file is on the -f chain that the Ozone
+# CLI assembles from this model and the distro's ozone.yml selection. There
+# are no profiles for whole modules: inclusion is the selection mechanism.
 #
 # Profiles are used ONLY inside additive fragments that rewire other
 # services' definitions (the restore gates in support/restore.yml and
 # sso/restore.yml); the manifest activates them when their condition holds.
 #
 # Relative bind-mount paths in every compose file resolve against the
-# compose project directory (compose/), which ozonectl pins with
+# compose project directory (compose/), which the Ozone CLI pins with
 # --project-directory. Resource files live in
 # compose/<module-dir>/resources/<owner>/.
 # ---------------------------------------------------------------------------
@@ -23,7 +23,7 @@ base:
 # Database servers. A server's compose file joins the chain when any
 # selected app, integration or mode declares the matching engine in its
 # `db:` attribute.
-database-services:
+databases:
   mysql: other/mysql.yml
   postgresql: other/postgresql.yml
   redis: other/redis.yml
@@ -33,11 +33,11 @@ database-services:
 #   sso:              appended as -f when the app is selected and sso is enabled
 #   restore-profiles: activated when restore is enabled and the app is selected
 #   db-init:          database init dirs (data/<engine>/<dir>) for this app
-#   db:               database services the app requires (see database-services)
+#   db:               database services the app requires (see databases)
 #   url:              the service's public URL, a template over declared vars;
-#                    printed by ozonectl for the selected apps
+#                    printed by Ozone CLI for the selected apps
 #   credentials:      var names of the app's default login, printed by
-#                    ozonectl for the selected apps
+#                    Ozone CLI for the selected apps
 apps:
   openmrs:
     compose: [apps/openmrs.yml]
@@ -84,6 +84,15 @@ apps:
   orthanc:
     compose: [apps/orthanc.yml]
     url: ${SERVER_SCHEME}://${ORTHANC_HOSTNAME}
+  keycloak:
+    compose: [sso/keycloak.yml]
+    db-init: [keycloak]
+    db: postgresql
+    restore-compose: [sso/restore.yml]
+    restore-profiles: [keycloak-restore]
+    # Url and credentials are set here to be used by Ozone CLI output message.
+    url: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
+    credentials: [KEYCLOAK_USER, KEYCLOAK_PASSWORD]
 
 # App pairs that cannot be selected together; the manifest rejects a
 # selection containing an incompatible pair.
@@ -169,7 +178,7 @@ deployment:
 #   compose:          on the chain when the integration activates
 #   sso:              appended as -f when the integration activates and sso is enabled
 #   db-init:          database init dirs activated with the integration
-#   db:               database services the integration requires (see database-services)
+#   db:               database services the integration requires (see databases)
 integrations:
   eip-erpnext-openmrs:
     requires: [openmrs, erpnext]
@@ -211,14 +220,13 @@ integrations:
     db-init: [eip-odoo-openmrs]
     db: mysql
 
-# Modes: switchable at assembly time.
-#   compose:          on the chain when the mode is enabled
-#   sso:              appended as -f when the mode is enabled and sso is enabled
-#   db-init:          database init dirs activated with the mode
-#   db:               database services the mode requires (see database-services)
-#   restore-compose:  (sso) appended as -f when restore is also enabled
-#   restore-profiles: (sso) activated when restore is also enabled
-modes:
+# Addons: optional stack extras, toggled in the distro's selection.
+#   compose:          on the chain when the addon is enabled
+#   sso:              appended as -f when the addon is enabled and SSO (the keycloak app) is selected
+#   db-init:          database init dirs activated with the addon
+#   db:               database services the addon requires (see databases)
+#   sso-users:        (demo-data) Keycloak users file, printed by the Ozone CLI when SSO is selected
+addons:
   # Ozone's default reverse proxy (nginx). Disabled when an external proxy
   # (e.g. Traefik) manages the `web` network instead.
   proxy:
@@ -232,29 +240,29 @@ modes:
   logging-agent:
     compose: [support/logging-agent.yml]
 
-  sso:
-    compose: [sso/keycloak.yml]
-    db-init: [keycloak]
-    db: postgresql
-    restore-compose: [sso/restore.yml]
-    restore-profiles: [keycloak-restore]
-    url: ${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
-    credentials: [KEYCLOAK_USER, KEYCLOAK_PASSWORD]
-
-  backup:
-    compose: [support/backup.yml]
-
   # Demo data seeding: OpenMRS demo patients, keycloak demo users via the
-  # sso override. Enabled by any distro in its selection.yml (e.g. the
-  # ozone-demo distro), or ad hoc on a running stack.
+  # sso override. Enabled by any distro in its selection (e.g. the
+  # ozone-demo distro).
   demo-data:
     compose: [support/demo-data.yml]
     sso: [sso/demo-data.yml]
     # The Keycloak users provisioned by the demo-data service, printed by
-    # ozonectl when SSO is also enabled
+    # Ozone CLI when the keycloak app is also selected
     sso-users: ${KEYCLOAK_CONFIG_PATH}/demo/users.json
 
+# Operations: run by dedicated Ozone CLI commands (backup, restore), not
+# toggled in the selection.
+#   compose:          the operation's compose files
+#   sso:              appended as -f when SSO (the keycloak app) is selected
+#   db:               database services the operation requires (see databases)
+operations:
+  # Scheduled backups: a long-running service, started on a live stack with
+  # the 'backup' command.
+  backup:
+    compose: [support/backup.yml]
+
+  # One-off restore: run it BEFORE 'up' (the 'restore' command).
+  # backup is included with restore: support/restore.yml wires the backup
+  # service to wait for the restore service to complete.
   restore:
-    # backup is included with restore: support/restore.yml wires the backup
-    # service to wait for the restore service to complete.
     compose: [support/restore.yml, support/backup.yml]
