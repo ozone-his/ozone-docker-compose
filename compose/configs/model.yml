@@ -49,7 +49,7 @@ apps:
     credentials: [OPENMRS_USER, OPENMRS_PASSWORD]
   bahmniemr:
     compose: [apps/bahmniemr.yml]
-    db-init: [eip-bahmni]
+    db-init: [openmrs, eip-bahmni]
     db: mysql
     url: ${SERVER_SCHEME}://${BAHMNI_EMR_HOSTNAME}/bahmni
     credentials: [OPENMRS_USER, OPENMRS_PASSWORD]
@@ -202,6 +202,14 @@ integrations:
     compose:
       - integrations/bahmniemr-senaite-override.yml
       - integrations/eip-openmrs-senaite.yml
+    db-init: [eip-openmrs-senaite]
+    db: mysql
+  bahmniemr-odoo:
+    requires: [bahmniemr, odoo]
+    compose: [integrations/eip-odoo-openmrs.yml]
+    sso: [sso/eip-odoo-openmrs.yml]
+    db-init: [eip-odoo-openmrs]
+    db: mysql
 
 # Modes: switchable at assembly time.
 #   compose:          on the chain when the mode is enabled

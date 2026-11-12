@@ -43,6 +43,9 @@ apps:
 
   bahmniemr:
     configs:
+      # OpenMRS backend as seen from the Bahmni EMR services
+      OPENMRS_HOST: openmrs
+      OPENMRS_PORT: 8080
       # Mail Config Properties Environment Variables
       MAIL_FROM:
       MAIL_SMTP_HOST:
@@ -80,6 +83,9 @@ apps:
 
   odoo:
     configs:
+      # Odoo service as seen from the other services (via env-substitution)
+      ODOO_HOST: http://odoo
+      ODOO_PORT: 8069
       ODOO_DB_USER: odoo
       ODOO_DB_PASSWORD: password
       ODOO_USER: admin

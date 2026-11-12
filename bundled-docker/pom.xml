@@ -24,8 +24,38 @@
         <true>true</true>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.ozonehis</groupId>
+            <artifactId>compose</artifactId>
+            <type>zip</type>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
+            <!-- Unpack the compose project artifact: the bundled images'
+                 resources are owned by the compose modules -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>Unpack the compose project</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <excludeTransitive>true</excludeTransitive>
+                            <outputDirectory>${project.build.directory}/compose</outputDirectory>
+                            <includeArtifactIds>compose</includeArtifactIds>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- Package as a Zip file -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -53,6 +83,29 @@
                 <version>3.2.0</version>
                 <executions>
                     <execution>
+                        <!-- Copy the app resources owned by the compose project
+                             into the paths the Dockerfiles COPY from -->
+                        <id>Copy compose resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${project.build.directory}/${project.artifactId}-${project.version}/openmrs
+                            </outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/compose/apps/resources/openmrs</directory>
+                                    <includes>
+                                        <include>tomcat/server.xml</include>
+                                        <include>log4j2.xml</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>Copy local resources</id>
                         <phase>generate-resources</phase>
                         <goals>
@@ -77,14 +130,8 @@
                                         <include>keycloak/**</include>
                                         <include>grafana-agent/**</include>
                                         <include>scripts/**</include>
-                                    </includes>
-                                </resource>
-                                <resource>
-                                    <directory>../</directory>
-                                    <includes>
                                         <include>docker-compose-bundled.yml.template</include>
                                         <include>docker-compose-bundled-sso.yml.template</include>
-                                        <include>openmrs/**</include>
                                     </includes>
                                 </resource>
                             </resources>

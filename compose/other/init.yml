@@ -12,10 +12,11 @@ services:
     restart: on-failure
     volumes:
        - "${DISTRO_PATH}:/opt/env-substitution/files"
-    # All substitution env is declared here in one place: the compose model is
-    # included unconditionally (see compose.yml), so per-app fragments of this
-    # service would conflict. Values come from the generated .env; entries for
-    # apps that are not deployed are inert.
+    # Only the always-present entries are declared here: fragments across
+    # the -f chain merge this service's environment per key, so app- and
+    # mode-specific entries live in their owner's fragment (e.g. the SSO
+    # client credentials in sso/*.yml). Values come from the generated
+    # .env; entries for apps that are not deployed are inert.
     environment:
       # OpenMRS
       - OPENMRS_PUBLIC_URL=${SERVER_SCHEME}://${O3_HOSTNAME}
@@ -41,13 +42,6 @@ services:
       - KEYCLOAK_URL=${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
       - KEYCLOAK_INTERNAL_HOST_URL=${KEYCLOAK_INTERNAL_HOST_URL}
       - KEYCLOAK_ADMIN_SA_CLIENT_SECRET=${KEYCLOAK_ADMIN_SA_CLIENT_SECRET}
-      - EIP_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
-      - OPENMRS_CLIENT_UUID=${OPENMRS_CLIENT_UUID}
-      - OPENMRS_CLIENT_SECRET=${OPENMRS_CLIENT_SECRET}
-      - ODOO_CLIENT_UUID=${ODOO_CLIENT_UUID}
-      - ODOO_CLIENT_SECRET=${ODOO_CLIENT_SECRET}
-      - SENAITE_CLIENT_UUID=${SENAITE_CLIENT_UUID}
-      - SENAITE_CLIENT_SECRET=${SENAITE_CLIENT_SECRET}
       - SUPERSET_PUBLIC_URL=${SERVER_SCHEME}://${SUPERSET_HOSTNAME}
       - SUPERSET_CLIENT_UUID=${SUPERSET_CLIENT_UUID}
       - SUPERSET_CLIENT_SECRET=${SUPERSET_CLIENT_SECRET}

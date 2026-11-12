@@ -2,3 +2,8 @@ services:
   odoo:
     environment:
       - ADDONS=${ODOO_ADDONS},auth_oidc,auth_oauth_autologin,sso_user_roles
+
+  env-substitution:
+    environment:
+      - ODOO_CLIENT_UUID=${ODOO_CLIENT_UUID}
+      - ODOO_CLIENT_SECRET=${ODOO_CLIENT_SECRET}

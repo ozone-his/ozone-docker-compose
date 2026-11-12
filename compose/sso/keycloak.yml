@@ -48,5 +48,9 @@ services:
       traefik.http.routers.keycloak.entrypoints: "websecure"
       traefik.http.services.keycloak.loadbalancer.server.port: 8080
 
+  env-substitution:
+    environment:
+      - EIP_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+
 volumes:
   keycloak-realm: ~

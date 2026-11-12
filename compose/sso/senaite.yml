@@ -7,3 +7,8 @@ services:
       - OAUTH_CONFIG_FILE=/data/oidc/client.json
     volumes:
       - ${SENAITE_OIDC_CONFIG_PATH}/:/data/oidc
+
+  env-substitution:
+    environment:
+      - SENAITE_CLIENT_UUID=${SENAITE_CLIENT_UUID}
+      - SENAITE_CLIENT_SECRET=${SENAITE_CLIENT_SECRET}
