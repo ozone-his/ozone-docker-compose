@@ -19,7 +19,7 @@
 
 apps:
   openmrs:
-    configs:
+    common:
       # OpenMRS backend
       OMRS_JAVA_SERVER_OPTS: ''
       OMRS_JAVA_MEMORY_OPTS: ''
@@ -40,9 +40,10 @@ apps:
     sso:
       OPENMRS_CLIENT_UUID: 14b6083d-2d3c-4fb1-a75d-0f5af17be198
       OPENMRS_CLIENT_SECRET: AYmNV4AEHA0Tlxwa
+    secrets: [OPENMRS_DB_USER, OPENMRS_DB_PASSWORD, OPENMRS_USER, OPENMRS_PASSWORD, OPENMRS_CLIENT_UUID, OPENMRS_CLIENT_SECRET]
 
   bahmniemr:
-    configs:
+    common:
       # OpenMRS backend as seen from the Bahmni EMR services
       OPENMRS_HOST: openmrs
       OPENMRS_PORT: 8080
@@ -71,7 +72,7 @@ apps:
       EIP_TEST_ORDER_TYPE_UUID:
 
   senaite:
-    configs:
+    common:
       SITE: senaite
       SENAITE_ADMIN_USER: admin
       SENAITE_ADMIN_PASSWORD: password
@@ -84,7 +85,7 @@ apps:
       SENAITE_CLIENT_SECRET: Vdi1xIgJiUcrF4dx
 
   odoo:
-    configs:
+    common:
       # Odoo service as seen from the other services (via env-substitution)
       ODOO_HOST: http://odoo
       ODOO_PORT: 8069
@@ -104,13 +105,13 @@ apps:
       ODOO_CLIENT_SECRET: z3epa8rE66tUIZz6
 
   erpnext:
-    configs:
+    common:
       ERPNEXT_USER: administrator
       ERPNEXT_PASSWORD: password
       ERPNEXT_DB_NAME: erpnext
 
   openelis:
-    configs:
+    common:
       # OpenELIS Global
       OPENELIS_DB_SCHEMA: clinlims
       OPENELIS_DB_NAME: clinlims
@@ -138,7 +139,7 @@ apps:
   orthanc: {}
 
   keycloak:
-    configs:
+    common:
       KEYCLOAK_DB_USER: keycloak
       KEYCLOAK_DB_PASSWORD: keycloak
       KEYCLOAK_DB: keycloak
@@ -163,7 +164,7 @@ apps:
 # credentials), not the values of the apps they integrate.
 integrations:
   eip-odoo-openmrs:
-    configs:
+    common:
       EIP_DB_NAME_ODOO: openmrs_eip_mgt_odoo
       EIP_DB_USER_ODOO: openmrs_eip_mgt_odoo
       EIP_DB_PASSWORD_ODOO: password
@@ -176,25 +177,25 @@ integrations:
       ODOO_CUSTOMER_WEIGHT_FIELD:
 
   eip-openmrs-senaite:
-    configs:
+    common:
       EIP_DB_NAME_SENAITE: openmrs_eip_mgt_senaite
       EIP_DB_USER_SENAITE: openmrs_eip_mgt_senaite
       EIP_DB_PASSWORD_SENAITE: password
 
   eip-erpnext-openmrs:
-    configs:
+    common:
       EIP_DB_NAME_ERPNEXT: openmrs_eip_mgt_erpnext
       EIP_DB_USER_ERPNEXT: openmrs_eip_mgt_erpnext
       EIP_DB_PASSWORD_ERPNEXT: password
 
   eip-openmrs-orthanc:
-    configs:
+    common:
       EIP_DB_NAME_ORTHANC: openmrs_eip_mgt_orthanc
       EIP_DB_USER_ORTHANC: openmrs_eip_mgt_orthanc
       EIP_DB_PASSWORD_ORTHANC: password
 
   eip-odoo-openelis:
-    configs:
+    common:
       EIP_ODOO_OPENELIS_LOG_LEVEL:
       EIP_ODOO_OPENELIS_DATA_DIR:
       EIP_SYNC_TASK_TS_OVERLAP: 45000
@@ -205,14 +206,14 @@ integrations:
 # One block per addon, named after the model entry.
 addons:
   proxy:
-    configs:
+    common:
       # Maximum body size for file uploads through the nginx proxy
       PROXY_CLIENT_MAX_BODY_SIZE: 10m
       # Extra frame-ancestors origins allowed by the proxy's CSP header
       FRAME_ANCESTORS: ''
 
   logging-agent:
-    configs:
+    common:
       # Where the agent pushes the collected logs (the logging server,
       # deployed separately). Enabling logging-agent without a value here
       # or at deployment time fails the compose command loudly.
@@ -221,7 +222,7 @@ addons:
 # One block per operation, named after the model entry.
 operations:
   backup:
-    configs:
+    common:
       RESTIC_KEEP_DAILY: 7
       RESTIC_KEEP_WEEKLY: 4
       RESTIC_KEEP_MONTHLY: 12
@@ -229,7 +230,7 @@ operations:
       CRON_SCHEDULE: '*/5 * * * *'
 
   restore:
-    configs:
+    common:
       # The snapshot to restore from
       RESTIC_RESTORE_SNAPSHOT: latest
 
@@ -237,7 +238,7 @@ operations:
 # are declared exactly once here and are always part of the generated .env,
 # so both contexts can never see different repository credentials.
 restic:
-  configs:
+  common:
     RESTIC_REPOSITORY: /restic_data
     RESTIC_PASSWORD: password
     LOG_LEVEL: info
@@ -249,16 +250,16 @@ restic:
 # The database servers.
 databases:
   mysql:
-    configs:
+    common:
       MYSQL_ROOT_PASSWORD: 3cY8Kve4lGey
       MYSQL_MAX_CONNECTIONS: 500
 
   postgresql:
-    configs:
+    common:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB_HOST: postgresql
 
   redis:
-    configs:
+    common:
       REDIS_PASSWORD: password

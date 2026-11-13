@@ -106,7 +106,7 @@ incompatibilities:
 # known at build or distro time and are provided through the generated .env
 # (edit a line) or the shell environment at deployment time.
 #   hostnames   hostname templates of the services behind the reverse proxy
-#   configs     additional vars that may need to be set at deployment time
+#   common      additional vars that may need to be set at deployment time
 #   datadirs    host-path overrides for filestore volumes (empty = default)
 deployment:
   services:
