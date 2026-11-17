@@ -108,6 +108,10 @@ incompatibilities:
 #   hostnames   hostname templates of the services behind the reverse proxy
 #   common      additional vars that may need to be set at deployment time
 #   datadirs    host-path overrides for filestore volumes (empty = default)
+# The whole deployment section is always merged into the generated .env:
+# it declares deployment knobs (mostly hostname templates), and base compose
+# files consume some of them (e.g. other/init.yml uses O3_HOSTNAME) whatever
+# the selection. Only the vars.yml owner blocks are selection-filtered.
 deployment:
   services:
     openmrs:

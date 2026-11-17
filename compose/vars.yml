@@ -15,6 +15,17 @@
 #     compose files; structural constants of an image belong in the
 #     environment section of its compose file.
 #   - The `sso:` sections are only merged when SSO is enabled.
+#   - Blocks under `apps:` / `integrations:` / `addons:` are merged into the
+#     generated .env only when their owner runs: a selected app, an activated
+#     integration, or an enabled addon. Every other section (databases,
+#     operations, restic, ...) and any section-level common/paths is
+#     infrastructure and always merged.
+#   - A block may declare `vars-from:` (a list of section-qualified block
+#     names, e.g. [apps.openmrs, integrations.eip-openmrs-senaite]): when the
+#     block is merged, the listed blocks are merged too, transitively. Use it
+#     when an owner's compose files consume another owner's vars without that
+#     owner running (e.g. bahmniemr consumes openmrs's vars). Edges may be
+#     declared at any distro level; an unknown target or a cycle is an error.
 # ---------------------------------------------------------------------------
 
 apps:
@@ -40,9 +51,13 @@ apps:
     sso:
       OPENMRS_CLIENT_UUID: 14b6083d-2d3c-4fb1-a75d-0f5af17be198
       OPENMRS_CLIENT_SECRET: AYmNV4AEHA0Tlxwa
-    secrets: [OPENMRS_DB_USER, OPENMRS_DB_PASSWORD, OPENMRS_USER, OPENMRS_PASSWORD, OPENMRS_CLIENT_UUID, OPENMRS_CLIENT_SECRET]
+
 
   bahmniemr:
+    # bahmniemr runs OpenMRS in the background and its compose file consumes
+    # the openmrs and odoo vars blocks (OPENMRS_DB_*, ODOO_DB_*): merge them
+    # when bahmniemr is selected, even though openmrs and odoo are not.
+    vars-from: [apps.openmrs, apps.odoo]
     common:
       # OpenMRS backend as seen from the Bahmni EMR services
       OPENMRS_HOST: openmrs
@@ -68,9 +83,9 @@ apps:
       EIP_DB_NAME_BAHMNI: openmrs_eip_mgt_bahmni
       EIP_DB_USER_BAHMNI: openmrs_eip_mgt_bahmni
       EIP_DB_PASSWORD_BAHMNI: password
+      OMRS_DB_EXTRA_ARGS: "&zeroDateTimeBehavior=convertToNull"
       # Test order type consumed by the EIP flows
       EIP_TEST_ORDER_TYPE_UUID:
-    secrets: [EIP_DB_USER_BAHMNI, EIP_DB_PASSWORD_BAHMNI, REPORTS_DB_USERNAME, REPORTS_DB_PASSWORD, MAIL_USER, MAIL_PASSWORD]
 
   senaite:
     common:
@@ -84,7 +99,7 @@ apps:
     sso:
       SENAITE_CLIENT_UUID: 3b8672bf-b239-46e5-b0b6-8ba71a4bf5ac
       SENAITE_CLIENT_SECRET: Vdi1xIgJiUcrF4dx
-    secrets: [SENAITE_DB_USER, SENAITE_DB_PASSWORD, SENAITE_ADMIN_USER, SENAITE_ADMIN_PASSWORD, SENAITE_CLIENT_UUID, SENAITE_CLIENT_SECRET]
+
 
   odoo:
     common:
@@ -105,14 +120,14 @@ apps:
     sso:
       ODOO_CLIENT_UUID: 70a0e2fd-2bb2-4417-9fc6-22cdca1bb5be
       ODOO_CLIENT_SECRET: z3epa8rE66tUIZz6
-    secrets: [ODOO_DB_USER, ODOO_DB_PASSWORD, ODOO_USER, ODOO_PASSWORD, ODOO_CLIENT_UUID, ODOO_CLIENT_SECRET]
+
 
   erpnext:
     common:
       ERPNEXT_USER: administrator
       ERPNEXT_PASSWORD: password
       ERPNEXT_DB_NAME: erpnext
-    secrets: [ERPNEXT_USER, ERPNEXT_PASSWORD]
+
 
   openelis:
     common:
@@ -139,7 +154,7 @@ apps:
       # OpenELIS FHIR server address, consumed by the eip-odoo-openelis
       # integration services
       EIP_OPENELIS_FHIR_URL: http://fhir.openelis.org:8080
-    secrets: [OPENELIS_DB_USER, OPENELIS_DB_PASSWORD, OPENELIS_DEFAULT_PASSWORD, OPENELIS_DB_ADMIN_PASSWORD, OPENELIS_FHIR_SERVER_USERNAME, OPENELIS_FHIR_SERVER_PASSWORD, SSL_KEYSTORE_PASSWORD, SSL_TRUSTSTORE_PASSWORD]
+
 
   orthanc: {}
 
@@ -163,7 +178,7 @@ apps:
       OAUTH_CLIENT_SECRET: h9PQzv6zWnVl1yxnhdfZulnW7FPqPlci
       OAUTH_CLIENT_SCOPE: openid
       OAUTH_ACCESS_TOKEN_URL: http://keycloak:8080/realms/ozone/protocol/openid-connect/token
-    secrets: [KEYCLOAK_DB_USER, KEYCLOAK_DB_PASSWORD, KEYCLOAK_USER, KEYCLOAK_PASSWORD, SUPERSET_CLIENT_UUID, SUPERSET_CLIENT_SECRET, KEYCLOAK_ADMIN_SA_CLIENT_SECRET, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET]
+
 
 # One block per integration, named after the model entry. These hold the
 # values the integration services own (mostly their mgt-database
@@ -181,28 +196,28 @@ integrations:
       ODOO_CUSTOMER_EXTERNAL_ID: comment
       ODOO_CUSTOMER_DOB_FIELD:
       ODOO_CUSTOMER_WEIGHT_FIELD:
-    secrets: [EIP_DB_USER_ODOO, EIP_DB_PASSWORD_ODOO]
+
 
   eip-openmrs-senaite:
     common:
       EIP_DB_NAME_SENAITE: openmrs_eip_mgt_senaite
       EIP_DB_USER_SENAITE: openmrs_eip_mgt_senaite
       EIP_DB_PASSWORD_SENAITE: password
-    secrets: [EIP_DB_USER_SENAITE, EIP_DB_PASSWORD_SENAITE]
+
 
   eip-erpnext-openmrs:
     common:
       EIP_DB_NAME_ERPNEXT: openmrs_eip_mgt_erpnext
       EIP_DB_USER_ERPNEXT: openmrs_eip_mgt_erpnext
       EIP_DB_PASSWORD_ERPNEXT: password
-    secrets: [EIP_DB_USER_ERPNEXT, EIP_DB_PASSWORD_ERPNEXT]
+
 
   eip-openmrs-orthanc:
     common:
       EIP_DB_NAME_ORTHANC: openmrs_eip_mgt_orthanc
       EIP_DB_USER_ORTHANC: openmrs_eip_mgt_orthanc
       EIP_DB_PASSWORD_ORTHANC: password
-    secrets: [EIP_DB_USER_ORTHANC, EIP_DB_PASSWORD_ORTHANC]
+
 
   eip-odoo-openelis:
     common:
@@ -212,6 +227,14 @@ integrations:
       EIP_SYNC_TASK_INITIAL_DELAY: 60000
       EIP_SYNC_TASK_DELAY: 300000
       EIP_ODOO_OPENELIS_URL: http://eip-odoo-openelis:8080
+
+  # These integrations reuse another integration's compose file without
+  # activating it (its `requires` apps are not all selected), so they also
+  # need that integration's vars block merged.
+  bahmniemr-senaite:
+    vars-from: [integrations.eip-openmrs-senaite]
+  bahmniemr-odoo:
+    vars-from: [integrations.eip-odoo-openmrs]
 
 # One block per addon, named after the model entry.
 addons:
@@ -256,7 +279,7 @@ restic:
     AWS_DEFAULT_REGION: eu-west-1
     AWS_ACCESS_KEY_ID:
     AWS_SECRET_ACCESS_KEY:
-  secrets: [RESTIC_PASSWORD, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY]
+
 
 # The database servers.
 databases:
@@ -264,16 +287,16 @@ databases:
     common:
       MYSQL_ROOT_PASSWORD: 3cY8Kve4lGey
       MYSQL_MAX_CONNECTIONS: 500
-    secrets: [MYSQL_ROOT_PASSWORD]
+
 
   postgresql:
     common:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB_HOST: postgresql
-    secrets: [POSTGRES_USER,POSTGRES_PASSWORD]
+
 
   redis:
     common:
       REDIS_PASSWORD: password
-    secrets: [REDIS_PASSWORD]
+

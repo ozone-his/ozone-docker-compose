@@ -65,7 +65,7 @@ services:
       OMRS_C3P0_MAX_SIZE: ${OMRS_C3P0_MAX_SIZE:-50}
       WEIGHT_CONCEPT_UUID: ${WEIGHT_CONCEPT_UUID}
       HEIGHT_CONCEPT_UUID: ${HEIGHT_CONCEPT_UUID}
-      OMRS_DB_EXTRA_ARGS: "&zeroDateTimeBehavior: convertToNull"
+      OMRS_DB_EXTRA_ARGS: ${OMRS_DB_EXTRA_ARGS}
       LUCENE_MATCH_TYPE: "START"
       DOCUMENT_MAX_SIZE_MB: ${DOCUMENT_MAX_SIZE_MB}
     volumes:
@@ -292,7 +292,6 @@ services:
   ipd:
 
     image: bahmni/microfrontend-ipd:1.0.0
-    container_name: ipd
     restart: unless-stopped
     # volumes:
     #   - "${IPD_PATH:?}/dist/federation/:/usr/local/apache2/htdocs/ipd"
