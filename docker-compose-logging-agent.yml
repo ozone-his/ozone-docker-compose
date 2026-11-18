@@ -1,6 +1,6 @@
 services:
   grafana-agent:
-    image: grafana/agent:latest
+    image: grafana/agent:v0.44.8
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/log:/var/log:ro
