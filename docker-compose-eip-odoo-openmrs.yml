@@ -40,7 +40,7 @@ services:
       - EIP_ODOO_FHIR_PASSWORD=${ODOO_PASSWORD}
       - EIP_PRODUCT_SYNC_INITIAL_DELAY=${EIP_PRODUCT_SYNC_INITIAL_DELAY}
       - EIP_PRODUCT_SYNC_DELAY=${EIP_PRODUCT_SYNC_DELAY}
-    image: mekomsolutions/eip-client:2.4.0
+    image: mekomsolutions/eip-client
     networks:
       ozone:
         aliases:
