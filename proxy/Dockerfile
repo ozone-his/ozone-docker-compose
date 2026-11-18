@@ -1,4 +1,6 @@
-FROM nginx:1.25-alpine
+FROM nginx:1.28-alpine
+
+RUN apk upgrade --no-cache brotli-libs
 
 ENV FRAME_ANCESTORS ""
 

@@ -81,14 +81,14 @@ services:
       - "./openelis/tomcat/hapi_server.xml:/opt/bitnami/tomcat/conf/server.xml"
 
   oe-proxy:
-    image: nginx:1.15-alpine
+    build:
+      context: ./proxy/openelis
     ports:
       - "${OE_PROXY_PUBLIC_PORT:-80}:80"
       - "${OE_PROXY_SSL_PUBLIC_PORT:-443}:443"
     volumes:
       - certs-vol:/etc/nginx/certs/
       - keys-vol:/etc/nginx/keys/
-      - ./proxy/openelis/nginx.conf:/etc/nginx/nginx.conf:ro
     restart: unless-stopped
     networks:
       - web
