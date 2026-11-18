@@ -32,6 +32,14 @@ services:
       - ${SENAITE_CONFIG_PATH}:/data/importdata/senaite
       - ${SENAITE_BLOBSTORAGE_PATH:-senaite-blobstorage}:/home/senaite/senaitelims/blobstorage
 
+  # PostgreSQL init credentials for the SENAITE database (apps.senaite
+  # vars), consumed by the init scripts in data/postgresql/senaite.
+  postgresql:
+    environment:
+      SENAITE_DB_NAME: ${SENAITE_DB_NAME}
+      SENAITE_DB_USER: ${SENAITE_DB_USER}
+      SENAITE_DB_PASSWORD: ${SENAITE_DB_PASSWORD}
+
  
 volumes:
   eip-home-senaite: ~

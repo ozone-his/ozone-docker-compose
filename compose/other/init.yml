@@ -15,36 +15,28 @@ services:
     # Only the always-present entries are declared here: fragments across
     # the -f chain merge this service's environment per key, so app- and
     # mode-specific entries live in their owner's fragment (e.g. the SSO
-    # client credentials in sso/*.yml). Values come from the generated
-    # .env; entries for apps that are not deployed are inert.
+    # client credentials in sso/*.yml, the Odoo FHIR API credentials in
+    # apps/odoo.yml, the OpenELIS entries in apps/openelis.yml, the Keycloak
+    # and Superset entries in sso/keycloak.yml). Values come from the
+    # generated .env; entries for apps that are not deployed are not
+    # declared at all, so the service never sees blank values for them.
     environment:
       # OpenMRS
       - OPENMRS_PUBLIC_URL=${SERVER_SCHEME}://${O3_HOSTNAME}
       # Odoo
       - ODOO_PUBLIC_URL=${SERVER_SCHEME}://${ODOO_HOSTNAME}
       - EXTERNAL_FHIR_API_URL=http://fhir-odoo:8080/odoo/fhir/R4
-      - EXTERNAL_FHIR_API_USERNAME=${ODOO_USER}
-      - EXTERNAL_FHIR_API_PASSWORD=${ODOO_PASSWORD}
       # Senaite
       - SENAITE_PUBLIC_URL=${SERVER_SCHEME}://${SENAITE_HOSTNAME}
       # OpenELIS
       - OPENELIS_FHIR_SERVER_PUBLIC_URL=${SERVER_SCHEME}://${FHIR_OPENELIS_HOSTNAME}/fhir/
-      - OPENELIS_FHIR_SERVER_USERNAME=${OPENELIS_FHIR_SERVER_USERNAME}
-      - OPENELIS_FHIR_SERVER_PASSWORD=${OPENELIS_FHIR_SERVER_PASSWORD}
       - ENABLE_SSO=${ENABLE_SSO}
       - OPENELIS_CLIENT_ID=${OPENELIS_CLIENT_ID:-openelis}
       - KEYCLOAK_PUBLIC_URL=${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
-      - OEG_FACILITY_ID=${OEG_FACILITY_ID}
-      - OPENELIS_FHIR_STORE_URL=${OPENELIS_FHIR_STORE_URL}
       # Orthanc
       - ORTHANC_PUBLIC_URL=${SERVER_SCHEME}://${ORTHANC_HOSTNAME}
       # Keycloak realm templating
       - KEYCLOAK_URL=${SERVER_SCHEME}://${KEYCLOAK_HOSTNAME}
-      - KEYCLOAK_INTERNAL_HOST_URL=${KEYCLOAK_INTERNAL_HOST_URL}
-      - KEYCLOAK_ADMIN_SA_CLIENT_SECRET=${KEYCLOAK_ADMIN_SA_CLIENT_SECRET}
       - SUPERSET_PUBLIC_URL=${SERVER_SCHEME}://${SUPERSET_HOSTNAME}
-      - SUPERSET_CLIENT_UUID=${SUPERSET_CLIENT_UUID}
-      - SUPERSET_CLIENT_SECRET=${SUPERSET_CLIENT_SECRET}
-      - SUPERSET_CLIENT_ENABLED=${SUPERSET_CLIENT_ENABLED}
       - OPENELIS_PUBLIC_URL=${SERVER_SCHEME}://${OPENELIS_HOSTNAME}
       - OPENELIS_HOSTNAME=${OPENELIS_HOSTNAME}

@@ -118,6 +118,24 @@ services:
     tty: true
     restart: unless-stopped
 
+  # PostgreSQL init credentials for the OpenELIS databases (apps.openelis
+  # vars), consumed by the init scripts in data/postgresql/openelis*.
+  postgresql:
+    environment:
+      OPENELIS_DB_NAME: ${OPENELIS_DB_NAME}
+      OPENELIS_DB_SCHEMA: ${OPENELIS_DB_SCHEMA}
+      OPENELIS_DB_USER: ${OPENELIS_DB_USER}
+      OPENELIS_DB_PASSWORD: ${OPENELIS_DB_PASSWORD}
+      OPENELIS_DB_ADMIN_PASSWORD: ${OPENELIS_DB_ADMIN_PASSWORD}
+
+  # env-substitution entries that need apps.openelis vars.
+  env-substitution:
+    environment:
+      - OPENELIS_FHIR_SERVER_USERNAME=${OPENELIS_FHIR_SERVER_USERNAME}
+      - OPENELIS_FHIR_SERVER_PASSWORD=${OPENELIS_FHIR_SERVER_PASSWORD}
+      - OEG_FACILITY_ID=${OEG_FACILITY_ID}
+      - OPENELIS_FHIR_STORE_URL=${OPENELIS_FHIR_STORE_URL}
+
 secrets:
   common.properties:
     file: "${OPENELIS_CONFIG_PATH}/properties/common.properties"

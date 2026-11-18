@@ -305,6 +305,18 @@ services:
       ozone:
       web:
 
+  # MySQL init credentials consumed by the init scripts in data/mysql for
+  # the OpenMRS database (pulled via vars-from apps.openmrs) and the EIP
+  # Bahmni database (apps.bahmniemr vars).
+  mysql:
+    environment:
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
+      OPENMRS_DB_USER: ${OPENMRS_DB_USER}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
+      EIP_DB_NAME_BAHMNI: ${EIP_DB_NAME_BAHMNI}
+      EIP_DB_USER_BAHMNI: ${EIP_DB_USER_BAHMNI}
+      EIP_DB_PASSWORD_BAHMNI: ${EIP_DB_PASSWORD_BAHMNI}
+
 volumes:
   eip-home-bahmni:
   openmrs-data:

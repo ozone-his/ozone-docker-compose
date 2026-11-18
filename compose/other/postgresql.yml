@@ -9,23 +9,12 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       DB_INIT_LIST: ${DB_INIT_LIST:-}
-      # Database credentials consumed by the init scripts in data/postgresql/*.
-      # All values are provided by the generated .env.
-      ODOO_DB_NAME: ${ODOO_DATABASE}
-      ODOO_DB_USER: ${ODOO_DB_USER}
-      ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD}
-      SENAITE_DB_NAME: ${SENAITE_DB_NAME}
-      SENAITE_DB_USER: ${SENAITE_DB_USER}
-      SENAITE_DB_PASSWORD: ${SENAITE_DB_PASSWORD}
-      OPENELIS_DB_NAME: ${OPENELIS_DB_NAME}
-      OPENELIS_DB_SCHEMA: ${OPENELIS_DB_SCHEMA}
-      OPENELIS_DB_USER: ${OPENELIS_DB_USER}
-      OPENELIS_DB_PASSWORD: ${OPENELIS_DB_PASSWORD}
-      OPENELIS_DB_ADMIN_PASSWORD: ${OPENELIS_DB_ADMIN_PASSWORD}
-      KEYCLOAK_DB: ${KEYCLOAK_DB}
-      KEYCLOAK_DB_SCHEMA: ${KEYCLOAK_DB_SCHEMA}
-      KEYCLOAK_DB_USER: ${KEYCLOAK_DB_USER}
-      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      # Per-app database credentials consumed by the init scripts in
+      # data/postgresql/* are NOT declared here: each owner's fragment
+      # (e.g. apps/odoo.yml, apps/senaite.yml, apps/openelis.yml,
+      # sso/keycloak.yml) re-declares this service and merges `environment`
+      # per key, so they are set exactly when their owner is on the -f
+      # chain - which is when the generated .env carries their values.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s

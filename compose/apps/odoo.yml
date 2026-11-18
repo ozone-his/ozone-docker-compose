@@ -90,6 +90,20 @@ services:
           - odoo-fhir-facade
     restart: unless-stopped
 
+  # PostgreSQL init credentials for the Odoo database (apps.odoo vars),
+  # consumed by the init scripts in data/postgresql/odoo.
+  postgresql:
+    environment:
+      ODOO_DB_NAME: ${ODOO_DATABASE}
+      ODOO_DB_USER: ${ODOO_DB_USER}
+      ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD}
+
+  # env-substitution entries that need apps.odoo vars.
+  env-substitution:
+    environment:
+      - EXTERNAL_FHIR_API_USERNAME=${ODOO_USER}
+      - EXTERNAL_FHIR_API_PASSWORD=${ODOO_PASSWORD}
+
 volumes:
   odoo-checksums: ~
   odoo-config: ~

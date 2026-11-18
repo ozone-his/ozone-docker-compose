@@ -18,26 +18,12 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       DB_INIT_LIST: ${DB_INIT_LIST:-}
-      # Database credentials consumed by the init scripts in data/mysql/*.
-      # All values are provided by the generated .env.
-      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
-      OPENMRS_DB_USER: ${OPENMRS_DB_USER}
-      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
-      EIP_DB_NAME_BAHMNI: ${EIP_DB_NAME_BAHMNI}
-      EIP_DB_USER_BAHMNI: ${EIP_DB_USER_BAHMNI}
-      EIP_DB_PASSWORD_BAHMNI: ${EIP_DB_PASSWORD_BAHMNI}
-      EIP_DB_NAME_ODOO: ${EIP_DB_NAME_ODOO}
-      EIP_DB_USER_ODOO: ${EIP_DB_USER_ODOO}
-      EIP_DB_PASSWORD_ODOO: ${EIP_DB_PASSWORD_ODOO}
-      EIP_DB_NAME_SENAITE: ${EIP_DB_NAME_SENAITE}
-      EIP_DB_USER_SENAITE: ${EIP_DB_USER_SENAITE}
-      EIP_DB_PASSWORD_SENAITE: ${EIP_DB_PASSWORD_SENAITE}
-      EIP_DB_NAME_ERPNEXT: ${EIP_DB_NAME_ERPNEXT}
-      EIP_DB_USER_ERPNEXT: ${EIP_DB_USER_ERPNEXT}
-      EIP_DB_PASSWORD_ERPNEXT: ${EIP_DB_PASSWORD_ERPNEXT}
-      EIP_DB_NAME_ORTHANC: ${EIP_DB_NAME_ORTHANC}
-      EIP_DB_USER_ORTHANC: ${EIP_DB_USER_ORTHANC}
-      EIP_DB_PASSWORD_ORTHANC: ${EIP_DB_PASSWORD_ORTHANC}
+      # Per-app database credentials consumed by the init scripts in
+      # data/mysql/* are NOT declared here: each owner's fragment (e.g.
+      # apps/openmrs.yml, apps/bahmniemr.yml, integrations/eip-*.yml)
+      # re-declares this service and merges `environment` per key, so they
+      # are set exactly when their owner is on the -f chain - which is when
+      # the generated .env carries their values.
     healthcheck:
       test: ["CMD-SHELL", "mariadb-admin ping --protocol=tcp -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" || exit 1"]
       interval: 5s

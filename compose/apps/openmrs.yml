@@ -94,6 +94,14 @@ services:
       - "${OPENMRS_FRONTEND_BINARY_PATH}:/usr/share/nginx/html"
       - "${OPENMRS_FRONTEND_CONFIG_PATH}:/usr/share/nginx/html/configs"
 
+  # MySQL init credentials for the OpenMRS database (apps.openmrs vars),
+  # consumed by the init scripts in data/mysql/openmrs.
+  mysql:
+    environment:
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
+      OPENMRS_DB_USER: ${OPENMRS_DB_USER}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
+
 volumes:  
   openmrs-core: ~
   openmrs-config: ~

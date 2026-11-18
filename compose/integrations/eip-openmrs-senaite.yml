@@ -47,3 +47,9 @@ services:
     volumes:
       - "${EIP_OPENMRS_SENAITE_ROUTES_PATH}:/eip-client/routes"
       - eip-home-senaite:/eip-home
+
+  mysql:
+    environment:
+      EIP_DB_NAME_SENAITE: ${EIP_DB_NAME_SENAITE}
+      EIP_DB_USER_SENAITE: ${EIP_DB_USER_SENAITE}
+      EIP_DB_PASSWORD_SENAITE: ${EIP_DB_PASSWORD_SENAITE}

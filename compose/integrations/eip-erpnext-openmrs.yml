@@ -43,5 +43,11 @@ services:
       - "${EIP_ERPNEXT_OPENMRS_ROUTES_PATH}:/eip-client/routes"
       - eip-home-erpnext:/eip-home
 
+  mysql:
+    environment:
+      EIP_DB_NAME_ERPNEXT: ${EIP_DB_NAME_ERPNEXT}
+      EIP_DB_USER_ERPNEXT: ${EIP_DB_USER_ERPNEXT}
+      EIP_DB_PASSWORD_ERPNEXT: ${EIP_DB_PASSWORD_ERPNEXT}
+
 volumes:
   eip-home-erpnext: ~

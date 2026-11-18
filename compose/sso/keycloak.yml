@@ -51,6 +51,20 @@ services:
   env-substitution:
     environment:
       - EIP_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+      - KEYCLOAK_INTERNAL_HOST_URL=${KEYCLOAK_INTERNAL_HOST_URL}
+      - KEYCLOAK_ADMIN_SA_CLIENT_SECRET=${KEYCLOAK_ADMIN_SA_CLIENT_SECRET}
+      - SUPERSET_CLIENT_UUID=${SUPERSET_CLIENT_UUID}
+      - SUPERSET_CLIENT_SECRET=${SUPERSET_CLIENT_SECRET}
+      - SUPERSET_CLIENT_ENABLED=${SUPERSET_CLIENT_ENABLED}
+
+  # PostgreSQL init credentials for the Keycloak database (apps.keycloak
+  # vars), consumed by the init scripts in data/postgresql/keycloak.
+  postgresql:
+    environment:
+      KEYCLOAK_DB: ${KEYCLOAK_DB}
+      KEYCLOAK_DB_SCHEMA: ${KEYCLOAK_DB_SCHEMA}
+      KEYCLOAK_DB_USER: ${KEYCLOAK_DB_USER}
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
 
 volumes:
   keycloak-realm: ~

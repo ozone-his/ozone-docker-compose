@@ -43,5 +43,14 @@ services:
       - "${EIP_OPENMRS_ORTHANC_ROUTES_PATH}:/eip-client/routes"
       - eip-home-orthanc:/eip-home
 
+  # MySQL init credentials for the EIP Orthanc database
+  # (integrations.eip-openmrs-orthanc vars), consumed by the init scripts in
+  # data/mysql/eip-openmrs-orthanc.
+  mysql:
+    environment:
+      EIP_DB_NAME_ORTHANC: ${EIP_DB_NAME_ORTHANC}
+      EIP_DB_USER_ORTHANC: ${EIP_DB_USER_ORTHANC}
+      EIP_DB_PASSWORD_ORTHANC: ${EIP_DB_PASSWORD_ORTHANC}
+
 volumes:
   eip-home-orthanc: ~

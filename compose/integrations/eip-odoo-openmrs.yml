@@ -59,5 +59,14 @@ services:
       - "${EIP_ODOO_OPENMRS_ROUTES_PATH}:/eip-client/routes"
       - eip-home-odoo:/eip-home
 
+  # MySQL init credentials for the EIP Odoo database
+  # (integrations.eip-odoo-openmrs vars), consumed by the init scripts in
+  # data/mysql/eip-odoo-openmrs.
+  mysql:
+    environment:
+      EIP_DB_NAME_ODOO: ${EIP_DB_NAME_ODOO}
+      EIP_DB_USER_ODOO: ${EIP_DB_USER_ODOO}
+      EIP_DB_PASSWORD_ODOO: ${EIP_DB_PASSWORD_ODOO}
+
 volumes:
   eip-home-odoo: ~
