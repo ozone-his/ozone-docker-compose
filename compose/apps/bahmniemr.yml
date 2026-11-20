@@ -103,7 +103,7 @@ services:
           - bahmni-openmrs
       web:
 
-  # Bahmni EIP routes
+  # Bahmni EIP routes (create Test order from Order when applicable)
   eip-bahmni:
 
     depends_on:
@@ -115,7 +115,8 @@ services:
         condition: service_started
     environment:
       - EIP_PROFILE=prod
-      - EIP_DB_NAME_BAHMNI=${EIP_DB_NAME_BAHMNI}      - EIP_DB_USER_BAHMNI=${EIP_DB_USER_BAHMNI}
+      - EIP_DB_NAME_BAHMNI=${EIP_DB_NAME_BAHMNI}
+      - EIP_DB_USER_BAHMNI=${EIP_DB_USER_BAHMNI}
       - EIP_DB_PASSWORD_BAHMNI=${EIP_DB_PASSWORD_BAHMNI}
       - MYSQL_ADMIN_USER=root
       - MYSQL_ADMIN_USER_PASSWORD=${MYSQL_ROOT_PASSWORD}
