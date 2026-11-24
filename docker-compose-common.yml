@@ -57,7 +57,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    image: postgres:13
+    image: postgres:16
     networks:
       - ozone
     ports:
