@@ -17,7 +17,7 @@ services:
     image: itechuw/openelis-global-2:3.2.1.6
     platform: linux/amd64
     depends_on:
-      - postgresql
+      - openelis-postgresql
       - certs
       - env-substitution
     restart: always
@@ -49,7 +49,7 @@ services:
     image: itechuw/openelis-global-2-fhir:3.2.1.6
     platform: linux/amd64
     depends_on:
-      - postgresql
+      - openelis-postgresql
       - certs
     ports:
       - "${OPENELIS_FHIR_PORT:-9095}:8080"
@@ -124,15 +124,33 @@ services:
       - OEG_FACILITY_ID=${OEG_FACILITY_ID}
       - OPENELIS_FHIR_STORE_URL=${OPENELIS_FHIR_STORE_URL}
 
-  postgresql:
+  # Dedicated Postgres 13 for OpenELIS (shared postgresql is 16+ for Keycloak).
+  # OpenELIS still uses an unquoted system_user table that clashes with PG14+ SYSTEM_USER.
+  openelis-postgresql:
+    image: postgres:13
+    restart: unless-stopped
     environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       OPENELIS_DB_NAME: ${OPENELIS_DB_NAME}
       OPENELIS_DB_SCHEMA: ${OPENELIS_DB_SCHEMA}
       OPENELIS_DB_USER: ${OPENELIS_DB_USER}
       OPENELIS_DB_PASSWORD: ${OPENELIS_DB_PASSWORD}
       OPENELIS_DB_ADMIN_PASSWORD: ${OPENELIS_DB_ADMIN_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ozone
     volumes:
+      - "${OPENELIS_POSTGRES_DATADIR:-openelis-postgresql-data}:/var/lib/postgresql/data"
+      - "${SQL_SCRIPTS_PATH}/postgresql/create_db.sh:/docker-entrypoint-initdb.d/create_db.sh"
       - "${SQL_SCRIPTS_PATH}/postgresql/openelis:/docker-entrypoint-initdb.d/db/openelis"
+    labels:
+      restic-compose-backup.postgres: true
 
 secrets:
   common.properties:
@@ -140,6 +158,7 @@ secrets:
 
 volumes:
   db-data: ~
+  openelis-postgresql-data: ~
   key_trust-store-volume: ~
   certs-vol: ~
   keys-vol: ~
