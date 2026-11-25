@@ -54,7 +54,8 @@ if [[ $INSTALLED_DOCKER_VERSION =~ $MINIMUM_REQUIRED_DOCKER_VERSION_REGEX ]]; th
             export USE_HTTPS="true"
              setGitpodHostnames
         else
-            export GITPOD_ENV="false"
+            # Keep a GITPOD_ENV=true set by the user, e.g. when Ozone runs behind a TLS-terminating reverse proxy
+            export GITPOD_ENV="${GITPOD_ENV:-false}"
         fi
 
     # Export the scheme
